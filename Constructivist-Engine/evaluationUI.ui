@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string/>
+  </property>
+  <property name="styleSheet">
+   <string>
+QWidget{
+ background-color:#EAF8FF;
+ font-family: Nunito;
+}
+
+/* MCQ options */
+QPushButton{
+ background-color:#FFD166;
+ border-radius:30px;
+ font-size:26px;
+ padding:15px;
+ border:5px solid #FF9F1C;
+}
+
+/* Hover highlight */
+QPushButton:hover{
+ background-color:#FFADAD;
+ border:5px solid #FF006E;
+}
+
+/* Click feedback */
+QPushButton:pressed{
+ background-color:#FF8FAB;
+ border:5px solid #FF006E;
+}
+
+/* Volume slider */
+QSlider{
+ height:30px;
+}
+
+/* Volume icon */
+QLabel{
+ font-size:26px;
+ color:#444;
+}
+   </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>25</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="robot_face">
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="imageGrid">
+      <property name="spacing">
+       <number>30</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="mcq_image01">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="mcq_image02">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="mcq_image03">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="mcq_image04">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="controlLayout">
+      <item>
+       <widget class="QSlider" name="volume">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>70</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="skip_button">
+        <property name="text">
+         <string>▶</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="break_button">
+        <property name="text">
+         <string>☕</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
