@@ -1,0 +1,68 @@
+{
+    "task_id": "t_1",
+    "task_name": "Left Right Identification",
+    "description": "A task to help students understand the concept of left and right.",
+    "speech_start": "Welcome to the Left Right Identification task.",
+    "speech_end": "Let's get started!",
+
+    "engage": {
+        "task_title": "Engage with Left and Right",
+        "speech_start": "Hello children. Today we are going to learn about left and right.",
+        "speech_end": "Can you remember which side is your left hand?",
+        "description": "Connect with prior knowledge. show video if needed. not compulsory.",
+        "video_url": "localpath/tasks/t1/engage_video.mp4"
+    },
+    "explore": {
+        "task_title": "Let's Explore Left and Right",
+        "speech_start": "Let's explore something together.",
+        "video_url": "localpath/tasks/t1/explore_video.mp4",
+        "description": "If needed only show the video, its not compulsory, Students observe objects and identify directions.",
+        "activity_description": "Students raise their left hand and right hand and show to the teacher. (Kinestatic activity with teacher guidance)",
+        "speech_end": "Great. Now let's learn more together."
+    },
+    "explain": {
+        "speech_start": "Left means this side of your body and right means the other side.",
+        "speech_end": "Now you know what left and right means.",
+        "task_title": "Understanding Left and Right",
+        "video_url": "localpath/tasks/t1/explain_video.mp4",
+        "description": "Robot explains the concept using examples."
+    },
+    "elaborate": {
+        "speech_start": "Now let's try a task.",
+        "speech_end": "Good job.",
+        "task_title": "Choose the correct direction",
+        "task_description": "Which image shows the left hand?",
+        "multiple_choices_word": {
+            "op1": "Left Hand",
+            "op2": "Right Hand",
+            "op3": "Both Hands",
+            "op4": "No Hands"
+        },
+        "multiple_choices_images": {
+            "op1": "tasks/t1/option1.png",
+            "op2": "tasks/t1/option2.png",
+            "op3": "tasks/t1/option3.png",
+            "op4": "tasks/t1/option4.png"
+        },
+        "correct_option": "op1"
+    },
+    "evaluate": {
+        "speech_start": "Let's try another task.",
+        "speech_end": "Well done.",
+        "task_title": "Identify direction",
+        "task_description": "Which arrow points right?",
+        "multiple_choices_word": {
+            "op1": "Left Arrow",
+            "op2": "Right Arrow",
+            "op3": "Up Arrow",
+            "op4": "Down Arrow"
+        },
+        "multiple_choices_images": {
+            "op1": "tasks/t1/arrow_left.png",
+            "op2": "tasks/t1/arrow_right.png",
+            "op3": "tasks/t1/arrow_up.png",
+            "op4": "tasks/t1/arrow_down.png"
+        },
+        "correct_option": "op2"
+    }
+}
