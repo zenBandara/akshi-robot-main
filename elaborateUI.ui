@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+<class>ElaborateUI</class>
+
+<widget class="QWidget" name="ElaborateUI">
+
+ <property name="styleSheet">
+  <string>
+QWidget{
+ background-color:#FFF7E8;
+ font-family: Nunito;
+}
+
+QPushButton{
+ background-color:#FFB6C1;
+ border-radius:30px;
+ font-size:26px;
+ padding:15px;
+}
+  </string>
+ </property>
+
+ <layout class="QVBoxLayout">
+
+  <item>
+   <widget class="QLabel" name="task_title">
+    <property name="text">
+     <string>Choose the Correct Answer</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </item>
+
+  <item>
+   <layout class="QGridLayout">
+
+    <item row="0" column="0">
+     <widget class="QPushButton" name="option1"/>
+    </item>
+
+    <item row="0" column="1">
+     <widget class="QPushButton" name="option2"/>
+    </item>
+
+    <item row="1" column="0">
+     <widget class="QPushButton" name="option3"/>
+    </item>
+
+    <item row="1" column="1">
+     <widget class="QPushButton" name="option4"/>
+    </item>
+
+   </layout>
+  </item>
+
+ </layout>
+
+</widget>
+</ui>

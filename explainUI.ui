@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+<class>ExplainUI</class>
+
+<widget class="QWidget" name="ExplainUI">
+
+ <property name="styleSheet">
+  <string>
+QWidget{
+ background-color:#FFF7E8;
+ font-family: Nunito;
+}
+
+QPushButton{
+ background-color:#FFB6C1;
+ border-radius:30px;
+ font-size:26px;
+ padding:15px;
+}
+  </string>
+ </property>
+
+ <layout class="QVBoxLayout">
+
+  <item>
+   <widget class="QLabel" name="task_title">
+    <property name="text">
+     <string>Explanation</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </item>
+
+  <item>
+   <widget class="QLabel" name="description">
+    <property name="text">
+     <string>This is the explanation text.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </item>
+
+  <item>
+   <widget class="QPushButton" name="next_button">
+    <property name="text">
+     <string>Next ▶</string>
+    </property>
+   </widget>
+  </item>
+
+ </layout>
+
+</widget>
+</ui>

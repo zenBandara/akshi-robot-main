@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+<class>EngageUI</class>
+
+<widget class="QWidget" name="EngageUI">
+
+ <property name="styleSheet">
+  <string>
+QWidget{
+ background-color:#FFF7E8;
+ font-family: Nunito;
+}
+
+QPushButton{
+ background-color:#FFB6C1;
+ border-radius:30px;
+ font-size:26px;
+ padding:15px;
+}
+
+QPushButton:hover{
+ background-color:#FFD1DC;
+}
+  </string>
+ </property>
+
+ <layout class="QVBoxLayout">
+
+  <item>
+   <widget class="QLabel" name="robot_face">
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </item>
+
+  <item>
+   <widget class="QLabel" name="task_title">
+    <property name="text">
+     <string>Let's Learn Together</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </item>
+
+  <item>
+   <widget class="QPushButton" name="start_button">
+    <property name="text">
+     <string>Start ▶</string>
+    </property>
+   </widget>
+  </item>
+
+ </layout>
+
+</widget>
+</ui>
