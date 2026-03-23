@@ -189,10 +189,21 @@ def on_show():
         anim.stop()
     active_animations.clear()
     
-    active_animations.append(apply_pulse_glow(window.card_1))
-    active_animations.append(apply_pulse_glow(window.card_2))
-    active_animations.append(apply_pulse_glow(window.card_3))
-    active_animations.append(apply_pulse_glow(window.card_4))
+    # Identify exactly which physical frame contains the correct payload
+    correct_physical_key = next((k for k, v in key_mapping.items() if v == correct_option_key), None)
+    
+    if level >= 3:
+        # Level 3 Physical Affordance: Aggressively Spotlight ONLY the correct answer
+        if correct_physical_key == "1":
+            active_animations.append(apply_pulse_glow(window.card_1))
+        elif correct_physical_key == "2":
+            active_animations.append(apply_pulse_glow(window.card_2))
+    else:
+        # Standard L1/L2 Layout: Pulse all available interactive objects evenly
+        if "1" in key_mapping: active_animations.append(apply_pulse_glow(window.card_1))
+        if "2" in key_mapping: active_animations.append(apply_pulse_glow(window.card_2))
+        if "3" in key_mapping: active_animations.append(apply_pulse_glow(window.card_3))
+        if "4" in key_mapping: active_animations.append(apply_pulse_glow(window.card_4))
 
     # 5. Robot Speech & Input Delay
     global input_enabled
