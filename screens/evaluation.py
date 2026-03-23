@@ -11,6 +11,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QPropertyAnimation, QEasingCurve, QParallelAnimationGroup, QTimer, Qt
 
+from core.keyboard_manager import keyboard_manager
+
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -228,22 +230,20 @@ def start_lesson(lesson_id):
 
     setup_timer()
 
-    # enable keyboard listener
-    window.keyPressEvent = handle_key_press
+    # enable keyboard listener via global manager
+    keyboard_manager.register_handler(handle_key_press)
 
 
 # ---------------- KEYBOARD INPUT ----------------
 
-def handle_key_press(event):
+def handle_key_press(mapped_action):
 
     global correct_option
 
-    key = event.text()
-
-    if key not in ["1", "2", "3", "4"]:
+    if mapped_action not in ["1", "2", "3", "4"]:
         return
 
-    selected = f"op{key}"
+    selected = f"op{mapped_action}"
 
     print("Selected option:", selected)
 

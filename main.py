@@ -59,6 +59,12 @@ stack.setCurrentIndex(0)
 
 main_window.setCentralWidget(stack)
 
+# Setup Global Keyboard Manager
+from core.keyboard_manager import keyboard_manager
+def global_key_press(event):
+    keyboard_manager.handle_key_press(event)
+    
+main_window.keyPressEvent = global_key_press
 
 # Load teachers from Firebase
 teachers = firebase.get_teachers()
