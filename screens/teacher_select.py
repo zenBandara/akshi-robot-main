@@ -75,12 +75,22 @@ def handle_key_press(mapped_action):
         window.teacher_list_label.setText(f"Loading students for {selected_teacher}...")
         
         import random
+        import core.task_loader as task_loader
+        
         # Fetch students and lesson config to state manager
         students = firebase.get_students(selected_teacher)
-        lesson = firebase.get_current_lesson(selected_teacher)
+        lesson_id = firebase.get_current_lesson(selected_teacher)
         
+        # Resolve physical JSON dictionary payload instead of raw string IDs
+        all_tasks = task_loader.get_loaded_tasks()
+        lesson_data = next((t for t in all_tasks if t.get("task_id") == lesson_id), None)
+        
+        if not lesson_data:
+            print(f"Warning: Lesson {lesson_id} not physically found on disk. Falling back to random structure.")
+            lesson_data = task_loader.pick_random_task()
+            
         state_manager.set_student_list(students)
-        state_manager.set_current_task(lesson)
+        state_manager.set_current_task(lesson_data)
         
         # Create a shuffled queue
         student_queue = students.copy()
