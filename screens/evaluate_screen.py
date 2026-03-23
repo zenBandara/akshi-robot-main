@@ -83,28 +83,47 @@ def on_show():
     if level >= 2:
         window.card_3.hide()
         window.card_4.hide()
-        img_size = 350
         
-        # Physical Affordance: Acoustic Bell & Layout Ambience
-        window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #1A237E; border: 15px solid #FFD600; border-radius: 10px; font-family: 'Nunito', sans-serif; }")
-        
-        bell_path = os.path.join(project_root, "assets", "sounds", "bell.wav")
-        if os.path.exists(bell_path):
-            try:
-                bell = pygame.mixer.Sound(bell_path)
-                bell.set_volume(0.4)
-                bell.play()
-            except Exception as e:
-                pass
+        if level == 2:
+            img_size = 350
+            # Physical Affordance: Layout Ambience L2
+            window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #1A237E; border: 15px solid #FFD600; border-radius: 10px; font-family: 'Nunito', sans-serif; }")
+            window.question_label.setStyleSheet("font-size: 34px; font-weight: bold; color: #00838F; background-color: white; border-radius: 20px; padding: 15px;")
+            for c in [window.card_1, window.card_2]:
+                c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #4DD0E1; }")
+            for t in [window.text_1, window.text_2]:
+                t.setStyleSheet("font-size: 24px; font-weight: bold; color: #00838F; border: none; background: transparent;")
+            for k in [window.key_1, window.key_2]:
+                k.setStyleSheet("font-size: 20px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 12px; padding: 5px; margin: 0px 40px;")
                 
-        bgm_path = os.path.join(project_root, "assets", "sounds", "arcade_bgm.wav")
-        if os.path.exists(bgm_path):
-            try:
-                arcade_bgm = pygame.mixer.Sound(bgm_path)
-                arcade_bgm.set_volume(0.15)
-                arcade_bgm.play(loops=-1)
-            except Exception as e:
-                pass
+            bell_path = os.path.join(project_root, "assets", "sounds", "bell.wav")
+            if os.path.exists(bell_path):
+                try:
+                    bell = pygame.mixer.Sound(bell_path)
+                    bell.set_volume(0.4)
+                    bell.play()
+                except Exception as e:
+                    pass
+                    
+            bgm_path = os.path.join(project_root, "assets", "sounds", "arcade_bgm.wav")
+            if os.path.exists(bgm_path):
+                try:
+                    arcade_bgm = pygame.mixer.Sound(bgm_path)
+                    arcade_bgm.set_volume(0.15)
+                    arcade_bgm.play(loops=-1)
+                except Exception as e:
+                    pass
+        else:
+            # Level 3: Maximum Accessible High-Contrast
+            img_size = 400
+            window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #000000; font-family: 'Nunito', sans-serif; border: none; }")
+            window.question_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #FFFF00; background-color: black; border-radius: 20px; padding: 15px; border: 2px solid #FFFF00;")
+            for c in [window.card_1, window.card_2]:
+                c.setStyleSheet("QFrame { background-color: #000000; border-radius: 25px; border: 6px solid #FFFF00; }")
+            for t in [window.text_1, window.text_2]:
+                t.setStyleSheet("font-size: 32px; font-weight: bold; color: #FFFF00; border: none; background: transparent;")
+            for k in [window.key_1, window.key_2]:
+                k.setStyleSheet("font-size: 26px; font-weight: bold; color: black; background-color: #FFFF00; border-radius: 12px; padding: 5px; margin: 0px 40px;")
         
         # Pick 1 correct and 1 random distractor
         distractors = [k for k in mc_words.keys() if k != correct_option_key]
@@ -118,8 +137,16 @@ def on_show():
             "2": chosen_keys[1]
         }
     else:
-        # Reset to base pastel cyan
+        # Reset to base pastel cyan natively
         window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #E0F7FA; font-family: 'Nunito', sans-serif; border: none; }")
+        window.question_label.setStyleSheet("font-size: 34px; font-weight: bold; color: #00838F; background-color: white; border-radius: 20px; padding: 15px;")
+        for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
+            c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #4DD0E1; }")
+        for t in [window.text_1, window.text_2, window.text_3, window.text_4]:
+            t.setStyleSheet("font-size: 24px; font-weight: bold; color: #00838F; border: none; background: transparent;")
+        for k in [window.key_1, window.key_2, window.key_3, window.key_4]:
+            k.setStyleSheet("font-size: 20px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 12px; padding: 5px; margin: 0px 40px;")
+            
         window.card_3.show()
         window.card_4.show()
         img_size = 220
