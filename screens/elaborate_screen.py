@@ -3,6 +3,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
+from core.keyboard_manager import keyboard_manager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -81,5 +82,40 @@ def on_show():
 def enable_input():
     global input_enabled
     input_enabled = True
+    keyboard_manager.register_handler(handle_key_press)
     print("[Elaborate Screen L1] Speech finished. Keyboard input enabled.")
-    # TODO Step 26: Bind keyboard handler
+
+def handle_key_press(action):
+    global input_enabled
+    if not input_enabled:
+        return
+        
+    if action not in ["1", "2", "3", "4"]:
+        return
+        
+    # Lock out further inputs immediately
+    input_enabled = False
+    print(f"[Elaborate Screen L1] Student pressed key {action}. Review complete!")
+    
+    # Highlight the chosen card visually (Deep Purple border / Light Purple BG)
+    card_map = {
+        "1": window.card_1,
+        "2": window.card_2,
+        "3": window.card_3,
+        "4": window.card_4
+    }
+    
+    selected_card = card_map.get(action)
+    if selected_card:
+        selected_card.setStyleSheet("QFrame { background-color: #E1BEE7; border-radius: 25px; border: 6px solid #8E24AA; }")
+        
+    print("[Elaborate Screen L1] Transitioning back to Evaluate L1...")
+    try:
+        from screens import evaluate_screen
+        parent_stack = window.parentWidget()
+        if parent_stack:
+            evaluate_ui = evaluate_screen.get_ui()
+            parent_stack.addWidget(evaluate_ui)
+            parent_stack.setCurrentWidget(evaluate_ui)
+    except ImportError:
+        print("Warning: Could not transition back to evaluate screen.")
