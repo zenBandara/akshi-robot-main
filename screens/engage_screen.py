@@ -57,15 +57,40 @@ def on_show():
     else:
         window.media_label.setText("🌟\n[No Visual Prompt Provided]")
         
-    # Placeholder for Step 48
-    window.robot_text_label.setText("🤖 Establishing warm emotional context...")
-
-# Placeholders for future steps
-def play_second_speech():
-    pass
+    # 3. Multi-Stage Warm Emotional Speech Loop
+    global input_enabled, engage_data
+    input_enabled = False
+    engage_data = task_data.get("engage", {})
     
+    speech_start = engage_data.get("speech_start", "Let's review this together!")
+    
+    window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
+    print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{speech_start}\"")
+    
+    # Extra slow, soothing computational cadence (1.8 words per second)
+    words_count = len(speech_start.split())
+    delay_ms = max(2500, int((words_count / 1.8) * 1000))
+    QTimer.singleShot(delay_ms, play_second_speech)
+
+def play_second_speech():
+    global engage_data
+    speech_end = engage_data.get("speech_end", "Press Enter when you're ready to try one more time!")
+    
+    if speech_end:
+        window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
+        print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{speech_end}\"")
+        words_count = len(speech_end.split())
+        delay_ms = max(2500, int((words_count / 1.8) * 1000))
+        QTimer.singleShot(delay_ms, enable_input)
+    else:
+        enable_input()
+
 def enable_input():
-    pass
+    global input_enabled
+    input_enabled = True
+    window.robot_text_label.setText("🤖 Waiting for you to feel ready...")
+    print("[Engage Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
+    # TODO Step 49: Bind keyboard handler
 
 def handle_key_press(action):
     pass
