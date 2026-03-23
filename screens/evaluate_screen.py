@@ -1,4 +1,8 @@
+import os
+import random
 from PySide6.QtGui import QPixmap
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile, Qt, QTimer
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.animations import apply_pulse_glow
@@ -12,6 +16,7 @@ window = None
 input_enabled = False
 active_animations = []
 evaluate_timer = None
+key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 
 def get_ui():
     global window
@@ -30,11 +35,13 @@ def get_ui():
     return window
 
 def on_show():
-    print("[Evaluate Screen L1] Becoming active...")
-    state_manager.set_current_screen("evaluate_L1")
+    global evaluate_timer, active_animations, input_enabled, key_mapping
+    level = state_manager.get_affordance_level()
+    
+    print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
+    state_manager.set_current_screen("evaluate")
     
     # 0. Clean Resets
-    global evaluate_timer, active_animations, input_enabled
     if evaluate_timer:
         evaluate_timer.stop()
     for anim in active_animations:
@@ -57,23 +64,56 @@ def on_show():
     # 3. Apply Option Cards
     mc_words = eval_data.get("multiple_choices_word", {})
     mc_images = eval_data.get("multiple_choices_images", {})
+    correct_option_key = eval_data.get("correct_option")
+    
+    img_size = 220
+    if level >= 2:
+        window.card_3.hide()
+        window.card_4.hide()
+        img_size = 350
+        
+        # Pick 1 correct and 1 random distractor
+        distractors = [k for k in mc_words.keys() if k != correct_option_key]
+        distractor_key = random.choice(distractors) if distractors else "op1"
+        
+        chosen_keys = [correct_option_key, distractor_key]
+        random.shuffle(chosen_keys)
+        
+        key_mapping = {
+            "1": chosen_keys[0],
+            "2": chosen_keys[1]
+        }
+    else:
+        window.card_3.show()
+        window.card_4.show()
+        img_size = 220
+        key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
     
     def setup_card(idx, text_widget, img_widget):
-        key = f"op{idx}"
+        physical_key = str(idx)
+        if physical_key not in key_mapping:
+            # Hide card if not part of the current key_mapping
+            text_widget.parentWidget().hide()
+            return
+            
+        text_widget.parentWidget().show() # Ensure it's visible if it's mapped
+        json_key = key_mapping[physical_key]
         
         # Ensure text is populated
-        text_widget.setText(mc_words.get(key, ""))
+        text_widget.setText(mc_words.get(json_key, ""))
         
         # Ensure image is dynamically pulled from disk (or fallback)
-        img_path = mc_images.get(key, "")
+        img_path = mc_images.get(json_key, "")
         if img_path:
             abs_img_path = os.path.join(project_root, img_path)
             if os.path.exists(abs_img_path):
                 pixmap = QPixmap(abs_img_path)
                 # Keep aspect ratio safely bounded inside the grid
-                img_widget.setPixmap(pixmap.scaled(220, 220, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                img_widget.setPixmap(pixmap.scaled(img_size, img_size, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             else:
                 img_widget.setText("\n\n[Image Missing]\n\n")
+        else:
+            img_widget.clear() # Clear any previous image if no new one
                 
     setup_card(1, window.text_1, window.img_1)
     setup_card(2, window.text_2, window.img_2)
@@ -135,16 +175,16 @@ def on_timer_expire():
     # TODO: Trigger failure path via flow controller (Step 25+)
         
 def handle_key_press(action):
-    global input_enabled, evaluate_timer
+    global input_enabled, evaluate_timer, key_mapping
     if not input_enabled:
         return
         
-    if action not in ["1", "2", "3", "4"]:
+    if action not in key_mapping:
         return
         
     # Lock out further inputs immediately
     input_enabled = False
-    print(f"[Evaluate Screen L1] Student pressed key {action}.")
+    print(f"[Evaluate Screen] Student pressed physical key {action}.")
     
     # Stop distracting animations gracefully
     global active_animations
@@ -167,13 +207,15 @@ def handle_key_press(action):
     task_data = state_manager.get_current_task()
     eval_data = task_data.get("evaluate", {}) if task_data else {}
     correct_option = eval_data.get("correct_option")
-    selected_option = f"op{action}"
+    
+    # Map physical key stroke natively back to JSON structure
+    selected_option = key_mapping[action]
     
     if evaluate_timer:
         evaluate_timer.stop()
     
     if selected_option == correct_option:
-        print("[Evaluate Screen L1] Answer VALIDATION: CORRECT! 🎉")
+        print(f"[Evaluate Screen] Answer VALIDATION: CORRECT! 🎉 (Level {state_manager.get_affordance_level()})")
         
         try:
             from screens import celebration_screen

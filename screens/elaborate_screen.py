@@ -109,7 +109,9 @@ def handle_key_press(action):
     if selected_card:
         selected_card.setStyleSheet("QFrame { background-color: #E1BEE7; border-radius: 25px; border: 6px solid #8E24AA; }")
         
-    print("[Elaborate Screen L1] Transitioning back to Evaluate L1...")
+    print("[Elaborate Screen L1] Transitioning back to Evaluate (Level 2)...")
+    state_manager.set_affordance_level(2)
+    
     try:
         from screens import evaluate_screen
         parent_stack = window.parentWidget()
