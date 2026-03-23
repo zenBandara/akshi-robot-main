@@ -67,11 +67,18 @@ def handle_key_press(mapped_action):
         
         window.teacher_list_label.setText(f"Loading students for {selected_teacher}...")
         
+        import random
         # Fetch students and save to state manager
         students = firebase.get_students(selected_teacher)
         state_manager.set_student_list(students)
-        print(f"Loaded {len(students)} students.")
         
-        print("Teacher selected. Transitioning to Student Calling Screen (Phase 2)...")
-        window.teacher_list_label.setText(f"Great! {selected_teacher} Selected!\n\n(Student Calling Screen will be built in Phase 2)")
-        # navigator.navigate_to("student_calling") # Uncomment in Phase 2
+        # Create a shuffled queue
+        student_queue = students.copy()
+        random.shuffle(student_queue)
+        state_manager.set_student_queue(student_queue)
+        
+        print("Teacher selected. Proceeding to select first student...")
+        window.teacher_list_label.setText(f"Great! {selected_teacher} Selected!\n\nPicking a student...")
+        
+        import core.session_logic as session_logic
+        session_logic.next_student()
