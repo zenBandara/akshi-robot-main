@@ -267,8 +267,9 @@ def on_timer_expire():
     if arcade_bgm:
         arcade_bgm.stop()
         
-    # Identical failure routing
-    if state_manager.get_affordance_level() == 1:
+    # Level-based Failure Routing
+    level = state_manager.get_affordance_level()
+    if level == 1:
         try:
             from screens import elaborate_screen
             parent_stack = window.parentWidget()
@@ -278,7 +279,7 @@ def on_timer_expire():
                 parent_stack.setCurrentWidget(elaborate_ui)
         except ImportError:
             pass
-    else:
+    elif level == 2:
         try:
             from screens import explain_screen
             parent_stack = window.parentWidget()
@@ -286,6 +287,17 @@ def on_timer_expire():
                 explain_ui = explain_screen.get_ui()
                 parent_stack.addWidget(explain_ui)
                 parent_stack.setCurrentWidget(explain_ui)
+        except ImportError:
+            pass
+    else:
+        # Level 3+ Incorrect -> Explore Screen
+        try:
+            from screens import explore_screen
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                explore_ui = explore_screen.get_ui()
+                parent_stack.addWidget(explore_ui)
+                parent_stack.setCurrentWidget(explore_ui)
         except ImportError:
             pass
         
@@ -426,7 +438,10 @@ def handle_key_press(action):
         print(f"[Evaluate Screen] Answer VALIDATION: CORRECT! 🎉 (Level {state_manager.get_affordance_level()})")
         
         # Track historical routing string
-        if state_manager.get_affordance_level() >= 2:
+        level = state_manager.get_affordance_level()
+        if level >= 3:
+            state_manager.current_path = ["evaluate_L1", "elaborate", "evaluate_L2", "explain", "evaluate_L3"]
+        elif level == 2:
             state_manager.current_path = ["evaluate_L1", "elaborate", "evaluate_L2"]
         else:
             state_manager.current_path = ["evaluate_L1"]
@@ -445,7 +460,8 @@ def handle_key_press(action):
         print(f"[Evaluate Screen] Answer VALIDATION: INCORRECT! ❌ (Selected: {selected_option}, Expected: {correct_option})")
         
         # Failure path via affordance metric
-        if state_manager.get_affordance_level() == 1:
+        level = state_manager.get_affordance_level()
+        if level == 1:
             try:
                 from screens import elaborate_screen
                 parent_stack = window.parentWidget()
@@ -455,7 +471,7 @@ def handle_key_press(action):
                     parent_stack.setCurrentWidget(elaborate_ui)
             except ImportError:
                 print("Warning: Could not transition to elaborate screen.")
-        else:
+        elif level == 2:
             try:
                 from screens import explain_screen
                 parent_stack = window.parentWidget()
@@ -465,3 +481,14 @@ def handle_key_press(action):
                     parent_stack.setCurrentWidget(explain_ui)
             except ImportError:
                 print("Warning: Could not transition to explain screen.")
+        else:
+            # Level 3 Incorrect -> Explore Screen
+            try:
+                from screens import explore_screen
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    explore_ui = explore_screen.get_ui()
+                    parent_stack.addWidget(explore_ui)
+                    parent_stack.setCurrentWidget(explore_ui)
+            except ImportError:
+                print("Warning: Could not transition to explore screen.")
