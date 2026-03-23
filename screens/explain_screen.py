@@ -3,6 +3,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
+from core.keyboard_manager import keyboard_manager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -90,6 +91,74 @@ def play_second_speech():
 def enable_input():
     global input_enabled
     input_enabled = True
+    keyboard_manager.register_handler(handle_key_press)
     window.robot_text_label.setText("🤖 Waiting for input...")
     print("[Explain Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
-    # TODO Step 35: Bind keyboard handler
+
+def handle_key_press(action):
+    global input_enabled
+    if not input_enabled:
+        return
+        
+    if action == "ENTER": # Hardware mapping for Return/Enter
+        input_enabled = False
+        print("[Explain Screen] Student pressed ENTER. Logging failure and advancing...")
+        
+        # 1. Log the Failure Interaction natively
+        task_data = state_manager.get_current_task()
+        task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
+        student_id = state_manager.get_current_student() or "unknown"
+        
+        log_data = {
+            "student_id": student_id,
+            "task_id": task_id,
+            "result": "incorrect",
+            "affordance_level_reached": state_manager.get_affordance_level(),
+            "path_taken": ["evaluate_L1", "elaborate", "evaluate_L2", "explain"]
+        }
+        
+        if not hasattr(state_manager, 'session_logs'):
+            state_manager.session_logs = []
+        state_manager.session_logs.append(log_data)
+        
+        try:
+            from core import firebase
+            firebase.log_event(log_data)
+        except ImportError:
+            pass
+            
+        print(f"[Explain Screen] LOGGED FAILURE: {log_data}")
+        
+        # 2. Rip next student & reset system globals
+        student_queue = state_manager.get_student_queue()
+        parent_stack = window.parentWidget()
+        
+        if student_queue:
+            next_stu = student_queue.pop(0)
+            state_manager.set_current_student(next_stu)
+            state_manager.set_student_queue(student_queue)
+            
+            # Wipe affordance state gracefully for the new human
+            if hasattr(state_manager, 'current_path'):
+                state_manager.current_path = []
+            state_manager.set_affordance_level(1)
+            
+            print(f"[Explain Screen] Advancing to next student: {next_stu}...")
+            try:
+                from screens import greeting_screen
+                if parent_stack:
+                    greeting_ui = greeting_screen.get_ui()
+                    parent_stack.addWidget(greeting_ui)
+                    parent_stack.setCurrentWidget(greeting_ui)
+            except ImportError:
+                print("Warning: Could not load greeting_screen.")
+        else:
+            print("[Explain Screen] Queue empty! Moving natively to Session Complete.")
+            try:
+                from screens import session_complete
+                if parent_stack:
+                    session_complete_ui = session_complete.get_ui()
+                    parent_stack.addWidget(session_complete_ui)
+                    parent_stack.setCurrentWidget(session_complete_ui)
+            except ImportError:
+                print("Warning: Could not load session_complete.")
