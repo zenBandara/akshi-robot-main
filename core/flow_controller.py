@@ -112,5 +112,69 @@ class FlowController:
         except ImportError as e:
             print(f"[FlowController] Critical Routing Error escalating out to {next_node}: {e}")
 
+    def on_skip(self, parent_widget):
+        """Handle an explicit student skip request natively."""
+        current_node = self.get_current_node()
+        
+        # 1. Store the exact point of the skip
+        if not hasattr(state_manager, 'current_path'):
+            state_manager.current_path = []
+        if current_node not in state_manager.current_path:
+            state_manager.current_path.append(current_node)
+            
+        print(f"[FlowController] Explicit Skip triggered natively at cascade node: {current_node}")
+        
+        # 2. Log Result (Skipped)
+        task_data = state_manager.get_current_task()
+        task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
+        student_id = state_manager.get_current_student() or "unknown"
+        
+        log_data = {
+            "student_id": student_id,
+            "task_id": task_id,
+            "result": "skipped",
+            "affordance_level_reached": getattr(state_manager, "affordance_level", 1),
+            "path_taken": state_manager.current_path
+        }
+        
+        if not hasattr(state_manager, 'session_logs'):
+            state_manager.session_logs = []
+        state_manager.session_logs.append(log_data)
+        
+        try:
+            from core import firebase
+            firebase.log_event(log_data)
+        except ImportError: pass
+            
+        print(f"[FlowController] LOGGED SKIP EVENT: {log_data}")
+        
+        # 3. Advance Queue Natively
+        student_queue = state_manager.get_student_queue()
+        
+        if student_queue:
+            next_stu = student_queue.pop(0)
+            state_manager.set_current_student(next_stu)
+            state_manager.set_student_queue(student_queue)
+            
+            # 4. Wipe affordance tracking state completely for the next child
+            self.reset_cascade()
+            state_manager.current_path = []
+            
+            try:
+                from screens import greeting_screen
+                if parent_widget:
+                    greeting_ui = greeting_screen.get_ui()
+                    parent_widget.addWidget(greeting_ui)
+                    parent_widget.setCurrentWidget(greeting_ui)
+            except ImportError: pass
+        else:
+            try:
+                from screens import session_complete
+                if parent_widget:
+                    session_complete_ui = session_complete.get_ui()
+                    parent_widget.addWidget(session_complete_ui)
+                    parent_widget.setCurrentWidget(session_complete_ui)
+            except ImportError: pass
+
 # Global singleton instance
 flow_controller = FlowController()
