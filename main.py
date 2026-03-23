@@ -6,6 +6,7 @@ from PySide6.QtCore import QObject, QEvent, Qt
 
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
+from components.robot_eyes import robot_eyes
 
 from screens import idle_screen
 from screens import greeting_screen
@@ -22,12 +23,18 @@ from screens import kinestatic
 app = QApplication(sys.argv)
 main_window = QMainWindow()
 main_window.setWindowTitle("Akshi Robot Interface")
-main_window.setMinimumSize(900, 600)
+main_window.setMinimumSize(900, 700)
 main_window.setFocusPolicy(Qt.StrongFocus) # Crucial for key events on empty windows!
 
 stack = QStackedWidget()
 stack.setFocusPolicy(Qt.StrongFocus)
 main_window.setCentralWidget(stack)
+
+# Deploy the global expressive robot face strictly bypassing the stack coordinates!
+robot_eyes.setParent(main_window)
+robot_eyes.move(680, 20) # absolute float coordinate at the top right
+robot_eyes.show()
+robot_eyes.raise_()
 
 # Bind the stack to the navigator
 navigator.set_stack(stack)

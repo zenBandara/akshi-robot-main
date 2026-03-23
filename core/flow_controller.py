@@ -1,5 +1,6 @@
 from core.state_manager import state_manager
 from core.transitions import switch_screen
+from components.robot_eyes import robot_eyes
 
 # Define the absolute deterministic sequence for a failing student
 CASCADE = [
@@ -43,6 +44,7 @@ class FlowController:
             state_manager.current_path.append(current_node)
             
         print(f"[FlowController] Success triggered at node: {current_node}")
+        robot_eyes.set_expression("surprised")
         
         # Reset cascade pointer safely for the next student
         self.reset_cascade()
@@ -68,6 +70,11 @@ class FlowController:
             state_manager.current_path.append(log_node)
             
         print(f"[FlowController] {'Timeout' if is_timeout else 'Incorrect Answer'} caught at: {log_node}")
+        
+        if is_timeout:
+            robot_eyes.set_expression("thinking")
+        else:
+            robot_eyes.set_expression("encouraging")
         
         # 2. Advance the pointer strictly by 1 scalar index unit
         self.cascade_index += 1
@@ -181,6 +188,7 @@ class FlowController:
     def on_break(self, parent_widget):
         """Safely pause the execution cascade natively without destroying state indexes."""
         print(f"[FlowController] Child requested break! Pausing cascade at node: {self.get_current_node()}")
+        robot_eyes.set_expression("sleeping")
         
         try:
             from screens import break_screen
@@ -192,6 +200,7 @@ class FlowController:
     def resume_cascade(self, parent_widget):
         """Restore exact execution state to the specific cascade pointer node logically mapped prior to Break condition."""
         current_node = self.get_current_node()
+        robot_eyes.set_expression("default")
         print(f"[FlowController] Break resolved. Resuming cascade execution identically at node: {current_node}")
         
         try:
