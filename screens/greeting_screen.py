@@ -1,6 +1,7 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QTimer
+from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QEasingCurve
+from PySide6.QtWidgets import QGraphicsOpacityEffect
 
 from core.state_manager import state_manager
 from core.voice_manager import VoiceManager
@@ -8,6 +9,10 @@ from core.navigator import navigator
 
 window = None
 voice_manager = VoiceManager()
+title_opacity = None
+subtitle_opacity = None
+anim_1 = None
+anim_2 = None
 
 def get_ui():
     global window
@@ -25,24 +30,49 @@ def get_ui():
     file.close()
 
     def on_show_hook():
-        print("[Greeting Screen] Becoming active...")
+        print("[Greeting Screen] Becoming active with Cinematic Typography...")
         state_manager.set_current_screen("greeting")
         
         from core.keyboard_manager import keyboard_manager
         keyboard_manager.unregister_handler() # Prevent W spamming
         
-        # Run animations & voice async after UI flips
+        # Sequester initial opacity to functionally invisible
+        global title_opacity, subtitle_opacity
+        title_opacity = QGraphicsOpacityEffect(window.title_label)
+        window.title_label.setGraphicsEffect(title_opacity)
+        title_opacity.setOpacity(0.0)
+        
+        subtitle_opacity = QGraphicsOpacityEffect(window.subtitle_label)
+        window.subtitle_label.setGraphicsEffect(subtitle_opacity)
+        subtitle_opacity.setOpacity(0.0)
+        
+        # Run animations & voice async after UI flips natively
         QTimer.singleShot(100, on_ready)
 
     window.on_show = on_show_hook
     return window
 
 def on_ready():
-    # Eyes open wide animation
-    window.eyes_label.setText("O  O")
+    global anim_1, anim_2
     
     greeting_message = "Hello there! I am Akshi! Ready to learn something fun today?"
     print(f"[Robot Speaks]: {greeting_message}")
+    
+    # 1. Animate massive Deep Blue Title
+    anim_1 = QPropertyAnimation(title_opacity, b"opacity")
+    anim_1.setDuration(1200)
+    anim_1.setStartValue(0.0)
+    anim_1.setEndValue(1.0)
+    anim_1.setEasingCurve(QEasingCurve.OutCubic)
+    anim_1.start()
+    
+    # 2. Animate secondary delayed Soft Subtitle 
+    anim_2 = QPropertyAnimation(subtitle_opacity, b"opacity")
+    anim_2.setDuration(1500)
+    anim_2.setStartValue(0.0)
+    anim_2.setEndValue(1.0)
+    anim_2.setEasingCurve(QEasingCurve.OutCubic)
+    QTimer.singleShot(800, anim_2.start) # Execute exactly synchronized visually trailing title
     
     # Speak the greeting
     try:

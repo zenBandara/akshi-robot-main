@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="styleSheet">
-   <string>QWidget { background-color: #2F3240; font-family: 'Nunito', sans-serif; color: white; }</string>
+   <string>QWidget { background-color: #FFFFFF; font-family: 'Nunito', sans-serif; }</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <item>
@@ -21,24 +21,20 @@
     <layout class="QVBoxLayout" name="centerLayout">
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <item>
-      <widget class="QLabel" name="robot_name">
-       <property name="text"><string>AKSHI</string></property>
-       <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="styleSheet"><string>font-size: 80px; font-weight: bold; letter-spacing: 10px; color: #FFF176;</string></property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="eyes_label">
-       <property name="text"><string>－  －</string></property>
-       <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="styleSheet"><string>font-size: 100px; font-weight: bold; color: #FFD166;</string></property>
+      <widget class="QWidget" name="web_container">
+       <property name="minimumSize">
+        <size>
+         <width>450</width>
+         <height>450</height>
+        </size>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="hint_label">
-       <property name="text"><string>Press W to wake me up! 🌟</string></property>
+       <property name="text"><string>Press W to wake me up!</string></property>
        <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="styleSheet"><string>font-size: 24px; color: #A0A5BD; margin-top: 50px;</string></property>
+       <property name="styleSheet"><string>font-size: 28px; font-weight: bold; color: #1976D2; margin-top: 20px;</string></property>
       </widget>
      </item>
     </layout>
