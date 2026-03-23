@@ -56,5 +56,61 @@ class FlowController:
         except ImportError:
             print("[FlowController] CRITICAL: Could not transit to Celebration Screen.")
 
+    def on_incorrect_answer(self, parent_widget):
+        """Handle an incorrect answer by deeply escalating the cognitive cascade."""
+        current_node = self.get_current_node()
+        
+        # 1. Store the exact point of numerical failure into the path array
+        if not hasattr(state_manager, 'current_path'):
+            state_manager.current_path = []
+        if current_node not in state_manager.current_path:
+            state_manager.current_path.append(current_node)
+            
+        print(f"[FlowController] Incorrect Answer caught at: {current_node}")
+        
+        # 2. Advance the pointer strictly by 1 scalar index unit
+        self.cascade_index += 1
+        next_node = self.get_current_node()
+        print(f"[FlowController] Escalating simulation natively to next cascade node: {next_node}")
+        
+        # 3. Modify global logical evaluation structural scaling natively
+        if next_node == "evaluate_L2":
+            state_manager.set_affordance_level(2)
+        elif next_node == "evaluate_L3":
+            state_manager.set_affordance_level(3)
+            
+        # Update logical 5e_stage directly into the unified tracker implicitly
+        state_manager.current_stage = next_node
+            
+        # 4. Synthesize visual routing
+        try:
+            target_ui = None
+            if next_node == "elaborate":
+                from screens import elaborate_screen
+                target_ui = elaborate_screen.get_ui()
+            elif next_node in ["evaluate_L1", "evaluate_L2", "evaluate_L3"]:
+                from screens import evaluate_screen
+                target_ui = evaluate_screen.get_ui()
+            elif next_node == "explain":
+                from screens import explain_screen
+                target_ui = explain_screen.get_ui()
+            elif next_node == "explore":
+                from screens import explore_screen
+                target_ui = explore_screen.get_ui()
+            elif next_node == "engage":
+                from screens import engage_screen
+                target_ui = engage_screen.get_ui()
+            elif next_node == "teacher_intervention":
+                from screens import teacher_intervention
+                target_ui = teacher_intervention.get_ui()
+                
+            if parent_widget and target_ui:
+                parent_widget.addWidget(target_ui)
+                parent_widget.setCurrentWidget(target_ui)
+            else:
+                print(f"[FlowController] Error: Failed to load target GUI framework for cascade node {next_node}")
+        except ImportError as e:
+            print(f"[FlowController] Critical Routing Error escalating out to {next_node}: {e}")
+
 # Global singleton instance
 flow_controller = FlowController()
