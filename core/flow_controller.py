@@ -51,12 +51,10 @@ class FlowController:
         
         # Trigger the Celebration path (which implicitly calls next_student() after the animations)
         try:
-            from screens import celebration_screen
-            if parent_widget:
-                celeb_ui = celebration_screen.get_ui()
-                switch_screen(parent_widget, celeb_ui)
-        except ImportError:
-            print("[FlowController] CRITICAL: Could not transit to Celebration Screen.")
+            from core.navigator import navigator
+            navigator.navigate_to("celebration")
+        except Exception as e:
+            print(f"[FlowController] CRITICAL: Could not transit to Celebration Screen. {e}")
 
     def on_incorrect_answer(self, parent_widget, is_timeout=False):
         """Handle an incorrect answer by deeply escalating the cognitive cascade."""

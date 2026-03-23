@@ -15,6 +15,7 @@ from screens import student_call_screen
 from screens import session_complete_screen
 from screens import evaluate_screen
 from screens import elaborate
+from screens import celebration_screen
 from screens import engage
 from screens import explain
 from screens import explore
@@ -61,6 +62,7 @@ screens = {
     "student_call": student_call_screen.get_ui(),
     "session_complete": session_complete_screen.get_ui(),
     "evaluate": evaluate_screen.get_ui(),
+    "celebration": celebration_screen.get_ui(),
     "elaborate": elaborate.get_ui(),
     "engage": engage.get_ui(),
     "explain": explain.get_ui(),

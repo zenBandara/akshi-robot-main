@@ -33,13 +33,13 @@ def on_show():
     
     # 1. Fetch exact Student Name
     student_name = state_manager.get_current_student()
+    display_name = str(student_name).capitalize() if student_name else "Superstar"
     if not student_name:
-        student_name = "Superstar"
         print("[Celebration Screen] Warning: No active student found in state manager.")
         
     # 2. Pick Random Encouragement Phrase
     from core.dialogue import DialoguePool
-    selected_phrase = DialoguePool.get_phrase("correct", student_name)
+    selected_phrase = DialoguePool.get_phrase("correct", display_name)
     
     # 3. Update UI Text
     window.celebration_text.setText(selected_phrase)
@@ -99,32 +99,6 @@ def end_celebration():
         
     print(f"[Celebration Screen] LOGGED SUCCESS: {log_data}")
     
-    # 8. Call next_student() logic (Step 22)
-    student_queue = state_manager.get_student_queue()
-    parent_stack = window.parentWidget()
-    
-    if student_queue:
-        next_stu = student_queue.pop(0)
-        state_manager.set_current_student(next_stu)
-        state_manager.set_student_queue(student_queue)
-        print(f"[Celebration Screen] Advancing to next student: {next_stu}...")
-        
-        # Navigate back to Student Calling / Greeting Screen
-        try:
-            from screens import greeting_screen
-            if parent_stack:
-                greeting_ui = greeting_screen.get_ui()
-                parent_stack.addWidget(greeting_ui)
-                parent_stack.setCurrentWidget(greeting_ui)
-        except ImportError:
-            print("Warning: Could not load greeting_screen.")
-    else:
-        print("[Celebration Screen] Queue empty! Moving to Session Complete.")
-        try:
-            from screens import session_complete
-            if parent_stack:
-                session_complete_ui = session_complete.get_ui()
-                parent_stack.addWidget(session_complete_ui)
-                parent_stack.setCurrentWidget(session_complete_ui)
-        except ImportError:
-            print("Warning: Could not load session_complete.")
+    # 8. Delegate structurally safely to the Global Session Logic sequence
+    import core.session_logic as session_logic
+    session_logic.next_student()

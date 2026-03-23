@@ -8,6 +8,7 @@ from core.keyboard_manager import keyboard_manager
 from core.sound_manager import sound_manager
 from core.animations import apply_pulse_glow
 from core.timer_widget import EmojiTimerWidget
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -18,6 +19,7 @@ input_enabled = False
 active_animations = []
 evaluate_timer = None
 key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -63,13 +65,15 @@ def on_show():
     eval_data = task_data["evaluate"]
     
     # 2. Set Question Text
-    base_desc = eval_data.get("task_description", "What was the question?")
+    title_text = eval_data.get("task_title", "Evaluation Phase")
+    desc_text = eval_data.get("task_description", "What was the question?")
+    student_name = str(state_manager.get_current_student() or "friend").capitalize()
+    
     if level >= 3:
-        student_name = str(state_manager.get_current_student() or "friend").capitalize()
         # Level 3 Affective Affordance: Personalized context and Escape Hatch control
-        window.question_label.setText(f"Okay {student_name}, {base_desc.lower()}\n(Press S to Skip)")
+        window.question_label.setText(f"Okay {student_name}, {desc_text.lower()}\n(Press S to Skip)")
     else:
-        window.question_label.setText(base_desc)
+        window.question_label.setText(f"{title_text}: {desc_text}\nUse the numbers on your keyboard to pick an option!")
     
     # 3. Apply Option Cards
     mc_words = eval_data.get("multiple_choices_word", {})
@@ -173,6 +177,8 @@ def on_show():
     # Identify exactly which physical frame contains the correct payload
     correct_physical_key = next((k for k, v in key_mapping.items() if v == correct_option_key), None)
     
+    print(f"\n[TESTING CHEAT] 🎯 The correct answer for this task is: Option {correct_physical_key} (Press '{correct_physical_key}')\n")
+    
     if level >= 3:
         # Level 3 Physical Affordance: Aggressively Spotlight ONLY the correct answer
         if correct_physical_key == "1":
@@ -189,20 +195,24 @@ def on_show():
     # 5. Robot Speech & Input Delay
     input_enabled = False
     
-    speech_text = eval_data.get("speech_start", "Let's try a task.")
+    speech_start = eval_data.get("speech_start", "Let's try a task.")
+    desc_text = eval_data.get("task_description", "")
+    student_name = str(state_manager.get_current_student() or "friend").capitalize()
     
     # Mathematical Speech Cadence offset
     if level >= 3:
-        student_name = str(state_manager.get_current_student() or "friend").capitalize()
         # Step 38 & 39: Level 3 Speech Simplification, Cadence, & personalization
-        speech_text = f"Okay {student_name}, look carefully! {speech_text}"
+        speech_text = f"Okay {student_name}, look carefully! {speech_start} {desc_text}".strip()
         print(f"🤖 ROBOT SPEAKS [SLOW RATE -30%]: \"{speech_text}\"")
+        voice_manager.speak(speech_text, f"eval_l3_{student_name}_{task_data.get('task_id', 'id')}")
         
         # Slower 1.5 words-per-second computational cadence
         words_count = len(speech_text.split())
         delay_ms = max(3000, int((words_count / 1.5) * 1000))
     else:
+        speech_text = f"{student_name}, {speech_start} {desc_text} Press the number to select your answer.".strip()
         print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
+        voice_manager.speak(speech_text, f"eval_l1_{student_name}_{task_data.get('task_id', 'id')}")
         
         # Standard 2.5 words-per-second computational cadence
         words_count = len(speech_text.split())
