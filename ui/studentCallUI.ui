@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="styleSheet">
-   <string>QWidget { background-color: #38B000; font-family: 'Nunito', sans-serif; color: white; }</string>
+   <string>QWidget { background-color: #FFFFFF; font-family: 'Nunito', sans-serif; }</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="leftMargin"><number>50</number></property>
@@ -25,14 +25,14 @@
     <widget class="QLabel" name="announcement_label">
      <property name="text"><string>It's your turn!</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="styleSheet"><string>font-size: 48px; font-weight: bold; color: #FFEA00; margin-bottom: 20px;</string></property>
+     <property name="styleSheet"><string>font-size: 48px; font-weight: bold; color: #1976D2; margin-bottom: 20px;</string></property>
     </widget>
    </item>
    <item>
     <widget class="QLabel" name="student_name_label">
      <property name="text"><string>Student Name</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="styleSheet"><string>font-size: 80px; font-weight: bold; color: #FFFFFF; letter-spacing: 5px;</string></property>
+     <property name="styleSheet"><string>font-size: 80px; font-weight: bold; color: #1A237E; letter-spacing: 5px;</string></property>
     </widget>
    </item>
    <item>
@@ -42,7 +42,7 @@
     <widget class="QLabel" name="hint_label">
      <property name="text"><string>Press Enter when you're ready! 🌟</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="styleSheet"><string>font-size: 24px; color: #CCFF33; margin-top: 50px;</string></property>
+     <property name="styleSheet"><string>font-size: 24px; color: #64748B; margin-top: 50px;</string></property>
     </widget>
    </item>
   </layout>

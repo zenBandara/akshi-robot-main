@@ -1,6 +1,6 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QPropertyAnimation, QTimer
+from PySide6.QtCore import QFile, QPropertyAnimation, QTimer, QEasingCurve
 from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
@@ -8,7 +8,7 @@ from core.navigator import navigator
 from core.voice_manager import VoiceManager
 
 window = None
-pulse_anim = None
+fade_anim = None
 fade_effect = None
 voice_manager = VoiceManager()
 
@@ -37,29 +37,36 @@ def get_ui():
         student_name = state_manager.get_current_student()
         display_name = student_name if student_name else "Buddy"
         
+        # Unconditionally extract the active hierarchical phase payload directly from state metadata constraints
+        current_task = state_manager.get_current_task()
+        task_name = current_task.get("task_name", "a fun new activity") if current_task else "a fun new activity"
+        
         window.student_name_label.setText(f"{display_name}! 🎉")
         
-        print(f"Robot says: Hey {display_name}! Come on up, it's your turn!")
-        voice_manager.speak(f"Hey {display_name}! Come on up, it's your turn!", f"call_{display_name}")
+        # Mathematically construct the highly-professional, highly-conversational dynamically cached TTS execution loop
+        intro_msg = f"Hello my wonderful friends! Today, we are going to learn all about {task_name}! It is going to be so much fun. {display_name}, can you please come on up? It is your turn to shine!"
+        
+        print(f"[Robot Speaks]: {intro_msg}")
+        voice_manager.speak(intro_msg, f"call_{display_name}_{task_name.replace(' ', '_').lower()}")
             
-        if pulse_anim:
-            pulse_anim.start()
+        if fade_anim:
+            fade_effect.setOpacity(0.0)
+            fade_anim.start()
 
     window.on_show = on_show
     return window
 
 def setup_animations():
-    global window, pulse_anim, fade_effect
+    global window, fade_anim, fade_effect
     
     fade_effect = QGraphicsOpacityEffect(window.student_name_label)
     window.student_name_label.setGraphicsEffect(fade_effect)
     
-    pulse_anim = QPropertyAnimation(fade_effect, b"opacity")
-    pulse_anim.setDuration(1200)
-    pulse_anim.setStartValue(0.4)
-    pulse_anim.setKeyValueAt(0.5, 1.0)
-    pulse_anim.setEndValue(0.4)
-    pulse_anim.setLoopCount(-1)
+    fade_anim = QPropertyAnimation(fade_effect, b"opacity")
+    fade_anim.setDuration(1200)
+    fade_anim.setStartValue(0.0)
+    fade_anim.setEndValue(1.0)
+    fade_anim.setEasingCurve(QEasingCurve.OutCubic)
 
 def handle_key_press(mapped_action):
     if mapped_action == "ENTER" or mapped_action == "CONTINUE":
