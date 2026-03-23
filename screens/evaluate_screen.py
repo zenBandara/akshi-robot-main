@@ -214,10 +214,35 @@ def on_timer_expire():
     # TODO: Trigger failure path via flow controller (Step 25+)
         
 def handle_key_press(action):
-    global input_enabled, evaluate_timer, key_mapping, arcade_bgm
+    global input_enabled, evaluate_timer, key_mapping, arcade_bgm, active_animations
     if not input_enabled:
         return
         
+    # L2 Control Affordance
+    if action == "BREAK" and state_manager.get_affordance_level() >= 2:
+        input_enabled = False
+        print("[Evaluate Screen] Student pressed BREAK. Suspending session...")
+        
+        # Cease physics
+        if evaluate_timer:
+            evaluate_timer.stop()
+        for anim in active_animations:
+            anim.stop()
+        if arcade_bgm:
+            arcade_bgm.stop()
+            
+        try:
+            from screens import break_screen
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                break_ui = break_screen.get_ui()
+                parent_stack.addWidget(break_ui)
+                parent_stack.setCurrentWidget(break_ui)
+        except ImportError:
+            print("Warning: Could not transition to break screen.")
+        return
+        
+    # Normal Mapping Validation
     if action not in key_mapping:
         return
         
