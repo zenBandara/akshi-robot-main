@@ -1,5 +1,6 @@
 import os
 import random
+import pygame
 from PySide6.QtGui import QPixmap
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer
@@ -28,6 +29,13 @@ def get_ui():
             return None
         window = loader.load(file)
         file.close()
+        
+        # Safely init audio mixer
+        try:
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+        except Exception as e:
+            print(f"Warning: Audio mixer failed to initialize. {e}")
         
         # Bind the navigator lifecycle hook
         window.on_show = on_show
@@ -71,6 +79,16 @@ def on_show():
         window.card_3.hide()
         window.card_4.hide()
         img_size = 350
+        
+        # Physical Affordance: Acoustic Bell
+        bell_path = os.path.join(project_root, "assets", "sounds", "bell.wav")
+        if os.path.exists(bell_path):
+            try:
+                bell = pygame.mixer.Sound(bell_path)
+                bell.set_volume(0.4) # Soft calming volume
+                bell.play()
+            except Exception as e:
+                pass
         
         # Pick 1 correct and 1 random distractor
         distractors = [k for k in mc_words.keys() if k != correct_option_key]
