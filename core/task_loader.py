@@ -22,7 +22,7 @@ def validate_task(data):
             
     # 2. Check 5E Standard Fields
     five_e_stages = ["engage", "explore", "explain", "elaborate", "evaluate"]
-    standard_fields = ["task_title", "speech_start", "speech_end", "description"]
+    common_fields = ["task_title", "speech_start", "speech_end"]
     
     for stage in five_e_stages:
         stage_data = data[stage]
@@ -30,10 +30,15 @@ def validate_task(data):
             print(f"Validation Error: Stage '{stage}' must be an object (dictionary).")
             return False
             
-        for field in standard_fields:
+        for field in common_fields:
             if field not in stage_data:
                 print(f"Validation Error: Stage '{stage}' is missing standard field '{field}'.")
                 return False
+                
+        # Only require generic description on non-interactive stages
+        if stage in ["engage", "explore", "explain"] and "description" not in stage_data:
+            print(f"Validation Error: Stage '{stage}' is missing standard field 'description'.")
+            return False
                 
     # 3. Check Interactive Fields (elaborate & evaluate)
     interactive_stages = ["elaborate", "evaluate"]

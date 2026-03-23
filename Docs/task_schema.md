@@ -23,6 +23,8 @@ Every 5E stage object (`engage`, `explore`, `explain`, `elaborate`, `evaluate`) 
 - `task_title` (string): The title displayed at the top of the screen.
 - `speech_start` (string): The exact dialogue the robot will speak when the screen opens.
 - `speech_end` (string): The dialogue the robot will speak at the conclusion of the screen's activity.
+
+For the non-interactive stages (`engage`, `explore`, `explain`), they must additionally include:
 - `description` (string): Background notes for teachers or general descriptions of the on-screen activity.
 
 *(Optional)* `video_url` (string): Path to an MP4 video file to play automatically during the stage (e.g., `"tasks/t1/engage_video.mp4"`).
