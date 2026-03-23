@@ -1,6 +1,8 @@
 import json
 import os
 import glob
+import random
+from core.state_manager import state_manager
 
 def validate_task(data):
     """
@@ -115,3 +117,37 @@ def load_all_tasks(directory_path="Tasks/task_jsons"):
             
     print(f"Successfully loaded and validated {len(valid_tasks)} tasks from {directory_path}.")
     return valid_tasks
+
+# Cache for loaded tasks
+_loaded_tasks = None
+
+def get_loaded_tasks():
+    global _loaded_tasks
+    if _loaded_tasks is None:
+        _loaded_tasks = load_all_tasks()
+    return _loaded_tasks
+
+def pick_random_task(exclude_ids=None):
+    """
+    Selects a random task from the loaded pool, avoiding any task_ids in exclude_ids.
+    Stores the picked task into state_manager.current_task and returns it.
+    """
+    if exclude_ids is None:
+        exclude_ids = []
+        
+    all_tasks = get_loaded_tasks()
+    
+    # Filter out excluded tasks
+    available_tasks = [t for t in all_tasks if t.get("task_id") not in exclude_ids]
+    
+    if not available_tasks:
+        print("Warning: No available tasks to pick from (all excluded or none loaded).")
+        return None
+        
+    picked_task = random.choice(available_tasks)
+    print(f"Picked random task: '{picked_task.get('task_name')}' (ID: {picked_task.get('task_id')})")
+    
+    # Store in state manager
+    state_manager.set_current_task(picked_task)
+    
+    return picked_task
