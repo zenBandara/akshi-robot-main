@@ -3,6 +3,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
+from core.keyboard_manager import keyboard_manager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -86,4 +87,32 @@ def on_show():
 def enable_input():
     global input_enabled
     input_enabled = True
+    keyboard_manager.register_handler(handle_key_press)
     print("[Evaluate Screen L1] Speech finished. Keyboard input enabled.")
+
+def handle_key_press(action):
+    global input_enabled
+    if not input_enabled:
+        return
+        
+    if action not in ["1", "2", "3", "4"]:
+        return
+        
+    # Lock out further inputs immediately
+    input_enabled = False
+    print(f"[Evaluate Screen L1] Student pressed key {action}.")
+    
+    # Highlight the chosen card visually via StyleSheet manipulation
+    card_map = {
+        "1": window.card_1,
+        "2": window.card_2,
+        "3": window.card_3,
+        "4": window.card_4
+    }
+    
+    selected_card = card_map.get(action)
+    if selected_card:
+        selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
+        
+    # Validation logic will go here in Step 15
+    print(f"Selection visually clamped to option {action}. Awaiting validation...")
