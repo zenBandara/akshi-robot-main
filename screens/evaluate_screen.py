@@ -4,6 +4,7 @@ from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.animations import apply_pulse_glow
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -11,6 +12,7 @@ ui_path = os.path.join(project_root, "ui", "evaluateLevel1UI.ui")
 
 window = None
 input_enabled = False
+active_animations = []
 
 def get_ui():
     global window
@@ -70,7 +72,18 @@ def on_show():
     setup_card(3, window.text_3, window.img_3)
     setup_card(4, window.text_4, window.img_4)
 
-    # 4. Robot Speech & Input Delay
+    # 4. Bind Animations
+    global active_animations
+    for anim in active_animations:
+        anim.stop()
+    active_animations.clear()
+    
+    active_animations.append(apply_pulse_glow(window.card_1))
+    active_animations.append(apply_pulse_glow(window.card_2))
+    active_animations.append(apply_pulse_glow(window.card_3))
+    active_animations.append(apply_pulse_glow(window.card_4))
+
+    # 5. Robot Speech & Input Delay
     global input_enabled
     input_enabled = False
     
@@ -102,6 +115,11 @@ def handle_key_press(action):
     input_enabled = False
     print(f"[Evaluate Screen L1] Student pressed key {action}.")
     
+    # Stop distracting animations gracefully
+    global active_animations
+    for anim in active_animations:
+        anim.stop()
+        
     # Highlight the chosen card visually via StyleSheet manipulation
     card_map = {
         "1": window.card_1,
