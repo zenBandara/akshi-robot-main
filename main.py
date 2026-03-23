@@ -2,10 +2,13 @@ import sys
 import datetime
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
 
-from core import firebase
+from core.keyboard_manager import keyboard_manager
+from core.navigator import navigator
+
+from screens import idle_screen
+from screens import greeting_screen
+from screens import teacher_select
 from screens import evaluation
 from screens import elaborate
 from screens import engage
@@ -13,98 +16,47 @@ from screens import explain
 from screens import explore
 from screens import kinestatic
 
-
 app = QApplication(sys.argv)
-loader = QUiLoader()
-
-
-def load_ui(path):
-
-    file = QFile(path)
-
-    if not file.open(QFile.ReadOnly):
-        print("Cannot open UI file:", path)
-        sys.exit()
-
-    ui = loader.load(file)
-    file.close()
-
-    return ui
-
-
 main_window = QMainWindow()
+main_window.setWindowTitle("Akshi Robot Interface")
+main_window.setMinimumSize(900, 600)
+
 stack = QStackedWidget()
-
-
-# Load teacher UI
-teacher_ui = load_ui("ui/mainUI.ui")
-
-dropdown = teacher_ui.teacher_dropdown
-submit_btn = teacher_ui.submit_btn
-
-
-# Load learning screens
-evaluation_screen = evaluation.get_ui()
-
-
-
-# Add screens to stack
-stack.addWidget(teacher_ui)        # index 0
-stack.addWidget(evaluation_screen) # index 1
-
-
-
-# Ensure teacher screen appears first
-stack.setCurrentIndex(0)
-
 main_window.setCentralWidget(stack)
 
+# Bind the stack to the navigator
+navigator.set_stack(stack)
+
 # Setup Global Keyboard Manager
-from core.keyboard_manager import keyboard_manager
 def global_key_press(event):
     keyboard_manager.handle_key_press(event)
     
 main_window.keyPressEvent = global_key_press
 
-# Load teachers from Firebase
-teachers = firebase.get_teachers()
+# Load all instantiated screens
+print("Loading screens...")
+screens = {
+    "idle": idle_screen.get_ui(),
+    "greeting": greeting_screen.get_ui(),
+    "teacher_select": teacher_select.get_ui(),
+    "evaluation": evaluation.get_ui(),
+    "elaborate": elaborate.get_ui(),
+    "engage": engage.get_ui(),
+    "explain": explain.get_ui(),
+    "explore": explore.get_ui(),
+    "kinestatic": kinestatic.get_ui(),
+}
 
-for t in teachers:
-    dropdown.addItem(t)
-
-
-def check_teacher():
-
-    selected = dropdown.currentText()
-
-    data = firebase.get_teacher_data(selected)
-
-    if not data:
-        print("Teacher not found")
-        return
-
-    today = datetime.date.today().strftime("%Y-%m-%d")
-
-    attendance = data.get("attendance", {})
-
-    if today in attendance:
-
-        lesson_id = data.get("current_lesson")
-
-        print("Starting lesson:", lesson_id)
-
-        stack.setCurrentIndex(1)
-
-        evaluation.start_lesson(lesson_id)
-
+# Register all valid screens in the navigator
+for name, widget in screens.items():
+    if widget:
+        navigator.register_screen(name, widget)
     else:
+        print(f"Warning: UI for '{name}' failed to load.")
 
-        print("Set attendees and lesson to move from the teacher's web dashboard")
-
-
-submit_btn.clicked.connect(check_teacher)
-
+# Set startup screen
+navigator.navigate_to("idle")
 
 main_window.show()
-
+print("Akshi app launched successfully!")
 sys.exit(app.exec())
