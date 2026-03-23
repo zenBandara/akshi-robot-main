@@ -1,3 +1,6 @@
+import json
+import os
+
 def validate_task(data):
     """
     Validate a task JSON dictionary against the official Akshi Robot schema.
@@ -57,3 +60,29 @@ def validate_task(data):
                 return False
                 
     return True
+
+def load_task(filepath):
+    """
+    Read and parse a single JSON task file.
+    Returns the parsed dictionary if valid, or None if validation fails.
+    """
+    if not os.path.exists(filepath):
+        print(f"Error: Task file not found at '{filepath}'.")
+        return None
+        
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+        if validate_task(data):
+            return data
+        else:
+            print(f"Failed to load task from '{filepath}' due to validation errors.")
+            return None
+            
+    except json.JSONDecodeError as e:
+        print(f"JSON Parsing Error in '{filepath}': {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error loading '{filepath}': {e}")
+        return None
