@@ -5,13 +5,13 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
-import firebase
-import evaluation
-import elaborate
-import engage
-import explain
-import explore
-import kinestatic
+from core import firebase
+from screens import evaluation
+from screens import elaborate
+from screens import engage
+from screens import explain
+from screens import explore
+from screens import kinestatic
 
 
 app = QApplication(sys.argv)
@@ -37,7 +37,7 @@ stack = QStackedWidget()
 
 
 # Load teacher UI
-teacher_ui = load_ui("mainUI.ui")
+teacher_ui = load_ui("ui/mainUI.ui")
 
 dropdown = teacher_ui.teacher_dropdown
 submit_btn = teacher_ui.submit_btn

@@ -13,7 +13,8 @@ from PySide6.QtCore import QFile, QPropertyAnimation, QEasingCurve, QParallelAni
 
 
 current_dir = os.path.dirname(__file__)
-ui_path = os.path.join(current_dir, "evaluationUI.ui")
+project_root = os.path.dirname(current_dir)
+ui_path = os.path.join(project_root, "ui", "evaluationUI.ui")
 
 window = None
 timer = None
@@ -127,7 +128,7 @@ def setup_timer():
     global timer
     global timer_label
 
-    alarm_path = os.path.join(current_dir, "audio", "alarm.mp3")
+    alarm_path = os.path.join(project_root, "assets", "alarm.mp3")
 
     pygame.mixer.init()
 
@@ -205,7 +206,7 @@ def start_lesson(lesson_id):
     print("Evaluation started for lesson:", lesson_id)
 
     # check json file existence
-    json_path = os.path.join(current_dir, "Tasks", "task_jsons", f"{lesson_id}.json")
+    json_path = os.path.join(project_root, "Tasks", "task_jsons", f"{lesson_id}.json")
 
     if not os.path.exists(json_path):
         print("Task JSON not found:", json_path)
@@ -250,7 +251,7 @@ def handle_key_press(event):
 
         print("Correct answer")
 
-        import engage
+        from screens import engage
         engage_screen = engage.get_ui()
 
         parent_stack = window.parentWidget()

@@ -6,7 +6,8 @@ from PySide6.QtCore import QFile
 def get_ui():
 
     current_dir = os.path.dirname(__file__)
-    ui_path = os.path.join(current_dir, "kinestaticUI.ui")
+    project_root = os.path.dirname(current_dir)
+    ui_path = os.path.join(project_root, "ui", "elaborateUI.ui")
 
     loader = QUiLoader()
     file = QFile(ui_path)

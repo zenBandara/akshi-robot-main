@@ -1,4 +1,4 @@
-from voice_manager import VoiceManager
+from core.voice_manager import VoiceManager
 
 
 class RobotTask:
