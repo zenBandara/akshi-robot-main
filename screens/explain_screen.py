@@ -1,6 +1,6 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Qt
+from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 
@@ -9,6 +9,8 @@ project_root = os.path.dirname(current_dir)
 ui_path = os.path.join(project_root, "ui", "explainUI.ui")
 
 window = None
+input_enabled = False
+explain_data = {}
 
 def get_ui():
     global window
@@ -59,5 +61,35 @@ def on_show():
     else:
         window.media_label.setText("🖼️\n[No Media Provided]")
         
-    # Placeholder for Step 34 (Speech)
-    window.robot_text_label.setText("🤖 Generating explanation...")
+    # 4. Multi-Stage Robot Speech Loop
+    global input_enabled, explain_data
+    input_enabled = False
+    explain_data = task_data.get("explain", {})
+    
+    speech_start = explain_data.get("speech_start", "Let's review this concept together.")
+    window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
+    print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
+    
+    words_count = len(speech_start.split())
+    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    QTimer.singleShot(delay_ms, play_second_speech)
+
+def play_second_speech():
+    global explain_data
+    speech_end = explain_data.get("speech_end", "Take your time absorbing this. Press Enter when you are ready to continue.")
+    
+    if speech_end:
+        window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
+        print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
+        words_count = len(speech_end.split())
+        delay_ms = max(2000, int((words_count / 2.5) * 1000))
+        QTimer.singleShot(delay_ms, enable_input)
+    else:
+        enable_input()
+
+def enable_input():
+    global input_enabled
+    input_enabled = True
+    window.robot_text_label.setText("🤖 Waiting for input...")
+    print("[Explain Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
+    # TODO Step 35: Bind keyboard handler
