@@ -2,6 +2,7 @@ import asyncio
 import edge_tts
 import os
 import threading
+import hashlib
 from playsound import playsound
 
 
@@ -26,8 +27,9 @@ class VoiceManager:
         await communicate.save(filename)
 
     def speak(self, text, audio_name, rate="+10%"):
-
-        filename = os.path.join(self.audio_folder, audio_name + ".mp3")
+        # Synthesize a short deterministic hash of the text to invalidate legacy caches when JSON changes natively
+        text_hash = hashlib.md5(text.encode()).hexdigest()[:6]
+        filename = os.path.join(self.audio_folder, f"{audio_name}_{text_hash}.mp3")
 
         if os.path.exists(filename):
             print("Using cached audio:", filename)

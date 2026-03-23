@@ -4,31 +4,31 @@
   "description": "A task to help students understand the concept of left and right.",
   "engage": {
     "task_title": "Engage with Left and Right",
-    "speech_start": "Hello children. Today we are going to learn about left and right.",
-    "speech_end": "Can you remember which side is your left hand?",
+    "speech_start": "Hello friends! Today we have a super fun mission. We are going to learn all about our left and right sides. Are you ready? Let's go!",
+    "speech_end": "Do you remember which hand is your left hand? Raise it up high!",
     "description": "Connect with prior knowledge. Show video if needed. Not compulsory.",
     "video_url": "tasks/t1/engage_video.mp4"
   },
   "explore": {
     "task_title": "Let's Explore Left and Right",
-    "speech_start": "Let's explore something together.",
+    "speech_start": "Time to move around! Let's explore together.",
     "video_url": "tasks/t1/explore_video.mp4",
     "description": "Students observe objects and identify directions.",
     "activity_description": "Students raise their left hand and right hand and show to the teacher. (Kinesthetic activity with teacher guidance)",
-    "speech_end": "Great. Now let's learn more together."
+    "speech_end": "Awesome exploring! Let's head back to our lesson."
   },
   "explain": {
     "task_title": "Understanding Left and Right",
-    "speech_start": "Left means this side of your body and right means the other side.",
-    "speech_end": "Now you know what left and right means.",
+    "speech_start": "Look at your hands! The hand that makes an 'L' shape is your left hand. The other one is your right hand!",
+    "speech_end": "Now you know what left and right means. You're so smart!",
     "video_url": "tasks/t1/explain_video.mp4",
     "description": "Robot explains the concept using examples."
   },
   "elaborate": {
     "task_type": "mcq_image",
     "task_title": "Choose the correct direction",
-    "speech_start": "Now let's try a task.",
-    "speech_end": "Good job.",
+    "speech_start": "Hmm, let's look at this one closer. Can you help me find the right answer?",
+    "speech_end": "Excellent! You are learning so fast!",
     "task_description": "Which image shows the left hand?",
     "multiple_choices_word": {
       "op1": "Left Hand",
@@ -47,8 +47,8 @@
   "evaluate": {
     "task_type": "mcq_image",
     "task_title": "Identify direction",
-    "speech_start": "Let's try another task.",
-    "speech_end": "Well done.",
+    "speech_start": "Alright, it's time to show what you know! Look carefully at the screen.",
+    "speech_end": "You are doing fantastic!",
     "task_description": "Which arrow points right?",
     "multiple_choices_word": {
       "op1": "Left Arrow",

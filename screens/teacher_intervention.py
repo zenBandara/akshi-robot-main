@@ -3,6 +3,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QTimer
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -10,6 +11,7 @@ ui_path = os.path.join(project_root, "ui", "teacherInterventionUI.ui")
 
 window = None
 input_enabled = False
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -45,10 +47,11 @@ def on_show():
     window.robot_text_label.setText(f"🤖 \"{speech_text}\"")
     
     print(f"🤖 ROBOT SPEAKS [CHEERFUL ENCOURAGING TONE]: \"{speech_text}\"")
+    voice_manager.speak(speech_text, f"teacher_intervention_{student_name}")
     
     # Calculate audio wait sequence (assume steady ~2.5 WPS to keep things calm but brisk)
     words_count = len(speech_text.split())
-    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    delay_ms = max(2000, int((words_count / 1.8) * 1000))
     QTimer.singleShot(delay_ms, enable_input)
     
 def enable_input():
@@ -99,8 +102,8 @@ def handle_key_press(action):
         print(f"[Teacher Intervention] LOGGED FINAL TASK RESULT: {log_data}")
         
         # Advance Queue Natively
+        # Advance Queue Natively
         student_queue = state_manager.get_student_queue()
-        parent_stack = window.parentWidget()
         
         if student_queue:
             next_stu = student_queue.pop(0)
@@ -112,17 +115,13 @@ def handle_key_press(action):
             state_manager.set_affordance_level(1)
             
             try:
-                from screens import greeting_screen
-                if parent_stack:
-                    greeting_ui = greeting_screen.get_ui()
-                    parent_stack.addWidget(greeting_ui)
-                    parent_stack.setCurrentWidget(greeting_ui)
-            except ImportError: pass
+                from core.navigator import navigator
+                navigator.navigate_to("student_call")
+            except Exception as e:
+                print(f"Warning: Could not transition back to student_call screen. {e}")
         else:
             try:
-                from screens import session_complete
-                if parent_stack:
-                    session_complete_ui = session_complete.get_ui()
-                    parent_stack.addWidget(session_complete_ui)
-                    parent_stack.setCurrentWidget(session_complete_ui)
-            except ImportError: pass
+                from core.navigator import navigator
+                navigator.navigate_to("session_complete")
+            except Exception as e:
+                print(f"Warning: Could not transition back to session_complete screen. {e}")

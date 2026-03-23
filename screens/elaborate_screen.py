@@ -4,6 +4,7 @@ from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -11,6 +12,7 @@ ui_path = os.path.join(project_root, "ui", "elaborateUI.ui")
 
 window = None
 input_enabled = False
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -71,10 +73,11 @@ def on_show():
     
     speech_text = elab_data.get("speech_start", "Oops! Let's try this one more time...")
     print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
+    voice_manager.speak(speech_text, f"elaborate_{task_data.get('task_id', 'id')}")
     
     # Calculate rough delay based on text length (~2.5 words per second)
     words_count = len(speech_text.split())
-    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    delay_ms = max(2000, int((words_count / 1.8) * 1000))
     
     print(f"[Elaborate Screen L1] Delaying keyboard input for {delay_ms}ms to let speech finish...")
     QTimer.singleShot(delay_ms, enable_input)
@@ -113,11 +116,7 @@ def handle_key_press(action):
     state_manager.set_affordance_level(2)
     
     try:
-        from screens import evaluate_screen
-        parent_stack = window.parentWidget()
-        if parent_stack:
-            evaluate_ui = evaluate_screen.get_ui()
-            parent_stack.addWidget(evaluate_ui)
-            parent_stack.setCurrentWidget(evaluate_ui)
-    except ImportError:
-        print("Warning: Could not transition back to evaluate screen.")
+        from core.navigator import navigator
+        navigator.navigate_to("evaluate")
+    except Exception as e:
+        print(f"Warning: Could not transition back to evaluate screen. {e}")

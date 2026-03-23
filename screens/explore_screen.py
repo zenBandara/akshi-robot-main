@@ -4,6 +4,7 @@ from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -12,6 +13,7 @@ ui_path = os.path.join(project_root, "ui", "exploreUI.ui")
 window = None
 input_enabled = False
 explore_data = {}
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -63,20 +65,16 @@ def on_show():
     else:
         window.media_label.setText("🖐️\n[No Visual Prompt Provided]")
         
-    # 4. Multi-Stage Kinesthetic Robot Speech Loop
-    global input_enabled, explore_data
-    input_enabled = False
-    explore_data = task_data.get("explore", {})
-    
     speech_start = explore_data.get("speech_start", "Let's try a physical activity!")
     # Step 44: Physically Encourage Kinesthetic Output
     speech_start = f"Stand up! {speech_start}"
     
     window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
     print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
+    voice_manager.speak(speech_start, f"explore_start_{task_data.get('task_id', 'id')}")
     
     words_count = len(speech_start.split())
-    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    delay_ms = max(2000, int((words_count / 1.8) * 1000))
     QTimer.singleShot(delay_ms, play_second_speech)
 
 def play_second_speech():
@@ -86,8 +84,9 @@ def play_second_speech():
     if speech_end:
         window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
         print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
+        voice_manager.speak(speech_end, f"explore_end_{explore_data.get('task_id', 'id')}")
         words_count = len(speech_end.split())
-        delay_ms = max(2000, int((words_count / 2.5) * 1000))
+        delay_ms = max(2000, int((words_count / 1.8) * 1000))
         QTimer.singleShot(delay_ms, enable_input)
     else:
         enable_input()
@@ -136,31 +135,11 @@ def handle_key_press(action):
             
         print(f"[Explore Screen] LOGGED FINAL TASK RESULT: {log_data}")
         
-        # Advance Queue Natively
-        student_queue = state_manager.get_student_queue()
-        parent_stack = window.parentWidget()
-        
-        if student_queue:
-            next_stu = student_queue.pop(0)
-            state_manager.set_current_student(next_stu)
-            state_manager.set_student_queue(student_queue)
-            
-            # Wipe affordance tracking state completely for the next child
-            state_manager.current_path = []
-            state_manager.set_affordance_level(1)
-            
-            try:
-                from screens import greeting_screen
-                if parent_stack:
-                    greeting_ui = greeting_screen.get_ui()
-                    parent_stack.addWidget(greeting_ui)
-                    parent_stack.setCurrentWidget(greeting_ui)
-            except ImportError: pass
-        else:
-            try:
-                from screens import session_complete
-                if parent_stack:
-                    session_complete_ui = session_complete.get_ui()
-                    parent_stack.addWidget(session_complete_ui)
-                    parent_stack.setCurrentWidget(session_complete_ui)
-            except ImportError: pass
+        # Advance to Evaluate Level 3 Natively
+        print("[Explore Screen] Transitioning back to Evaluate (Level 3)...")
+        state_manager.set_affordance_level(3)
+        try:
+            from core.navigator import navigator
+            navigator.navigate_to("evaluate")
+        except Exception as e:
+            print(f"Warning: Could not transition back to evaluate screen. {e}")

@@ -4,6 +4,7 @@ from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -12,6 +13,7 @@ ui_path = os.path.join(project_root, "ui", "explainUI.ui")
 window = None
 input_enabled = False
 explain_data = {}
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -62,17 +64,13 @@ def on_show():
     else:
         window.media_label.setText("🖼️\n[No Media Provided]")
         
-    # 4. Multi-Stage Robot Speech Loop
-    global input_enabled, explain_data
-    input_enabled = False
-    explain_data = task_data.get("explain", {})
-    
     speech_start = explain_data.get("speech_start", "Let's review this concept together.")
     window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
     print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
+    voice_manager.speak(speech_start, f"explain_start_{task_data.get('task_id', 'id')}")
     
     words_count = len(speech_start.split())
-    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    delay_ms = max(2000, int((words_count / 1.8) * 1000))
     QTimer.singleShot(delay_ms, play_second_speech)
 
 def play_second_speech():
@@ -82,8 +80,9 @@ def play_second_speech():
     if speech_end:
         window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
         print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
+        voice_manager.speak(speech_end, f"explain_end_{explain_data.get('task_id', 'id')}")
         words_count = len(speech_end.split())
-        delay_ms = max(2000, int((words_count / 2.5) * 1000))
+        delay_ms = max(2000, int((words_count / 1.8) * 1000))
         QTimer.singleShot(delay_ms, enable_input)
     else:
         enable_input()
@@ -129,36 +128,11 @@ def handle_key_press(action):
             
         print(f"[Explain Screen] LOGGED FAILURE: {log_data}")
         
-        # 2. Rip next student & reset system globals
-        student_queue = state_manager.get_student_queue()
-        parent_stack = window.parentWidget()
-        
-        if student_queue:
-            next_stu = student_queue.pop(0)
-            state_manager.set_current_student(next_stu)
-            state_manager.set_student_queue(student_queue)
-            
-            # Wipe affordance state gracefully for the new human
-            if hasattr(state_manager, 'current_path'):
-                state_manager.current_path = []
-            state_manager.set_affordance_level(1)
-            
-            print(f"[Explain Screen] Advancing to next student: {next_stu}...")
-            try:
-                from screens import greeting_screen
-                if parent_stack:
-                    greeting_ui = greeting_screen.get_ui()
-                    parent_stack.addWidget(greeting_ui)
-                    parent_stack.setCurrentWidget(greeting_ui)
-            except ImportError:
-                print("Warning: Could not load greeting_screen.")
-        else:
-            print("[Explain Screen] Queue empty! Moving natively to Session Complete.")
-            try:
-                from screens import session_complete
-                if parent_stack:
-                    session_complete_ui = session_complete.get_ui()
-                    parent_stack.addWidget(session_complete_ui)
-                    parent_stack.setCurrentWidget(session_complete_ui)
-            except ImportError:
-                print("Warning: Could not load session_complete.")
+        # 2. Rip into Evaluation Sequence natively
+        print("[Explain Screen] Transitioning back to Evaluate (Level 3)...")
+        state_manager.set_affordance_level(3)
+        try:
+            from core.navigator import navigator
+            navigator.navigate_to("evaluate")
+        except Exception as e:
+            print(f"Warning: Could not transition back to evaluate screen. {e}")

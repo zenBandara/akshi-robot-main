@@ -65,9 +65,9 @@ def on_show():
     reward_anim.setEasingCurve(QEasingCurve.InOutSine)
     reward_anim.start()
     
-    # 6. Show reward for 4 seconds, then move on
-    print("[Celebration Screen] Displaying gamified reward for 4 seconds...")
-    QTimer.singleShot(4000, end_celebration)
+    # 6. Show reward for 6 seconds, then move on
+    print("[Celebration Screen] Displaying gamified reward for 6 seconds...")
+    QTimer.singleShot(6000, end_celebration)
 
 def end_celebration():
     global reward_anim

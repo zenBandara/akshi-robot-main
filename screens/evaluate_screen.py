@@ -208,7 +208,7 @@ def on_show():
         
         # Slower 1.5 words-per-second computational cadence
         words_count = len(speech_text.split())
-        delay_ms = max(3000, int((words_count / 1.5) * 1000))
+        delay_ms = max(3000, int((words_count / 1.8) * 1000))
     else:
         speech_text = f"{student_name}, {speech_start} {desc_text} Press the number to select your answer.".strip()
         print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
@@ -216,7 +216,7 @@ def on_show():
         
         # Standard 2.5 words-per-second computational cadence
         words_count = len(speech_text.split())
-        delay_ms = max(2000, int((words_count / 2.5) * 1000))
+        delay_ms = max(2000, int((words_count / 1.8) * 1000))
     
     print(f"Delaying keyboard input for {delay_ms}ms to allow speech to strictly finish...")
     QTimer.singleShot(delay_ms, enable_input)
@@ -353,9 +353,29 @@ def handle_key_press(action):
             
     else:
         print(f"[Evaluate Screen] Answer VALIDATION: INCORRECT! ❌")
-        try:
-            from core.flow_controller import flow_controller
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                flow_controller.on_incorrect_answer(parent_stack)
-        except ImportError: pass
+        
+        # 1. Fetch dynamic emotional encouragement sequence and speak natively on this screen!
+        from core.dialogue import DialoguePool
+        student_name = state_manager.get_current_student() or "friend"
+        current_level = state_manager.get_affordance_level()
+        dialogue_category = f"incorrect_L{current_level}"
+        encouragement_speech = DialoguePool.get_phrase(dialogue_category, student_name)
+        
+        print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
+        voice_manager.speak(encouragement_speech, f"eval_encourage_{student_name}")
+        
+        # 2. Delay the cascade escalation to give the Robot time to finish speaking.
+        clean_speech = encouragement_speech.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
+        words_count = len(clean_speech.split())
+        delay_ms = max(2000, int((words_count / 1.8) * 1000))
+        
+        from PySide6.QtCore import QTimer
+        def proceed_to_incorrect_cascade():
+            try:
+                from core.flow_controller import flow_controller
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    flow_controller.on_incorrect_answer(parent_stack)
+            except ImportError: pass
+            
+        QTimer.singleShot(delay_ms, proceed_to_incorrect_cascade)

@@ -4,6 +4,7 @@ from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -12,6 +13,7 @@ ui_path = os.path.join(project_root, "ui", "engageUI.ui")
 window = None
 input_enabled = False
 engage_data = {}
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -58,14 +60,11 @@ def on_show():
         window.media_label.setText("🌟\n[No Visual Prompt Provided]")
         
     # 3. Multi-Stage Warm Emotional Speech Loop
-    global input_enabled, engage_data
-    input_enabled = False
-    engage_data = task_data.get("engage", {})
-    
     speech_start = engage_data.get("speech_start", "Let's review this together!")
     
     window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
     print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{speech_start}\"")
+    voice_manager.speak(speech_start, f"engage_start_{task_data.get('task_id', 'id')}")
     
     # Extra slow, soothing computational cadence (1.8 words per second)
     words_count = len(speech_start.split())
@@ -79,6 +78,7 @@ def play_second_speech():
     if speech_end:
         window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
         print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{speech_end}\"")
+        voice_manager.speak(speech_end, f"engage_end_{engage_data.get('task_id', 'id')}")
         words_count = len(speech_end.split())
         delay_ms = max(2500, int((words_count / 1.8) * 1000))
         QTimer.singleShot(delay_ms, enable_input)
@@ -102,13 +102,8 @@ def handle_key_press(action):
         input_enabled = False
         print("[Engage Screen] Student pressed ENTER. Entering absolute final Evaluation loop! (Level 3)")
         
-        # Force routing back to Evaluation stage natively (Flow Controller will manage state tracking soon)
         try:
-            from screens import evaluate_screen
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                eval_ui = evaluate_screen.get_ui()
-                parent_stack.addWidget(eval_ui)
-                parent_stack.setCurrentWidget(eval_ui)
-        except ImportError:
-            print("Warning: Could not transition back to Evaluate Screen.")
+            from core.navigator import navigator
+            navigator.navigate_to("evaluate")
+        except Exception as e:
+            print(f"Warning: Could not transition back to Evaluate Screen. {e}")

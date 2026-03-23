@@ -14,11 +14,11 @@ from screens import teacher_select
 from screens import student_call_screen
 from screens import session_complete_screen
 from screens import evaluate_screen
-from screens import elaborate
+from screens import elaborate_screen
 from screens import celebration_screen
-from screens import engage
-from screens import explain
-from screens import explore
+from screens import engage_screen
+from screens import explain_screen
+from screens import explore_screen
 from screens import kinestatic
 
 app = QApplication(sys.argv)
@@ -63,10 +63,10 @@ screens = {
     "session_complete": session_complete_screen.get_ui(),
     "evaluate": evaluate_screen.get_ui(),
     "celebration": celebration_screen.get_ui(),
-    "elaborate": elaborate.get_ui(),
-    "engage": engage.get_ui(),
-    "explain": explain.get_ui(),
-    "explore": explore.get_ui(),
+    "elaborate": elaborate_screen.get_ui(),
+    "engage": engage_screen.get_ui(),
+    "explain": explain_screen.get_ui(),
+    "explore": explore_screen.get_ui(),
     "kinestatic": kinestatic.get_ui(),
 }
 

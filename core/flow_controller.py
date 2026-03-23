@@ -90,31 +90,26 @@ class FlowController:
             
         # 4. Synthesize visual routing
         try:
-            target_ui = None
-            if next_node == "elaborate":
-                from screens import elaborate_screen
-                target_ui = elaborate_screen.get_ui()
-            elif next_node in ["evaluate_L1", "evaluate_L2", "evaluate_L3"]:
-                from screens import evaluate_screen
-                target_ui = evaluate_screen.get_ui()
-            elif next_node == "explain":
-                from screens import explain_screen
-                target_ui = explain_screen.get_ui()
-            elif next_node == "explore":
-                from screens import explore_screen
-                target_ui = explore_screen.get_ui()
-            elif next_node == "engage":
-                from screens import engage_screen
-                target_ui = engage_screen.get_ui()
-            elif next_node == "teacher_intervention":
-                from screens import teacher_intervention
-                target_ui = teacher_intervention.get_ui()
-                
-            if parent_widget and target_ui:
-                switch_screen(parent_widget, target_ui)
+            from core.navigator import navigator
+            
+            # Map logical cascade nodes to navigator string IDs
+            screen_map = {
+                "evaluate_L1": "evaluate",
+                "evaluate_L2": "evaluate",
+                "evaluate_L3": "evaluate",
+                "elaborate": "elaborate",
+                "explain": "explain",
+                "explore": "explore",
+                "engage": "engage",
+                "teacher_intervention": "teacher_intervention"
+            }
+            
+            nav_target = screen_map.get(next_node)
+            if nav_target:
+                navigator.navigate_to(nav_target)
             else:
-                print(f"[FlowController] Error: Failed to load target GUI framework for cascade node {next_node}")
-        except ImportError as e:
+                print(f"[FlowController] Error: Unknown cascade node {next_node}")
+        except Exception as e:
             print(f"[FlowController] Critical Routing Error escalating out to {next_node}: {e}")
 
     def on_timeout(self, parent_widget):
@@ -170,18 +165,14 @@ class FlowController:
             state_manager.current_path = []
             
             try:
-                from screens import greeting_screen
-                if parent_widget:
-                    greeting_ui = greeting_screen.get_ui()
-                    switch_screen(parent_widget, greeting_ui)
-            except ImportError: pass
+                from core.navigator import navigator
+                navigator.navigate_to("greeting")
+            except Exception: pass
         else:
             try:
-                from screens import session_complete
-                if parent_widget:
-                    session_complete_ui = session_complete.get_ui()
-                    switch_screen(parent_widget, session_complete_ui)
-            except ImportError: pass
+                from core.navigator import navigator
+                navigator.navigate_to("session_complete")
+            except Exception: pass
 
     def on_break(self, parent_widget):
         """Safely pause the execution cascade natively without destroying state indexes."""
@@ -189,11 +180,9 @@ class FlowController:
         get_robot_eyes().set_expression("sleeping")
         
         try:
-            from screens import break_screen
-            if parent_widget:
-                break_ui = break_screen.get_ui()
-                switch_screen(parent_widget, break_ui)
-        except ImportError: pass
+            from core.navigator import navigator
+            navigator.navigate_to("break")
+        except Exception: pass
 
     def resume_cascade(self, parent_widget):
         """Restore exact execution state to the specific cascade pointer node logically mapped prior to Break condition."""
@@ -202,29 +191,21 @@ class FlowController:
         print(f"[FlowController] Break resolved. Resuming cascade execution identically at node: {current_node}")
         
         try:
-            target_ui = None
-            if current_node == "elaborate":
-                from screens import elaborate_screen
-                target_ui = elaborate_screen.get_ui()
-            elif current_node in ["evaluate_L1", "evaluate_L2", "evaluate_L3"]:
-                from screens import evaluate_screen
-                target_ui = evaluate_screen.get_ui()
-            elif current_node == "explain":
-                from screens import explain_screen
-                target_ui = explain_screen.get_ui()
-            elif current_node == "explore":
-                from screens import explore_screen
-                target_ui = explore_screen.get_ui()
-            elif current_node == "engage":
-                from screens import engage_screen
-                target_ui = engage_screen.get_ui()
-            elif current_node == "teacher_intervention":
-                from screens import teacher_intervention
-                target_ui = teacher_intervention.get_ui()
-                
-            if parent_widget and target_ui:
-                switch_screen(parent_widget, target_ui)
-        except ImportError as e:
+            from core.navigator import navigator
+            screen_map = {
+                "evaluate_L1": "evaluate",
+                "evaluate_L2": "evaluate",
+                "evaluate_L3": "evaluate",
+                "elaborate": "elaborate",
+                "explain": "explain",
+                "explore": "explore",
+                "engage": "engage",
+                "teacher_intervention": "teacher_intervention"
+            }
+            nav_target = screen_map.get(current_node)
+            if nav_target:
+                navigator.navigate_to(nav_target)
+        except Exception as e:
             print(f"[FlowController] Error attempting to resume cascade at {current_node}: {e}")
 
 # Global singleton instance
