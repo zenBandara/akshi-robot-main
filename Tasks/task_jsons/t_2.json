@@ -2,7 +2,6 @@
   "task_id": "t_2",
   "task_name": "Counting Objects",
   "description": "A task to help preschool students practice counting up to 4 objects.",
-
   "engage": {
     "task_title": "Let's Count!",
     "speech_start": "Hello! Do you like counting?",
@@ -10,7 +9,6 @@
     "description": "Connecting with counting experiences. Optional video integration.",
     "video_url": "tasks/t2/engage.mp4"
   },
-  
   "explore": {
     "task_title": "Counting on your fingers",
     "speech_start": "Can you hold up three fingers and show your teacher?",
@@ -18,14 +16,12 @@
     "description": "Kinesthetic activity counting physical fingers.",
     "activity_description": "Raise your hands and count aloud together with the teacher."
   },
-  
   "explain": {
     "task_title": "What are numbers?",
     "speech_start": "Numbers tell us how many things we have. One, two, three, four!",
     "speech_end": "Now you know how to count.",
     "description": "Robot visually shows numbers."
   },
-
   "elaborate": {
     "task_type": "mcq_image",
     "task_title": "Let's practice counting",
@@ -39,14 +35,13 @@
       "op4": "Four Apples"
     },
     "multiple_choices_images": {
-      "op1": "tasks/t2/apple_1.png",
-      "op2": "tasks/t2/apple_2.png",
-      "op3": "tasks/t2/apple_3.png",
-      "op4": "tasks/t2/apple_4.png"
+      "op1": "assets/placeholder.png",
+      "op2": "assets/placeholder.png",
+      "op3": "assets/placeholder.png",
+      "op4": "assets/placeholder.png"
     },
     "correct_option": "op2"
   },
-
   "evaluate": {
     "task_type": "mcq_image",
     "task_title": "Show me what you learned!",
@@ -60,10 +55,10 @@
       "op4": "Four Stars"
     },
     "multiple_choices_images": {
-      "op1": "tasks/t2/star_1.png",
-      "op2": "tasks/t2/star_2.png",
-      "op3": "tasks/t2/star_3.png",
-      "op4": "tasks/t2/star_4.png"
+      "op1": "assets/placeholder.png",
+      "op2": "assets/placeholder.png",
+      "op3": "assets/placeholder.png",
+      "op4": "assets/placeholder.png"
     },
     "correct_option": "op3"
   }

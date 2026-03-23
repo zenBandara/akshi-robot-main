@@ -2,7 +2,6 @@
   "task_id": "t_5",
   "task_name": "Big and Small",
   "description": "A task to help preschool students understand size comparisons.",
-
   "engage": {
     "task_title": "Big and Small Things",
     "speech_start": "Hello! Today we are looking at things that are very big, and very small!",
@@ -10,7 +9,6 @@
     "description": "Playing an animation showing an elephant and a mouse.",
     "video_url": "tasks/t5/engage.mp4"
   },
-  
   "explore": {
     "task_title": "Stretch out wide!",
     "speech_start": "Can you stretch your arms out really wide to show something BIG?",
@@ -18,14 +16,12 @@
     "description": "Kinesthetic activity stretching arms.",
     "activity_description": "Stretch arms wide for big, and bring hands close together for small."
   },
-  
   "explain": {
     "task_title": "What does size mean?",
     "speech_start": "Big means it takes up a lot of space. Small means it takes up a tiny bit of space.",
     "speech_end": "Now you know what big and small means.",
     "description": "Robot visually shows a big house and a small house."
   },
-
   "elaborate": {
     "task_type": "mcq_image",
     "task_title": "Let's practice sizes",
@@ -39,14 +35,13 @@
       "op4": "A Cat"
     },
     "multiple_choices_images": {
-      "op1": "tasks/t5/animal_mouse.png",
-      "op2": "tasks/t5/animal_dog.png",
-      "op3": "tasks/t5/animal_elephant.png",
-      "op4": "tasks/t5/animal_cat.png"
+      "op1": "assets/placeholder.png",
+      "op2": "assets/placeholder.png",
+      "op3": "assets/placeholder.png",
+      "op4": "assets/placeholder.png"
     },
     "correct_option": "op3"
   },
-
   "evaluate": {
     "task_type": "mcq_image",
     "task_title": "Show me what you learned!",
@@ -60,10 +55,10 @@
       "op4": "A Bus"
     },
     "multiple_choices_images": {
-      "op1": "tasks/t5/obj_car.png",
-      "op2": "tasks/t5/obj_bug.png",
-      "op3": "tasks/t5/obj_bicycle.png",
-      "op4": "tasks/t5/obj_bus.png"
+      "op1": "assets/placeholder.png",
+      "op2": "assets/placeholder.png",
+      "op3": "assets/placeholder.png",
+      "op4": "assets/placeholder.png"
     },
     "correct_option": "op2"
   }
