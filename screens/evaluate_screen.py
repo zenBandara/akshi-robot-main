@@ -210,13 +210,24 @@ def on_show():
     input_enabled = False
     
     speech_text = eval_data.get("speech_start", "Let's try a task.")
-    print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
     
-    # Calculate rough delay based on text length (~2.5 words per second)
-    words_count = len(speech_text.split())
-    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    # Mathematical Speech Cadence offset
+    if level >= 3:
+        # Step 38: Level 3 Speech Simplification & Cadence Slowdown
+        speech_text = f"Look carefully! {speech_text}"
+        print(f"🤖 ROBOT SPEAKS [SLOW RATE -30%]: \"{speech_text}\"")
+        
+        # Slower 1.5 words-per-second computational cadence
+        words_count = len(speech_text.split())
+        delay_ms = max(3000, int((words_count / 1.5) * 1000))
+    else:
+        print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
+        
+        # Standard 2.5 words-per-second computational cadence
+        words_count = len(speech_text.split())
+        delay_ms = max(2000, int((words_count / 2.5) * 1000))
     
-    print(f"Delaying keyboard input for {delay_ms}ms to allow speech to finish...")
+    print(f"Delaying keyboard input for {delay_ms}ms to allow speech to strictly finish...")
     QTimer.singleShot(delay_ms, enable_input)
 
 def enable_input():
