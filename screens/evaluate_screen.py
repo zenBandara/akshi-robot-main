@@ -1,11 +1,11 @@
 import os
 import random
-import pygame
 from PySide6.QtGui import QPixmap
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
+from core.sound_manager import sound_manager
 from core.animations import apply_pulse_glow
 from core.timer_widget import EmojiTimerWidget
 
@@ -17,7 +17,6 @@ window = None
 input_enabled = False
 active_animations = []
 evaluate_timer = None
-arcade_bgm = None
 key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 
 def get_ui():
@@ -30,13 +29,6 @@ def get_ui():
             return None
         window = loader.load(file)
         file.close()
-        
-        # Safely init audio mixer
-        try:
-            if not pygame.mixer.get_init():
-                pygame.mixer.init()
-        except Exception as e:
-            print(f"Warning: Audio mixer failed to initialize. {e}")
         
         # Bind the navigator lifecycle hook
         window.on_show = on_show
@@ -51,13 +43,12 @@ def on_show():
     state_manager.set_current_screen("evaluate")
     
     # 0. Clean Resets
-    global arcade_bgm
     if evaluate_timer:
         evaluate_timer.stop()
     for anim in active_animations:
         anim.stop()
-    if arcade_bgm:
-        arcade_bgm.stop()
+        
+    sound_manager.stop_bgm()
         
     active_animations.clear()
     input_enabled = False
@@ -102,23 +93,8 @@ def on_show():
             for k in [window.key_1, window.key_2]:
                 k.setStyleSheet("font-size: 20px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 12px; padding: 5px; margin: 0px 40px;")
                 
-            bell_path = os.path.join(project_root, "assets", "sounds", "bell.wav")
-            if os.path.exists(bell_path):
-                try:
-                    bell = pygame.mixer.Sound(bell_path)
-                    bell.set_volume(0.4)
-                    bell.play()
-                except Exception as e:
-                    pass
-                    
-            bgm_path = os.path.join(project_root, "assets", "sounds", "arcade_bgm.wav")
-            if os.path.exists(bgm_path):
-                try:
-                    arcade_bgm = pygame.mixer.Sound(bgm_path)
-                    arcade_bgm.set_volume(0.15)
-                    arcade_bgm.play(loops=-1)
-                except Exception as e:
-                    pass
+            sound_manager.play_bell()
+            sound_manager.play_bgm("arcade")
         else:
             # Level 3: Maximum Accessible High-Contrast
             img_size = 400
@@ -253,7 +229,7 @@ def enable_input():
     evaluate_timer.start()
 
 def on_timer_expire():
-    global input_enabled, arcade_bgm
+    global input_enabled
     if not input_enabled:
         return
         
@@ -264,8 +240,7 @@ def on_timer_expire():
     for anim in active_animations:
         anim.stop()
         
-    if arcade_bgm:
-        arcade_bgm.stop()
+    sound_manager.stop_bgm()
         
     # Delegate terminal routing completely accurately into isolated flow controller natively
     try:
@@ -276,7 +251,7 @@ def on_timer_expire():
     except ImportError: pass
         
 def handle_key_press(action):
-    global input_enabled, evaluate_timer, key_mapping, arcade_bgm, active_animations
+    global input_enabled, evaluate_timer, key_mapping, active_animations
     if not input_enabled:
         return
         
@@ -290,8 +265,8 @@ def handle_key_press(action):
             evaluate_timer.stop()
         for anim in active_animations:
             anim.stop()
-        if arcade_bgm:
-            arcade_bgm.stop()
+            
+        sound_manager.stop_bgm()
             
         try:
             from core.flow_controller import flow_controller
@@ -311,8 +286,8 @@ def handle_key_press(action):
             evaluate_timer.stop()
         for anim in active_animations:
             anim.stop()
-        if arcade_bgm:
-            arcade_bgm.stop()
+            
+        sound_manager.stop_bgm()
             
         try:
             from core.flow_controller import flow_controller
@@ -331,11 +306,11 @@ def handle_key_press(action):
     print(f"[Evaluate Screen] Student pressed physical key {action}.")
     
     # Stop distracting animations and audio gracefully
-    global active_animations, arcade_bgm
+    global active_animations
     for anim in active_animations:
         anim.stop()
-    if arcade_bgm:
-        arcade_bgm.stop()
+        
+    sound_manager.stop_bgm()
         
     # Highlight the chosen card visually via StyleSheet manipulation
     card_map = {
