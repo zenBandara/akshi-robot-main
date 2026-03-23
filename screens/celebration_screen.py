@@ -32,7 +32,7 @@ def on_show():
     state_manager.set_current_screen("celebration")
     
     # 1. Fetch exact Student Name
-    student_name = state_manager.current_student
+    student_name = state_manager.get_current_student()
     if not student_name:
         student_name = "Superstar"
         print("[Celebration Screen] Warning: No active student found in state manager.")
@@ -77,5 +77,60 @@ def end_celebration():
         reward_anim.stop()
         
     print("[Celebration Screen] Celebration timeout reached.")
-    # TODO Step 21: Log the result
-    # TODO Step 22: Call next_student()
+    
+    # 7. Log the Result (Step 21)
+    task_data = state_manager.get_current_task()
+    task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
+    student_id = state_manager.get_current_student() or "unknown"
+    
+    log_data = {
+        "student_id": student_id,
+        "task_id": task_id,
+        "result": "correct",
+        "affordance_level_reached": 1,
+        "path_taken": ["evaluate_L1"]
+    }
+    
+    # Cache log locally
+    if not hasattr(state_manager, 'session_logs'):
+        state_manager.session_logs = []
+    state_manager.session_logs.append(log_data)
+    
+    # Dispatch to Firebase stub
+    try:
+        from core import firebase
+        firebase.log_event(log_data)
+    except ImportError:
+        pass
+        
+    print(f"[Celebration Screen] LOGGED SUCCESS: {log_data}")
+    
+    # 8. Call next_student() logic (Step 22)
+    student_queue = state_manager.get_student_queue()
+    parent_stack = window.parentWidget()
+    
+    if student_queue:
+        next_stu = student_queue.pop(0)
+        state_manager.set_current_student(next_stu)
+        state_manager.set_student_queue(student_queue)
+        print(f"[Celebration Screen] Advancing to next student: {next_stu}...")
+        
+        # Navigate back to Student Calling / Greeting Screen
+        try:
+            from screens import greeting_screen
+            if parent_stack:
+                greeting_ui = greeting_screen.get_ui()
+                parent_stack.addWidget(greeting_ui)
+                parent_stack.setCurrentWidget(greeting_ui)
+        except ImportError:
+            print("Warning: Could not load greeting_screen.")
+    else:
+        print("[Celebration Screen] Queue empty! Moving to Session Complete.")
+        try:
+            from screens import session_complete
+            if parent_stack:
+                session_complete_ui = session_complete.get_ui()
+                parent_stack.addWidget(session_complete_ui)
+                parent_stack.setCurrentWidget(session_complete_ui)
+        except ImportError:
+            print("Warning: Could not load session_complete.")

@@ -43,7 +43,7 @@ def on_show():
     input_enabled = False
     
     # 1. Fetch Task Data
-    task_data = state_manager.current_task
+    task_data = state_manager.get_current_task()
     if not task_data or "evaluate" not in task_data:
         print("Error: No valid evaluate task found in state_manager.")
         window.question_label.setText("Error: Task not loaded.")
@@ -164,7 +164,8 @@ def handle_key_press(action):
         selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
         
     # Validation logic
-    eval_data = state_manager.current_task.get("evaluate", {})
+    task_data = state_manager.get_current_task()
+    eval_data = task_data.get("evaluate", {}) if task_data else {}
     correct_option = eval_data.get("correct_option")
     selected_option = f"op{action}"
     
@@ -173,7 +174,17 @@ def handle_key_press(action):
     
     if selected_option == correct_option:
         print("[Evaluate Screen L1] Answer VALIDATION: CORRECT! 🎉")
-        # TODO: Trigger success path (Step 18+ Celebration Screen)
+        
+        try:
+            from screens import celebration_screen
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                celebration_ui = celebration_screen.get_ui()
+                parent_stack.addWidget(celebration_ui)
+                parent_stack.setCurrentWidget(celebration_ui)
+        except ImportError:
+            print("Warning: Could not transition to celebration screen.")
+            
     else:
         print(f"[Evaluate Screen L1] Answer VALIDATION: INCORRECT! ❌ (Selected: {selected_option}, Expected: {correct_option})")
         # TODO: Trigger failure path (Step 25+ Elaborate Screen)
