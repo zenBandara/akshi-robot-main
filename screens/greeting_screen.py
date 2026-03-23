@@ -24,14 +24,20 @@ def get_ui():
     window = loader.load(file)
     file.close()
 
-    def handle_show_event(event):
+    def on_show_hook():
+        print("[Greeting Screen] Becoming active...")
         state_manager.set_current_screen("greeting")
-        on_show()
+        
+        from core.keyboard_manager import keyboard_manager
+        keyboard_manager.unregister_handler() # Prevent W spamming
+        
+        # Run animations & voice async after UI flips
+        QTimer.singleShot(100, on_ready)
 
-    window.showEvent = handle_show_event
+    window.on_show = on_show_hook
     return window
 
-def on_show():
+def on_ready():
     # Eyes open wide animation
     window.eyes_label.setText("O  O")
     

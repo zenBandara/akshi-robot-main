@@ -16,7 +16,12 @@ class Navigator:
 
     def navigate_to(self, screen_name):
         if screen_name in self.screens and self.stack:
-            self.stack.setCurrentWidget(self.screens[screen_name])
+            widget = self.screens[screen_name]
+            self.stack.setCurrentWidget(widget)
+            
+            # Fire the on_show lifecycle hook if the widget defines one
+            if hasattr(widget, "on_show"):
+                widget.on_show()
         else:
             print(f"Error: Cannot navigate to '{screen_name}'. Stack present: {self.stack is not None}")
 

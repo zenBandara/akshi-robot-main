@@ -2,6 +2,7 @@ import sys
 import datetime
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
+from PySide6.QtCore import QObject, QEvent, Qt
 
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
@@ -20,18 +21,26 @@ app = QApplication(sys.argv)
 main_window = QMainWindow()
 main_window.setWindowTitle("Akshi Robot Interface")
 main_window.setMinimumSize(900, 600)
+main_window.setFocusPolicy(Qt.StrongFocus) # Crucial for key events on empty windows!
 
 stack = QStackedWidget()
+stack.setFocusPolicy(Qt.StrongFocus)
 main_window.setCentralWidget(stack)
 
 # Bind the stack to the navigator
 navigator.set_stack(stack)
 
-# Setup Global Keyboard Manager
-def global_key_press(event):
-    keyboard_manager.handle_key_press(event)
-    
-main_window.keyPressEvent = global_key_press
+# Setup Global Keyboard Manager using EventFilter
+class GlobalKeyListener(QObject):
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.KeyPress or event.type() == QEvent.KeyPress:
+            # print(f"Key intercepted by app filter! Key: {event.key()}") # uncomment to debug all keys
+            keyboard_manager.handle_key_press(event)
+            return False
+        return super().eventFilter(obj, event)
+
+key_listener = GlobalKeyListener()
+app.installEventFilter(key_listener)
 
 # Load all instantiated screens
 print("Loading screens...")

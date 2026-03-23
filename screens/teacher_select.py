@@ -24,12 +24,13 @@ def get_ui():
     window = loader.load(file)
     file.close()
 
-    def handle_show_event(event):
+    def on_show():
+        print("[Teacher Select Screen] Becoming active...")
         state_manager.set_current_screen("teacher_select")
         keyboard_manager.register_handler(handle_key_press)
         load_teachers()
 
-    window.showEvent = handle_show_event
+    window.on_show = on_show
     return window
 
 def load_teachers():
@@ -71,5 +72,6 @@ def handle_key_press(mapped_action):
         state_manager.set_student_list(students)
         print(f"Loaded {len(students)} students.")
         
-        print("Transitioning to Student Calling Screen...")
-        navigator.navigate_to("student_calling")
+        print("Teacher selected. Transitioning to Student Calling Screen (Phase 2)...")
+        window.teacher_list_label.setText(f"Great! {selected_teacher} Selected!\n\n(Student Calling Screen will be built in Phase 2)")
+        # navigator.navigate_to("student_calling") # Uncomment in Phase 2

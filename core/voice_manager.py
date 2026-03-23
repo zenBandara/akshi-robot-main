@@ -1,6 +1,7 @@
 import asyncio
 import edge_tts
 import os
+import threading
 from playsound import playsound
 
 
@@ -34,4 +35,10 @@ class VoiceManager:
             print("Generating audio:", filename)
             asyncio.run(self.generate_voice(text, filename, rate))
 
-        playsound(filename)
+        def play():
+            try:
+                playsound(filename)
+            except Exception as e:
+                print(f"Error playing sound: {e}")
+                
+        threading.Thread(target=play, daemon=True).start()

@@ -12,9 +12,11 @@ class KeyboardManager:
             Qt.Key_Enter: "ENTER",
         }
         
-        # Add A-Z mappings
+        # Add A-Z mappings ONLY if they aren't already mapped
         for i in range(26):
-            self.key_mapping[Qt.Key_A + i] = chr(ord('A') + i)
+            key_code = Qt.Key_A + i
+            if key_code not in self.key_mapping:
+                self.key_mapping[key_code] = chr(ord('A') + i)
             
         # Add 0-9 mappings
         for i in range(10):

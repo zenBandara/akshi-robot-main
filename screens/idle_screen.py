@@ -1,6 +1,7 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QGraphicsOpacityEffect
+from PySide6.QtCore import QFile, QTimer, QPropertyAnimation
+from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.keyboard_manager import keyboard_manager
 from core.state_manager import state_manager
 from core.navigator import navigator
@@ -27,12 +28,13 @@ def get_ui():
 
     setup_animations()
     
-    # Register keyboard handlers only when the screen becomes active
-    def handle_show_event(event):
+    # Standardize lifecycle hooks for Navigator
+    def on_show():
+        print("[Idle Screen] Becoming active...")
         keyboard_manager.register_handler(handle_key_press)
         state_manager.set_current_screen("idle")
 
-    window.showEvent = handle_show_event
+    window.on_show = on_show
     return window
 
 def setup_animations():
