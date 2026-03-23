@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CelebrationScreen</class>
+ <widget class="QWidget" name="CelebrationScreen">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget { background-color: #F1F8E9; font-family: 'Nunito', sans-serif; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin"><number>40</number></property>
+   <property name="topMargin"><number>40</number></property>
+   <property name="rightMargin"><number>40</number></property>
+   <property name="bottomMargin"><number>40</number></property>
+   <property name="spacing"><number>20</number></property>
+   
+   <item>
+    <spacer name="topSpacer">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+    </spacer>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="celebration_img">
+     <property name="text"><string>🌟🎉</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet"><string>font-size: 150px; background: transparent;</string></property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="celebration_text">
+     <property name="text"><string>Amazing job, Student! 🎉🌟</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="styleSheet"><string>font-size: 54px; font-weight: bold; color: #2E7D32; background: transparent;</string></property>
+    </widget>
+   </item>
+   
+   <item>
+    <widget class="QLabel" name="instruction_text">
+     <property name="text"><string>Moving to the next student...</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet"><string>font-size: 24px; color: #558B2F; margin-top: 30px; background: transparent;</string></property>
+    </widget>
+   </item>
+
+   <item>
+    <spacer name="bottomSpacer">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+    </spacer>
+   </item>
+
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
