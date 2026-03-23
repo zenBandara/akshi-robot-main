@@ -4,6 +4,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QEasingCurve
 from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
+from core.voice_manager import VoiceManager
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -11,6 +12,7 @@ ui_path = os.path.join(project_root, "ui", "celebrationUI.ui")
 
 window = None
 reward_anim = None
+voice_manager = VoiceManager()
 
 def get_ui():
     global window
@@ -46,7 +48,9 @@ def on_show():
     
     # 4. Robot Speech Stub (Filter out emojis for speech engine)
     clean_speech = selected_phrase.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
-    print(f"🤖 ROBOT SPEAKS: \"{clean_speech.strip()}\"")
+    clean_speech_str = clean_speech.strip()
+    print(f"🤖 ROBOT SPEAKS: \"{clean_speech_str}\"")
+    voice_manager.speak(clean_speech_str, f"celebrate_{student_name}")
     
     # 5. Gamified Reward Animation (Level 1 Affective Affordance)
     global reward_anim

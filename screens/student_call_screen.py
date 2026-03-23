@@ -63,6 +63,7 @@ def setup_animations():
 
 def handle_key_press(mapped_action):
     if mapped_action == "ENTER" or mapped_action == "CONTINUE":
+        keyboard_manager.unregister_handler()
         print("Student ready! Transitioning to Evaluate Screen...")
         state_manager.set_five_e_stage("evaluate")
         state_manager.set_affordance_level(1)
