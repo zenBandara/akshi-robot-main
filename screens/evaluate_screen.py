@@ -114,5 +114,13 @@ def handle_key_press(action):
     if selected_card:
         selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
         
-    # Validation logic will go here in Step 15
-    print(f"Selection visually clamped to option {action}. Awaiting validation...")
+    eval_data = state_manager.current_task.get("evaluate", {})
+    correct_option = eval_data.get("correct_option")
+    selected_option = f"op{action}"
+    
+    if selected_option == correct_option:
+        print("[Evaluate Screen L1] Answer VALIDATION: CORRECT! 🎉")
+        # TODO: Trigger success path (Step 18+ Celebration Screen)
+    else:
+        print(f"[Evaluate Screen L1] Answer VALIDATION: INCORRECT! ❌ (Selected: {selected_option}, Expected: {correct_option})")
+        # TODO: Trigger failure path (Step 25+ Elaborate Screen)
