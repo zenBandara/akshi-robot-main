@@ -90,7 +90,25 @@ def enable_input():
     input_enabled = True
     window.robot_text_label.setText("🤖 Waiting for you to feel ready...")
     print("[Engage Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
-    # TODO Step 49: Bind keyboard handler
+    # Step 49: Bind keyboard handler
+    keyboard_manager.register_handler(handle_key_press)
 
 def handle_key_press(action):
-    pass
+    global input_enabled
+    if not input_enabled:
+        return
+        
+    if action == "ENTER":
+        input_enabled = False
+        print("[Engage Screen] Student pressed ENTER. Entering absolute final Evaluation loop! (Level 3)")
+        
+        # Force routing back to Evaluation stage natively (Flow Controller will manage state tracking soon)
+        try:
+            from screens import evaluate_screen
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                eval_ui = evaluate_screen.get_ui()
+                parent_stack.addWidget(eval_ui)
+                parent_stack.setCurrentWidget(eval_ui)
+        except ImportError:
+            print("Warning: Could not transition back to Evaluate Screen.")
