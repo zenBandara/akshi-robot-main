@@ -1,4 +1,5 @@
 from core.state_manager import state_manager
+from core.transitions import switch_screen
 
 # Define the absolute deterministic sequence for a failing student
 CASCADE = [
@@ -51,8 +52,7 @@ class FlowController:
             from screens import celebration_screen
             if parent_widget:
                 celeb_ui = celebration_screen.get_ui()
-                parent_widget.addWidget(celeb_ui)
-                parent_widget.setCurrentWidget(celeb_ui)
+                switch_screen(parent_widget, celeb_ui)
         except ImportError:
             print("[FlowController] CRITICAL: Could not transit to Celebration Screen.")
 
@@ -106,8 +106,7 @@ class FlowController:
                 target_ui = teacher_intervention.get_ui()
                 
             if parent_widget and target_ui:
-                parent_widget.addWidget(target_ui)
-                parent_widget.setCurrentWidget(target_ui)
+                switch_screen(parent_widget, target_ui)
             else:
                 print(f"[FlowController] Error: Failed to load target GUI framework for cascade node {next_node}")
         except ImportError as e:
@@ -169,16 +168,14 @@ class FlowController:
                 from screens import greeting_screen
                 if parent_widget:
                     greeting_ui = greeting_screen.get_ui()
-                    parent_widget.addWidget(greeting_ui)
-                    parent_widget.setCurrentWidget(greeting_ui)
+                    switch_screen(parent_widget, greeting_ui)
             except ImportError: pass
         else:
             try:
                 from screens import session_complete
                 if parent_widget:
                     session_complete_ui = session_complete.get_ui()
-                    parent_widget.addWidget(session_complete_ui)
-                    parent_widget.setCurrentWidget(session_complete_ui)
+                    switch_screen(parent_widget, session_complete_ui)
             except ImportError: pass
 
     def on_break(self, parent_widget):
@@ -189,8 +186,7 @@ class FlowController:
             from screens import break_screen
             if parent_widget:
                 break_ui = break_screen.get_ui()
-                parent_widget.addWidget(break_ui)
-                parent_widget.setCurrentWidget(break_ui)
+                switch_screen(parent_widget, break_ui)
         except ImportError: pass
 
     def resume_cascade(self, parent_widget):
@@ -220,8 +216,7 @@ class FlowController:
                 target_ui = teacher_intervention.get_ui()
                 
             if parent_widget and target_ui:
-                parent_widget.addWidget(target_ui)
-                parent_widget.setCurrentWidget(target_ui)
+                switch_screen(parent_widget, target_ui)
         except ImportError as e:
             print(f"[FlowController] Error attempting to resume cascade at {current_node}: {e}")
 
