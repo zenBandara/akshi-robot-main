@@ -71,9 +71,14 @@ def on_show():
     global input_enabled
     input_enabled = False
     
-    speech_text = elab_data.get("speech_start", "Oops! Let's try this one more time...")
+    student_name = state_manager.get_current_student() or "friend"
+    speech_start = elab_data.get("speech_start", "Oops! Let's try this one more time...")
+    question_text = elab_data.get("task_description", "Which option is correct?")
+    
+    speech_text = f"{student_name}, {speech_start} {question_text} Press the number to select your answer."
+    
     print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
-    voice_manager.speak(speech_text, f"elaborate_{task_data.get('task_id', 'id')}")
+    voice_manager.speak(speech_text, f"elaborate_question_{task_data.get('task_id', 'id')}_{student_name}")
     
     # Calculate rough delay based on text length (~2.5 words per second)
     words_count = len(speech_text.split())
@@ -100,7 +105,7 @@ def handle_key_press(action):
     input_enabled = False
     print(f"[Elaborate Screen L1] Student pressed key {action}. Review complete!")
     
-    # Highlight the chosen card visually (Deep Purple border / Light Purple BG)
+    # Highlight the chosen card visually via StyleSheet manipulation
     card_map = {
         "1": window.card_1,
         "2": window.card_2,
@@ -109,14 +114,67 @@ def handle_key_press(action):
     }
     
     selected_card = card_map.get(action)
-    if selected_card:
-        selected_card.setStyleSheet("QFrame { background-color: #E1BEE7; border-radius: 25px; border: 6px solid #8E24AA; }")
-        
-    print("[Elaborate Screen L1] Transitioning back to Evaluate (Level 2)...")
-    state_manager.set_affordance_level(2)
     
-    try:
-        from core.navigator import navigator
-        navigator.navigate_to("evaluate")
-    except Exception as e:
-        print(f"Warning: Could not transition back to evaluate screen. {e}")
+    # Validation logic
+    task_data = state_manager.get_current_task()
+    elab_data = task_data.get("elaborate", {}) if task_data else {}
+    correct_option = elab_data.get("correct_option")
+    
+    # Map physical key stroke natively back to JSON structure
+    key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
+    selected_option = key_mapping.get(action)
+    
+    student_name = state_manager.get_current_student() or "friend"
+    from core.flow_controller import flow_controller
+    
+    if selected_option == correct_option:
+        print("[Elaborate Screen] Answer VALIDATION: CORRECT! 🎉")
+        if selected_card:
+            selected_card.setStyleSheet("QFrame { background-color: #C8E6C9; border-radius: 25px; border: 6px solid #4CAF50; }")
+            
+        speech = "Great job! Now let's try the real question again."
+        print(f"🤖 ROBOT SPEAKS: \"{speech}\"")
+        voice_manager.speak(speech, f"elaborate_correct_{student_name}")
+        
+        # Advance FlowController natively to evaluate_L2 (Cascade Index 2)
+        flow_controller.cascade_index = 2
+        state_manager.set_affordance_level(2)
+        state_manager.current_stage = "evaluate_L2"
+        
+        # Wait 3000ms for audio to resolve cleanly
+        delay_ms = 3000
+        def proceed_to_eval():
+            try:
+                from core.navigator import navigator
+                navigator.navigate_to("evaluate")
+            except Exception as e:
+                print(f"Warning: Could not transition back to evaluate screen. {e}")
+                
+        QTimer.singleShot(delay_ms, proceed_to_eval)
+        
+    else:
+        print("[Elaborate Screen] Answer VALIDATION: INCORRECT! ❌")
+        if selected_card:
+            selected_card.setStyleSheet("QFrame { background-color: #FFCCBC; border-radius: 25px; border: 6px solid #E64A19; }")
+            
+        from core.dialogue import DialoguePool
+        encouragement_speech = DialoguePool.get_phrase("incorrect_L1", student_name)
+        print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
+        voice_manager.speak(encouragement_speech, f"elaborate_wrong_{student_name}")
+        
+        # Advance FlowController completely bypassing L2 straight to explain (Cascade Index 3)
+        flow_controller.cascade_index = 3
+        state_manager.current_stage = "explain"
+        
+        clean_speech = encouragement_speech.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
+        words_count = len(clean_speech.split())
+        delay_ms = max(2000, int((words_count / 1.8) * 1000))
+        
+        def proceed_to_explain():
+            try:
+                from core.navigator import navigator
+                navigator.navigate_to("explain")
+            except Exception as e:
+                print(f"Warning: Could not transition back to explain screen. {e}")
+                
+        QTimer.singleShot(delay_ms, proceed_to_explain)

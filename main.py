@@ -19,6 +19,8 @@ from screens import celebration_screen
 from screens import engage_screen
 from screens import explain_screen
 from screens import explore_screen
+from screens import teacher_intervention
+from screens import break_screen
 from screens import kinestatic
 
 app = QApplication(sys.argv)
@@ -67,6 +69,8 @@ screens = {
     "engage": engage_screen.get_ui(),
     "explain": explain_screen.get_ui(),
     "explore": explore_screen.get_ui(),
+    "teacher_intervention": teacher_intervention.get_ui(),
+    "break": break_screen.get_ui(),
     "kinestatic": kinestatic.get_ui(),
 }
 

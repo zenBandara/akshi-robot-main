@@ -137,6 +137,9 @@ def handle_key_press(action):
         
         # Advance to Evaluate Level 3 Natively
         print("[Explore Screen] Transitioning back to Evaluate (Level 3)...")
+        from core.flow_controller import flow_controller
+        flow_controller.cascade_index = 6
+        state_manager.current_stage = "evaluate_L3"
         state_manager.set_affordance_level(3)
         try:
             from core.navigator import navigator

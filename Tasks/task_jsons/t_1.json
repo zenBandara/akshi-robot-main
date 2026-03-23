@@ -1,35 +1,35 @@
 {
   "task_id": "t_1",
   "task_name": "Left Right Identification",
-  "description": "A task to help students understand the concept of left and right.",
+  "description": "A deeply conversational task teaching preschoolers the difference between left and right.",
   "engage": {
     "task_title": "Engage with Left and Right",
-    "speech_start": "Hello friends! Today we have a super fun mission. We are going to learn all about our left and right sides. Are you ready? Let's go!",
-    "speech_end": "Do you remember which hand is your left hand? Raise it up high!",
-    "description": "Connect with prior knowledge. Show video if needed. Not compulsory.",
+    "speech_start": "Hello my wonderful friends! I am so excited to see you today! We have a super fun and very important mission. Today, we are going to learn all about our left side and our right side! Are you ready to go on an adventure together? Let's go!",
+    "speech_end": "Okay, let's think really hard for a second. Do you remember which hand is your left hand? Show me how you raise it all the way up high into the playful sky!",
+    "description": "Connect with prior knowledge. Watch the fun introductory video.",
     "video_url": "tasks/t1/engage_video.mp4"
   },
   "explore": {
     "task_title": "Let's Explore Left and Right",
-    "speech_start": "Time to move around! Let's explore together.",
+    "speech_start": "Okay superstars, it is time to move our bodies around! Stand straight up on your feet and let's explore together. Follow along with exactly what I do!",
     "video_url": "tasks/t1/explore_video.mp4",
-    "description": "Students observe objects and identify directions.",
-    "activity_description": "Students raise their left hand and right hand and show to the teacher. (Kinesthetic activity with teacher guidance)",
-    "speech_end": "Awesome exploring! Let's head back to our lesson."
+    "description": "Students observe objects and physically identify directions.",
+    "activity_description": "Raise your left hand, and then your right hand, and show your teacher!",
+    "speech_end": "Wow, you did such an awesome job exploring with me! You are amazing! Now let's head right back to our lesson and learn some more."
   },
   "explain": {
     "task_title": "Understanding Left and Right",
-    "speech_start": "Look at your hands! The hand that makes an 'L' shape is your left hand. The other one is your right hand!",
-    "speech_end": "Now you know what left and right means. You're so smart!",
+    "speech_start": "Here is a fun little trick just for you! Hold both of your hands out right in front of you. Look at them really closely! The hand that naturally makes an 'L' shape with your thumb and pointer finger... is your left hand! See the L? That means Left! And the other one is your right hand!",
+    "speech_end": "Now you know the magic secret of what left and right means. You are getting so smart, I can't even believe it!",
     "video_url": "tasks/t1/explain_video.mp4",
-    "description": "Robot explains the concept using examples."
+    "description": "Robot deeply explains the concept using the 'L' shape trick on the hands."
   },
   "elaborate": {
     "task_type": "mcq_image",
     "task_title": "Choose the correct direction",
-    "speech_start": "Hmm, let's look at this one closer. Can you help me find the right answer?",
-    "speech_end": "Excellent! You are learning so fast!",
-    "task_description": "Which image shows the left hand?",
+    "speech_start": "Hmm, let's look at this one a little closer together. I know you can do this! Can you help me find the absolutely correct answer?",
+    "speech_end": "Excellent! You are learning so fast, I am so incredibly proud of you!",
+    "task_description": "Look at the pictures. Which one of these images shows the left hand?",
     "multiple_choices_word": {
       "op1": "Left Hand",
       "op2": "Right Hand",
@@ -47,9 +47,9 @@
   "evaluate": {
     "task_type": "mcq_image",
     "task_title": "Identify direction",
-    "speech_start": "Alright, it's time to show what you know! Look carefully at the screen.",
-    "speech_end": "You are doing fantastic!",
-    "task_description": "Which arrow points right?",
+    "speech_start": "Alright, my brilliant superstar, it is time to show everybody what you know! Look very carefully at the screen and take all the time you need.",
+    "speech_end": "Wow! You are absolutely fantastic! I am cheering so loud for you!",
+    "task_description": "Can you show me which beautiful arrow points perfectly to the right?",
     "multiple_choices_word": {
       "op1": "Left Arrow",
       "op2": "Right Arrow",
