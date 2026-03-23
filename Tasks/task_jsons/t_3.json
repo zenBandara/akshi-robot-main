@@ -1,0 +1,70 @@
+{
+  "task_id": "t_3",
+  "task_name": "Identify Colors",
+  "description": "A task to help preschool students recognize and name basic colors.",
+
+  "engage": {
+    "task_title": "Colorful World!",
+    "speech_start": "Wow, look at all these pretty colors! Do you have a favorite color?",
+    "speech_end": "Let's learn some new colors together.",
+    "description": "Playing a colorful rainbow animation video.",
+    "video_url": "tasks/t3/engage.mp4"
+  },
+  
+  "explore": {
+    "task_title": "Finding Colors",
+    "speech_start": "Can you point to something blue in the room?",
+    "speech_end": "Great job finding colors!",
+    "description": "Kinesthetic activity identifying physical colors in the classroom.",
+    "activity_description": "Look around and point to any object that matches the teacher's color."
+  },
+  
+  "explain": {
+    "task_title": "Learning Color Names",
+    "speech_start": "This is red, this is blue, and this is yellow. They are so bright!",
+    "speech_end": "Now you know your colors.",
+    "description": "Robot visually shows primary colors and names them."
+  },
+
+  "elaborate": {
+    "task_type": "mcq_image",
+    "task_title": "Let's practice colors",
+    "speech_start": "Let's see if we can find the right color.",
+    "speech_end": "Excellent color matching.",
+    "task_description": "Which balloon is blue?",
+    "multiple_choices_word": {
+      "op1": "Red Balloon",
+      "op2": "Green Balloon",
+      "op3": "Yellow Balloon",
+      "op4": "Blue Balloon"
+    },
+    "multiple_choices_images": {
+      "op1": "tasks/t3/balloon_red.png",
+      "op2": "tasks/t3/balloon_green.png",
+      "op3": "tasks/t3/balloon_yellow.png",
+      "op4": "tasks/t3/balloon_blue.png"
+    },
+    "correct_option": "op4"
+  },
+
+  "evaluate": {
+    "task_type": "mcq_image",
+    "task_title": "Show me what you learned!",
+    "speech_start": "Okay, it's your turn to pick the color all by yourself.",
+    "speech_end": "You are a color expert!",
+    "task_description": "Which object is the red car?",
+    "multiple_choices_word": {
+      "op1": "Blue Car",
+      "op2": "Red Car",
+      "op3": "Green Car",
+      "op4": "Yellow Car"
+    },
+    "multiple_choices_images": {
+      "op1": "tasks/t3/car_blue.png",
+      "op2": "tasks/t3/car_red.png",
+      "op3": "tasks/t3/car_green.png",
+      "op4": "tasks/t3/car_yellow.png"
+    },
+    "correct_option": "op2"
+  }
+}
