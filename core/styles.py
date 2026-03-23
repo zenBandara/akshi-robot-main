@@ -8,6 +8,7 @@ class Styling:
     # Global Backgrounds & Text
     COLOR_BG_DEFAULT = "#F0F8FF"
     COLOR_TEXT_DARK = "#333333"
+    COLOR_ROBOT_TEXT = "#4CAF50"
     
     # Dedicated 5E Module Background Themes (Mapped from native .ui files)
     THEME_ELABORATE_BG = "#E8F5E9"  # Mint Green

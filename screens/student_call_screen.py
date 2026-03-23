@@ -67,5 +67,5 @@ def handle_key_press(mapped_action):
         state_manager.set_five_e_stage("evaluate")
         state_manager.set_affordance_level(1)
         
-        # Navigate to evaluation screen (Phase 3 handles the task logic)
-        navigator.navigate_to("evaluation")
+        # Navigate strictly to the new Phase 3 Evaluate Engine
+        navigator.navigate_to("evaluate")

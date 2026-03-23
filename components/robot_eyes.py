@@ -21,6 +21,10 @@ class RobotEyesWidget(QWidget):
         
         self.eyes_label = QLabel(self.expressions["default"])
         self.eyes_label.setAlignment(Qt.AlignCenter)
+        self.eyes_label.setFixedSize(180, 80)
+        self.setFixedSize(180, 80)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents) # Native hardware pass-through
+        
         self.eyes_label.setStyleSheet(f"""
             QLabel {{
                 font-size: 32px; 
