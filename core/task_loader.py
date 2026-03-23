@@ -1,5 +1,6 @@
 import json
 import os
+import glob
 
 def validate_task(data):
     """
@@ -86,3 +87,31 @@ def load_task(filepath):
     except Exception as e:
         print(f"Unexpected error loading '{filepath}': {e}")
         return None
+
+def load_all_tasks(directory_path="Tasks/task_jsons"):
+    """
+    Scans the given directory for .json files, loads, and validates them using load_task().
+    Returns a list of explicitly valid task dictionaries.
+    """
+    valid_tasks = []
+    
+    # Resolve path relative to the project root
+    if not os.path.isabs(directory_path):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        directory_path = os.path.join(project_root, directory_path)
+        
+    if not os.path.exists(directory_path):
+        print(f"Warning: Task directory '{directory_path}' does not exist.")
+        return valid_tasks
+        
+    pattern = os.path.join(directory_path, "*.json")
+    json_files = glob.glob(pattern)
+    
+    for filepath in json_files:
+        task_data = load_task(filepath)
+        if task_data is not None:
+            valid_tasks.append(task_data)
+            
+    print(f"Successfully loaded and validated {len(valid_tasks)} tasks from {directory_path}.")
+    return valid_tasks
