@@ -44,14 +44,12 @@ def handle_key_press(action):
         
     if action == "ENTER": # Mapped natively inside keyboard_manager.py
         input_enabled = False
-        print("[Break Screen] Student pressed Enter. Resuming Evaluate Session...")
+        print("[Break Screen] Student pressed Enter. Resuming Flow Controller Session...")
         
         try:
-            from screens import evaluate_screen
+            from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                evaluate_ui = evaluate_screen.get_ui()
-                parent_stack.addWidget(evaluate_ui)
-                parent_stack.setCurrentWidget(evaluate_ui)
+                flow_controller.resume_cascade(parent_stack)
         except ImportError:
-            print("Warning: Could not transition back to evaluate screen.")
+            print("Warning: Could not transition back via Flow Controller.")

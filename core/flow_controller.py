@@ -176,5 +176,49 @@ class FlowController:
                     parent_widget.setCurrentWidget(session_complete_ui)
             except ImportError: pass
 
+    def on_break(self, parent_widget):
+        """Safely pause the execution cascade natively without destroying state indexes."""
+        print(f"[FlowController] Child requested break! Pausing cascade at node: {self.get_current_node()}")
+        
+        try:
+            from screens import break_screen
+            if parent_widget:
+                break_ui = break_screen.get_ui()
+                parent_widget.addWidget(break_ui)
+                parent_widget.setCurrentWidget(break_ui)
+        except ImportError: pass
+
+    def resume_cascade(self, parent_widget):
+        """Restore exact execution state to the specific cascade pointer node logically mapped prior to Break condition."""
+        current_node = self.get_current_node()
+        print(f"[FlowController] Break resolved. Resuming cascade execution identically at node: {current_node}")
+        
+        try:
+            target_ui = None
+            if current_node == "elaborate":
+                from screens import elaborate_screen
+                target_ui = elaborate_screen.get_ui()
+            elif current_node in ["evaluate_L1", "evaluate_L2", "evaluate_L3"]:
+                from screens import evaluate_screen
+                target_ui = evaluate_screen.get_ui()
+            elif current_node == "explain":
+                from screens import explain_screen
+                target_ui = explain_screen.get_ui()
+            elif current_node == "explore":
+                from screens import explore_screen
+                target_ui = explore_screen.get_ui()
+            elif current_node == "engage":
+                from screens import engage_screen
+                target_ui = engage_screen.get_ui()
+            elif current_node == "teacher_intervention":
+                from screens import teacher_intervention
+                target_ui = teacher_intervention.get_ui()
+                
+            if parent_widget and target_ui:
+                parent_widget.addWidget(target_ui)
+                parent_widget.setCurrentWidget(target_ui)
+        except ImportError as e:
+            print(f"[FlowController] Error attempting to resume cascade at {current_node}: {e}")
+
 # Global singleton instance
 flow_controller = FlowController()
