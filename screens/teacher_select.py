@@ -35,20 +35,27 @@ def get_ui():
 
 def load_teachers():
     global teacher_map
-    window.teacher_list_label.setText("Fetching teachers from Firebase...")
     
     # Needs to run async or handle slight UI freezup if network is slow, 
     # but for simplicity we rely on firebase_admin caching
     teachers = firebase.get_teachers()
     
+    # Flush existing Layout Cards physically from PySide6 memory hooks
+    while window.cards_container.layout().count():
+        child = window.cards_container.layout().takeAt(0)
+        if child.widget(): child.widget().deleteLater()
+    
+    from PySide6.QtWidgets import QLabel, QFrame, QHBoxLayout
+    from PySide6.QtCore import Qt
+
     if not teachers:
-        window.teacher_list_label.setText("No teachers found.\nPlease check connection.")
+        error_label = QLabel("No teachers found.\nPlease check connection.")
+        error_label.setAlignment(Qt.AlignCenter)
+        error_label.setStyleSheet("font-size: 24px; color: #D32F2F;")
+        window.cards_container.layout().addWidget(error_label)
         return
 
     teacher_map.clear()
-    display_text = ""
-    
-    from PySide6.QtCore import Qt
     
     for i, teacher_id in enumerate(teachers):
         if i >= 26: break # Only map up to Z
@@ -57,12 +64,54 @@ def load_teachers():
         # We must map to the internal action name if the key is reserved globally (e.g. B -> BREAK)
         key_code = Qt.Key_A + i
         mapped_action = keyboard_manager.key_mapping.get(key_code, key_char)
-        
         teacher_map[mapped_action] = teacher_id
-        display_text += f"[ {key_char} ] - {teacher_id}\n\n"
-
-    display_text += "\nPress the corresponding letter key!"
-    window.teacher_list_label.setText(display_text)
+        
+        # Build highly-professional CSS Teacher Card component natively
+        card = QFrame()
+        card.setFixedHeight(75)
+        card.setStyleSheet("""
+            QFrame {
+                background-color: #F8FAFC;
+                border: 2px solid #E2E8F0;
+                border-radius: 12px;
+            }
+        """)
+        card_layout = QHBoxLayout(card)
+        card_layout.setContentsMargins(20, 0, 20, 0)
+        
+        # Synthesize vivid blue Typography Badge constraint
+        badge = QLabel(f"{key_char}")
+        badge.setFixedSize(45, 45)
+        badge.setAlignment(Qt.AlignCenter)
+        badge.setStyleSheet("""
+            QLabel {
+                background-color: #1976D2;
+                color: #FFFFFF;
+                font-size: 22px;
+                font-weight: bold;
+                border-radius: 22px;
+                border: none;
+            }
+        """)
+        
+        # Inject raw Email typography natively 
+        email_label = QLabel(teacher_id)
+        email_label.setStyleSheet("""
+            QLabel {
+                color: #334155;
+                font-size: 20px;
+                font-weight: bold;
+                background: transparent;
+                border: none;
+            }
+        """)
+        
+        card_layout.addWidget(badge)
+        card_layout.addSpacing(20)
+        card_layout.addWidget(email_label)
+        card_layout.addStretch()
+        
+        window.cards_container.layout().addWidget(card)
 
 def handle_key_press(mapped_action):
     # E.g. mapped_action == "A"
@@ -71,8 +120,7 @@ def handle_key_press(mapped_action):
         print(f"Teacher selected: {selected_teacher}")
         
         state_manager.set_selected_teacher(selected_teacher)
-        
-        window.teacher_list_label.setText(f"Loading students for {selected_teacher}...")
+        window.title_label.setText("Authenticating Teacher...")
         
         import random
         import core.task_loader as task_loader
@@ -98,7 +146,12 @@ def handle_key_press(mapped_action):
         state_manager.set_student_queue(student_queue)
         
         print("Teacher selected. Proceeding to select first student...")
-        window.teacher_list_label.setText(f"Great! {selected_teacher} Selected!\n\nPicking a student...")
+        window.title_label.setText(f"Loading session for {selected_teacher}...")
+        
+        # Strip all dynamically generated teacher cards visibly immediately indicating process consumption
+        while window.cards_container.layout().count():
+            child = window.cards_container.layout().takeAt(0)
+            if child.widget(): child.widget().deleteLater()
         
         import core.session_logic as session_logic
         session_logic.next_student()
