@@ -166,7 +166,6 @@ def on_show():
     setup_card(4, window.text_4, window.img_4)
 
     # 4. Bind Animations
-    global active_animations
     for anim in active_animations:
         anim.stop()
     active_animations.clear()
@@ -188,7 +187,6 @@ def on_show():
         if "4" in key_mapping: active_animations.append(apply_pulse_glow(window.card_4))
 
     # 5. Robot Speech & Input Delay
-    global input_enabled
     input_enabled = False
     
     speech_text = eval_data.get("speech_start", "Let's try a task.")
@@ -306,7 +304,6 @@ def handle_key_press(action):
     print(f"[Evaluate Screen] Student pressed physical key {action}.")
     
     # Stop distracting animations and audio gracefully
-    global active_animations
     for anim in active_animations:
         anim.stop()
         
