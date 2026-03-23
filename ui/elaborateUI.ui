@@ -1,61 +1,190 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-<class>ElaborateUI</class>
+ <class>ElaborateScreen</class>
+ <widget class="QWidget" name="ElaborateScreen">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget { background-color: #F3E5F5; font-family: 'Nunito', sans-serif; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin"><number>40</number></property>
+   <property name="topMargin"><number>30</number></property>
+   <property name="rightMargin"><number>40</number></property>
+   <property name="bottomMargin"><number>40</number></property>
+   <property name="spacing"><number>20</number></property>
+   
+   <!-- Top Bar with Timer and Question -->
+   <item>
+    <layout class="QHBoxLayout" name="topLayout">
+     <item>
+      <widget class="QLabel" name="question_label">
+       <property name="text"><string>Let's learn this together!</string></property>
+       <property name="alignment"><set>Qt::AlignCenter</set></property>
+       <property name="styleSheet"><string>font-size: 34px; font-weight: bold; color: #4A148C; background-color: white; border-radius: 20px; padding: 15px;</string></property>
+       <property name="minimumHeight"><number>80</number></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   
+   <!-- Timer Bar Placeholder -->
+   <item>
+    <layout class="QHBoxLayout" name="timerLayout">
+     <item>
+      <widget class="QLabel" name="timer_label">
+       <property name="text"><string>🕒 🕒 🕒 🕒 🕒</string></property>
+       <property name="alignment"><set>Qt::AlignCenter</set></property>
+       <property name="styleSheet"><string>font-size: 28px; color: #6A1B9A; padding: 5px;</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
 
-<widget class="QWidget" name="ElaborateUI">
+   <!-- 2x2 Grid Layout for Option Cards -->
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="spacing"><number>25</number></property>
+     
+     <!-- Option 1 -->
+     <item row="0" column="0">
+      <widget class="QFrame" name="card_1">
+       <property name="styleSheet"><string>QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; } QFrame:hover { border: 4px solid #AB47BC; }</string></property>
+       <layout class="QVBoxLayout" name="l1">
+        <property name="spacing"><number>10</number></property>
+        <item>
+         <widget class="QLabel" name="img_1">
+          <property name="text"><string>Image 1</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="scaledContents"><bool>true</bool></property>
+          <property name="styleSheet"><string>border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="text_1">
+          <property name="text"><string>Option 1</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 24px; font-weight: bold; color: #4A148C; border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="key_1">
+          <property name="text"><string>[ Press 1 ]</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 20px; font-weight: bold; color: white; background-color: #BA68C8; border-radius: 12px; padding: 5px; margin: 0px 40px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
 
- <property name="styleSheet">
-  <string>
-QWidget{
- background-color:#FFF7E8;
- font-family: Nunito;
-}
+     <!-- Option 2 -->
+     <item row="0" column="1">
+      <widget class="QFrame" name="card_2">
+       <property name="styleSheet"><string>QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; }</string></property>
+       <layout class="QVBoxLayout" name="l2">
+        <property name="spacing"><number>10</number></property>
+        <item>
+         <widget class="QLabel" name="img_2">
+          <property name="text"><string>Image 2</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="scaledContents"><bool>true</bool></property>
+          <property name="styleSheet"><string>border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="text_2">
+          <property name="text"><string>Option 2</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 24px; font-weight: bold; color: #4A148C; border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="key_2">
+          <property name="text"><string>[ Press 2 ]</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 20px; font-weight: bold; color: white; background-color: #BA68C8; border-radius: 12px; padding: 5px; margin: 0px 40px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
 
-QPushButton{
- background-color:#FFB6C1;
- border-radius:30px;
- font-size:26px;
- padding:15px;
-}
-  </string>
- </property>
+     <!-- Option 3 -->
+     <item row="1" column="0">
+      <widget class="QFrame" name="card_3">
+       <property name="styleSheet"><string>QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; }</string></property>
+       <layout class="QVBoxLayout" name="l3">
+        <property name="spacing"><number>10</number></property>
+        <item>
+         <widget class="QLabel" name="img_3">
+          <property name="text"><string>Image 3</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="scaledContents"><bool>true</bool></property>
+          <property name="styleSheet"><string>border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="text_3">
+          <property name="text"><string>Option 3</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 24px; font-weight: bold; color: #4A148C; border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="key_3">
+          <property name="text"><string>[ Press 3 ]</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 20px; font-weight: bold; color: white; background-color: #BA68C8; border-radius: 12px; padding: 5px; margin: 0px 40px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
 
- <layout class="QVBoxLayout">
+     <!-- Option 4 -->
+     <item row="1" column="1">
+      <widget class="QFrame" name="card_4">
+       <property name="styleSheet"><string>QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; }</string></property>
+       <layout class="QVBoxLayout" name="l4">
+        <property name="spacing"><number>10</number></property>
+        <item>
+         <widget class="QLabel" name="img_4">
+          <property name="text"><string>Image 4</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="scaledContents"><bool>true</bool></property>
+          <property name="styleSheet"><string>border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="text_4">
+          <property name="text"><string>Option 4</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 24px; font-weight: bold; color: #4A148C; border: none; background: transparent;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="key_4">
+          <property name="text"><string>[ Press 4 ]</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string>font-size: 20px; font-weight: bold; color: white; background-color: #BA68C8; border-radius: 12px; padding: 5px; margin: 0px 40px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
 
-  <item>
-   <widget class="QLabel" name="task_title">
-    <property name="text">
-     <string>Choose the Correct Answer</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-  </item>
+    </layout>
+   </item>
 
-  <item>
-   <layout class="QGridLayout">
-
-    <item row="0" column="0">
-     <widget class="QPushButton" name="option1"/>
-    </item>
-
-    <item row="0" column="1">
-     <widget class="QPushButton" name="option2"/>
-    </item>
-
-    <item row="1" column="0">
-     <widget class="QPushButton" name="option3"/>
-    </item>
-
-    <item row="1" column="1">
-     <widget class="QPushButton" name="option4"/>
-    </item>
-
-   </layout>
-  </item>
-
- </layout>
-
-</widget>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>
