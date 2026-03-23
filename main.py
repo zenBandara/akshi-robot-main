@@ -6,7 +6,7 @@ from PySide6.QtCore import QObject, QEvent, Qt
 
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
-from components.robot_eyes import robot_eyes
+from components.robot_eyes import get_robot_eyes
 
 from screens import idle_screen
 from screens import greeting_screen
@@ -31,6 +31,7 @@ stack.setFocusPolicy(Qt.StrongFocus)
 main_window.setCentralWidget(stack)
 
 # Deploy the global expressive robot face strictly bypassing the stack coordinates!
+robot_eyes = get_robot_eyes()
 robot_eyes.setParent(main_window)
 robot_eyes.move(680, 20) # absolute float coordinate at the top right
 robot_eyes.show()

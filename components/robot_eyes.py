@@ -55,5 +55,11 @@ class RobotEyesWidget(QWidget):
             # Sub-millisecond restoration mapping safely escaping closure blocks
             QTimer.singleShot(150, lambda: self.eyes_label.setText(self.expressions[self.current_state]))
 
-# Generate global autonomous singleton instance ensuring state persistence
-robot_eyes = RobotEyesWidget()
+robot_eyes_instance = None
+
+def get_robot_eyes():
+    """Lazy-load the singleton eye widget absolutely guaranteeing execution waits until the QApplication kernel is fully mounted."""
+    global robot_eyes_instance
+    if robot_eyes_instance is None:
+        robot_eyes_instance = RobotEyesWidget()
+    return robot_eyes_instance
