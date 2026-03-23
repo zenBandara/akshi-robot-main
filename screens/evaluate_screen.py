@@ -72,7 +72,13 @@ def on_show():
     eval_data = task_data["evaluate"]
     
     # 2. Set Question Text
-    window.question_label.setText(eval_data.get("task_description", "What was the question?"))
+    base_desc = eval_data.get("task_description", "What was the question?")
+    if level >= 3:
+        student_name = str(state_manager.get_current_student() or "friend").capitalize()
+        # Level 3 Affective Affordance: Personalized context phrasing
+        window.question_label.setText(f"Okay {student_name}, {base_desc.lower()}")
+    else:
+        window.question_label.setText(base_desc)
     
     # 3. Apply Option Cards
     mc_words = eval_data.get("multiple_choices_word", {})
@@ -213,8 +219,9 @@ def on_show():
     
     # Mathematical Speech Cadence offset
     if level >= 3:
-        # Step 38: Level 3 Speech Simplification & Cadence Slowdown
-        speech_text = f"Look carefully! {speech_text}"
+        student_name = str(state_manager.get_current_student() or "friend").capitalize()
+        # Step 38 & 39: Level 3 Speech Simplification, Cadence, & personalization
+        speech_text = f"Okay {student_name}, look carefully! {speech_text}"
         print(f"🤖 ROBOT SPEAKS [SLOW RATE -30%]: \"{speech_text}\"")
         
         # Slower 1.5 words-per-second computational cadence
