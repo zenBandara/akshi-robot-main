@@ -75,8 +75,8 @@ def on_show():
     base_desc = eval_data.get("task_description", "What was the question?")
     if level >= 3:
         student_name = str(state_manager.get_current_student() or "friend").capitalize()
-        # Level 3 Affective Affordance: Personalized context phrasing
-        window.question_label.setText(f"Okay {student_name}, {base_desc.lower()}")
+        # Level 3 Affective Affordance: Personalized context and Escape Hatch control
+        window.question_label.setText(f"Okay {student_name}, {base_desc.lower()}\n(Press S to Skip)")
     else:
         window.question_label.setText(base_desc)
     
@@ -294,7 +294,7 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    # L2 Control Affordance
+    # L2 Control Affordance: Break
     if action == "BREAK" and state_manager.get_affordance_level() >= 2:
         input_enabled = False
         print("[Evaluate Screen] Student pressed BREAK. Suspending session...")
@@ -316,6 +316,72 @@ def handle_key_press(action):
                 parent_stack.setCurrentWidget(break_ui)
         except ImportError:
             print("Warning: Could not transition to break screen.")
+        return
+        
+    # L3 Control Affordance: Skip
+    if action == "SKIP" and state_manager.get_affordance_level() >= 3:
+        input_enabled = False
+        print("[Evaluate Screen] Student pressed SKIP. Logging and skipping student...")
+        
+        # Cease physics
+        if evaluate_timer:
+            evaluate_timer.stop()
+        for anim in active_animations:
+            anim.stop()
+        if arcade_bgm:
+            arcade_bgm.stop()
+            
+        # Log Result
+        task_data = state_manager.get_current_task()
+        task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
+        student_id = state_manager.get_current_student() or "unknown"
+        
+        log_data = {
+            "student_id": student_id,
+            "task_id": task_id,
+            "result": "skipped",
+            "affordance_level_reached": state_manager.get_affordance_level(),
+            "path_taken": getattr(state_manager, "current_path", []) + ["skip"]
+        }
+        
+        if not hasattr(state_manager, 'session_logs'):
+            state_manager.session_logs = []
+        state_manager.session_logs.append(log_data)
+        
+        try:
+            from core import firebase
+            firebase.log_event(log_data)
+        except ImportError: pass
+            
+        # Advance Queue Natively
+        student_queue = state_manager.get_student_queue()
+        parent_stack = window.parentWidget()
+        
+        if student_queue:
+            next_stu = student_queue.pop(0)
+            state_manager.set_current_student(next_stu)
+            state_manager.set_student_queue(student_queue)
+            
+            if hasattr(state_manager, 'current_path'):
+                state_manager.current_path = []
+            state_manager.set_affordance_level(1)
+            
+            try:
+                from screens import greeting_screen
+                if parent_stack:
+                    greeting_ui = greeting_screen.get_ui()
+                    parent_stack.addWidget(greeting_ui)
+                    parent_stack.setCurrentWidget(greeting_ui)
+            except ImportError: pass
+        else:
+            try:
+                from screens import session_complete
+                if parent_stack:
+                    session_complete_ui = session_complete.get_ui()
+                    parent_stack.addWidget(session_complete_ui)
+                    parent_stack.setCurrentWidget(session_complete_ui)
+            except ImportError: pass
+            
         return
         
     # Normal Mapping Validation
