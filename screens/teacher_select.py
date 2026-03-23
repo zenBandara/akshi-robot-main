@@ -48,10 +48,17 @@ def load_teachers():
     teacher_map.clear()
     display_text = ""
     
+    from PySide6.QtCore import Qt
+    
     for i, teacher_id in enumerate(teachers):
         if i >= 26: break # Only map up to Z
         key_char = chr(ord('A') + i)
-        teacher_map[key_char] = teacher_id
+        
+        # We must map to the internal action name if the key is reserved globally (e.g. B -> BREAK)
+        key_code = Qt.Key_A + i
+        mapped_action = keyboard_manager.key_mapping.get(key_code, key_char)
+        
+        teacher_map[mapped_action] = teacher_id
         display_text += f"[ {key_char} ] - {teacher_id}\n\n"
 
     display_text += "\nPress the corresponding letter key!"
@@ -68,9 +75,12 @@ def handle_key_press(mapped_action):
         window.teacher_list_label.setText(f"Loading students for {selected_teacher}...")
         
         import random
-        # Fetch students and save to state manager
+        # Fetch students and lesson config to state manager
         students = firebase.get_students(selected_teacher)
+        lesson = firebase.get_current_lesson(selected_teacher)
+        
         state_manager.set_student_list(students)
+        state_manager.set_current_task(lesson)
         
         # Create a shuffled queue
         student_queue = students.copy()

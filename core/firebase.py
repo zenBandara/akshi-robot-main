@@ -1,3 +1,4 @@
+import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_admin import db
@@ -32,16 +33,33 @@ def get_teacher_data(email):
     return ref.get()
 
 def get_students(teacher_key):
-    """Fetch the student list for the specified teacher."""
-    ref = db.reference(f"teachers/{teacher_key}/students")
-    data = ref.get()
+    """Fetch today's student list for the specified teacher."""
+    today_str = datetime.date.today().isoformat()
     
-    if isinstance(data, dict):
-        return list(data.keys())
-    elif isinstance(data, list):
-        return data
+    ref = db.reference(f"teachers/{teacher_key}/attendance")
+    attendance_data = ref.get()
+    
+    if not attendance_data or not isinstance(attendance_data, dict):
+        return []
+        
+    # Try today, fallback to the most recently submitted attendance
+    if today_str in attendance_data:
+        students_str = attendance_data[today_str]
+    else:
+        latest_date = sorted(attendance_data.keys())[-1]
+        students_str = attendance_data[latest_date]
+        print(f"Warning: No attendance found for today ({today_str}). Using latest available ({latest_date}).")
+        
+    if isinstance(students_str, str):
+        return [s.strip() for s in students_str.split(",") if s.strip()]
         
     return []
+
+def get_current_lesson(teacher_key):
+    """Fetch the active lesson assigned by the teacher."""
+    ref = db.reference(f"teachers/{teacher_key}/current_lesson")
+    lesson = ref.get()
+    return lesson if lesson else "t_1"
 
 def log_event(data):
     """Stub for Firestore logging. Handled in Phase 6."""
