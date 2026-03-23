@@ -28,8 +28,33 @@ class FlowController:
     def reset_cascade(self):
         """Reset the cascade pointer unconditionally (e.g. for a new task or student)."""
         self.cascade_index = 0
-        state_manager.current_path = []
         state_manager.set_affordance_level(1)
+        # We do NOT wipe state_manager.current_path here because celebration_screen needs it to log Firebase telemetry first!
+
+    def on_correct_answer(self, parent_widget):
+        """Handle a correct answer resolution."""
+        current_node = self.get_current_node()
+        
+        if not hasattr(state_manager, 'current_path'):
+            state_manager.current_path = []
+            
+        if current_node not in state_manager.current_path:
+            state_manager.current_path.append(current_node)
+            
+        print(f"[FlowController] Success triggered at node: {current_node}")
+        
+        # Reset cascade pointer safely for the next student
+        self.reset_cascade()
+        
+        # Trigger the Celebration path (which implicitly calls next_student() after the animations)
+        try:
+            from screens import celebration_screen
+            if parent_widget:
+                celeb_ui = celebration_screen.get_ui()
+                parent_widget.addWidget(celeb_ui)
+                parent_widget.setCurrentWidget(celeb_ui)
+        except ImportError:
+            print("[FlowController] CRITICAL: Could not transit to Celebration Screen.")
 
 # Global singleton instance
 flow_controller = FlowController()
