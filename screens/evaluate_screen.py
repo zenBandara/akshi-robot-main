@@ -1,10 +1,8 @@
-import os
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.animations import apply_pulse_glow
+from core.timer_widget import EmojiTimerWidget
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -13,6 +11,7 @@ ui_path = os.path.join(project_root, "ui", "evaluateLevel1UI.ui")
 window = None
 input_enabled = False
 active_animations = []
+evaluate_timer = None
 
 def get_ui():
     global window
@@ -33,6 +32,15 @@ def get_ui():
 def on_show():
     print("[Evaluate Screen L1] Becoming active...")
     state_manager.set_current_screen("evaluate_L1")
+    
+    # 0. Clean Resets
+    global evaluate_timer, active_animations, input_enabled
+    if evaluate_timer:
+        evaluate_timer.stop()
+    for anim in active_animations:
+        anim.stop()
+    active_animations.clear()
+    input_enabled = False
     
     # 1. Fetch Task Data
     task_data = state_manager.current_task
@@ -98,13 +106,36 @@ def on_show():
     QTimer.singleShot(delay_ms, enable_input)
 
 def enable_input():
-    global input_enabled
+    global input_enabled, evaluate_timer
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
     print("[Evaluate Screen L1] Speech finished. Keyboard input enabled.")
+    
+    # Spin up the evaluation timer seamlessly after speech finishes
+    evaluate_timer = EmojiTimerWidget(
+        label_widget=window.timer_label,
+        total_seconds=20,
+        clock_count=10,
+        timeout_callback=on_timer_expire
+    )
+    evaluate_timer.start()
 
-def handle_key_press(action):
+def on_timer_expire():
     global input_enabled
+    if not input_enabled:
+        return
+        
+    input_enabled = False
+    print("[Evaluate Screen L1] Timer EXPIRED! ⏰ (Treating as Incorrect)")
+    
+    global active_animations
+    for anim in active_animations:
+        anim.stop()
+        
+    # TODO: Trigger failure path via flow controller (Step 25+)
+        
+def handle_key_press(action):
+    global input_enabled, evaluate_timer
     if not input_enabled:
         return
         
@@ -132,9 +163,13 @@ def handle_key_press(action):
     if selected_card:
         selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
         
+    # Validation logic
     eval_data = state_manager.current_task.get("evaluate", {})
     correct_option = eval_data.get("correct_option")
     selected_option = f"op{action}"
+    
+    if evaluate_timer:
+        evaluate_timer.stop()
     
     if selected_option == correct_option:
         print("[Evaluate Screen L1] Answer VALIDATION: CORRECT! 🎉")
