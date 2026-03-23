@@ -97,4 +97,70 @@ def enable_input():
     input_enabled = True
     window.robot_text_label.setText("🤖 Waiting for you to finish exploring...")
     print("[Explore Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
-    # TODO Step 45: Bind keyboard handler
+    # Step 45: Bind keyboard handler
+    keyboard_manager.register_handler(handle_key_press)
+
+def handle_key_press(action):
+    global input_enabled
+    if not input_enabled:
+        return
+        
+    if action == "ENTER":
+        input_enabled = False
+        print("[Explore Screen] Student pressed ENTER. Ending Exploration and moving to next student.")
+        
+        # Log Result (Deep Failure -> Explored)
+        task_data = state_manager.get_current_task()
+        task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
+        student_id = state_manager.get_current_student() or "unknown"
+        
+        # Hard-code the absolute deepest fallback sequence manually
+        state_manager.current_path = ["evaluate_L1", "elaborate", "evaluate_L2", "explain", "evaluate_L3", "explore"]
+        
+        log_data = {
+            "student_id": student_id,
+            "task_id": task_id,
+            "result": "incorrect",
+            "affordance_level_reached": getattr(state_manager, "affordance_level", 3),
+            "path_taken": state_manager.current_path
+        }
+        
+        if not hasattr(state_manager, 'session_logs'):
+            state_manager.session_logs = []
+        state_manager.session_logs.append(log_data)
+        
+        try:
+            from core import firebase
+            firebase.log_event(log_data)
+        except ImportError: pass
+            
+        print(f"[Explore Screen] LOGGED FINAL TASK RESULT: {log_data}")
+        
+        # Advance Queue Natively
+        student_queue = state_manager.get_student_queue()
+        parent_stack = window.parentWidget()
+        
+        if student_queue:
+            next_stu = student_queue.pop(0)
+            state_manager.set_current_student(next_stu)
+            state_manager.set_student_queue(student_queue)
+            
+            # Wipe affordance tracking state completely for the next child
+            state_manager.current_path = []
+            state_manager.set_affordance_level(1)
+            
+            try:
+                from screens import greeting_screen
+                if parent_stack:
+                    greeting_ui = greeting_screen.get_ui()
+                    parent_stack.addWidget(greeting_ui)
+                    parent_stack.setCurrentWidget(greeting_ui)
+            except ImportError: pass
+        else:
+            try:
+                from screens import session_complete
+                if parent_stack:
+                    session_complete_ui = session_complete.get_ui()
+                    parent_stack.addWidget(session_complete_ui)
+                    parent_stack.setCurrentWidget(session_complete_ui)
+            except ImportError: pass
