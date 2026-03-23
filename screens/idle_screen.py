@@ -3,6 +3,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QGraphicsOpacityEffect
 from core.keyboard_manager import keyboard_manager
 from core.state_manager import state_manager
+from core.navigator import navigator
 
 window = None
 blink_timer = None
@@ -61,4 +62,4 @@ def setup_animations():
 def handle_key_press(mapped_action):
     if mapped_action == "WAKE":
         print("WAKE command triggered!")
-        # TODO: Transition to Greeting Screen in Step 6
+        navigator.navigate_to("greeting")

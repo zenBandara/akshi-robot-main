@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GreetingScreen</class>
+ <widget class="QWidget" name="GreetingScreen">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget { background-color: #FFD166; font-family: 'Nunito', sans-serif; color: #444; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <spacer name="topSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="centerLayout">
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <item>
+      <widget class="QLabel" name="eyes_label">
+       <property name="text"><string>•  •</string></property>
+       <property name="alignment"><set>Qt::AlignCenter</set></property>
+       <property name="styleSheet"><string>font-size: 100px; font-weight: bold; color: #FF9F1C;</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="greeting_text">
+       <property name="text"><string>Hello there! 🌟 I'm Akshi! Ready to learn something fun today?</string></property>
+       <property name="alignment"><set>Qt::AlignCenter</set></property>
+       <property name="wordWrap"><bool>true</bool></property>
+       <property name="styleSheet"><string>font-size: 36px; font-weight: bold; color: #D81159; margin-top: 40px; padding: 20px;</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="bottomSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
