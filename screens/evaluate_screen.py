@@ -1,6 +1,6 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Qt
+from PySide6.QtCore import QFile, Qt, QTimer
 from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 
@@ -9,6 +9,7 @@ project_root = os.path.dirname(current_dir)
 ui_path = os.path.join(project_root, "ui", "evaluateLevel1UI.ui")
 
 window = None
+input_enabled = False
 
 def get_ui():
     global window
@@ -67,3 +68,22 @@ def on_show():
     setup_card(2, window.text_2, window.img_2)
     setup_card(3, window.text_3, window.img_3)
     setup_card(4, window.text_4, window.img_4)
+
+    # 4. Robot Speech & Input Delay
+    global input_enabled
+    input_enabled = False
+    
+    speech_text = eval_data.get("speech_start", "Let's try a task.")
+    print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
+    
+    # Calculate rough delay based on text length (~2.5 words per second)
+    words_count = len(speech_text.split())
+    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    
+    print(f"Delaying keyboard input for {delay_ms}ms to allow speech to finish...")
+    QTimer.singleShot(delay_ms, enable_input)
+
+def enable_input():
+    global input_enabled
+    input_enabled = True
+    print("[Evaluate Screen L1] Speech finished. Keyboard input enabled.")
