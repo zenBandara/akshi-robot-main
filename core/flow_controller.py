@@ -56,17 +56,18 @@ class FlowController:
         except ImportError:
             print("[FlowController] CRITICAL: Could not transit to Celebration Screen.")
 
-    def on_incorrect_answer(self, parent_widget):
+    def on_incorrect_answer(self, parent_widget, is_timeout=False):
         """Handle an incorrect answer by deeply escalating the cognitive cascade."""
         current_node = self.get_current_node()
+        log_node = f"{current_node}_timeout" if is_timeout else current_node
         
         # 1. Store the exact point of numerical failure into the path array
         if not hasattr(state_manager, 'current_path'):
             state_manager.current_path = []
-        if current_node not in state_manager.current_path:
-            state_manager.current_path.append(current_node)
+        if log_node not in state_manager.current_path:
+            state_manager.current_path.append(log_node)
             
-        print(f"[FlowController] Incorrect Answer caught at: {current_node}")
+        print(f"[FlowController] {'Timeout' if is_timeout else 'Incorrect Answer'} caught at: {log_node}")
         
         # 2. Advance the pointer strictly by 1 scalar index unit
         self.cascade_index += 1
@@ -111,6 +112,10 @@ class FlowController:
                 print(f"[FlowController] Error: Failed to load target GUI framework for cascade node {next_node}")
         except ImportError as e:
             print(f"[FlowController] Critical Routing Error escalating out to {next_node}: {e}")
+
+    def on_timeout(self, parent_widget):
+        """Treat an evaluation inactivity timeout identically to an incorrect answer cascade."""
+        self.on_incorrect_answer(parent_widget, is_timeout=True)
 
     def on_skip(self, parent_widget):
         """Handle an explicit student skip request natively."""
