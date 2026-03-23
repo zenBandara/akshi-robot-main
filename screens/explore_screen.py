@@ -63,5 +63,38 @@ def on_show():
     else:
         window.media_label.setText("🖐️\n[No Visual Prompt Provided]")
         
-    # Placeholder for Step 44
-    window.robot_text_label.setText("🤖 Establishing physical activity context...")
+    # 4. Multi-Stage Kinesthetic Robot Speech Loop
+    global input_enabled, explore_data
+    input_enabled = False
+    explore_data = task_data.get("explore", {})
+    
+    speech_start = explore_data.get("speech_start", "Let's try a physical activity!")
+    # Step 44: Physically Encourage Kinesthetic Output
+    speech_start = f"Stand up! {speech_start}"
+    
+    window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
+    print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
+    
+    words_count = len(speech_start.split())
+    delay_ms = max(2000, int((words_count / 2.5) * 1000))
+    QTimer.singleShot(delay_ms, play_second_speech)
+
+def play_second_speech():
+    global explore_data
+    speech_end = explore_data.get("speech_end", "Press Enter when you're done exploring!")
+    
+    if speech_end:
+        window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
+        print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
+        words_count = len(speech_end.split())
+        delay_ms = max(2000, int((words_count / 2.5) * 1000))
+        QTimer.singleShot(delay_ms, enable_input)
+    else:
+        enable_input()
+
+def enable_input():
+    global input_enabled
+    input_enabled = True
+    window.robot_text_label.setText("🤖 Waiting for you to finish exploring...")
+    print("[Explore Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
+    # TODO Step 45: Bind keyboard handler
