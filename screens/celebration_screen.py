@@ -38,14 +38,8 @@ def on_show():
         print("[Celebration Screen] Warning: No active student found in state manager.")
         
     # 2. Pick Random Encouragement Phrase
-    phrases = [
-        "Wow, {name}! You got it right! You're a superstar! 🌟",
-        "Amazing job, {name}! That is totally correct! 🎉",
-        "Fantastic work, {name}! You are so smart! 💡",
-        "You nailed it, {name}! You are a genius! ✨"
-    ]
-    
-    selected_phrase = random.choice(phrases).format(name=student_name)
+    from core.dialogue import DialoguePool
+    selected_phrase = DialoguePool.get_phrase("correct", student_name)
     
     # 3. Update UI Text
     window.celebration_text.setText(selected_phrase)

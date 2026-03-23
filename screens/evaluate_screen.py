@@ -267,39 +267,13 @@ def on_timer_expire():
     if arcade_bgm:
         arcade_bgm.stop()
         
-    # Level-based Failure Routing
-    level = state_manager.get_affordance_level()
-    if level == 1:
-        try:
-            from screens import elaborate_screen
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                elaborate_ui = elaborate_screen.get_ui()
-                parent_stack.addWidget(elaborate_ui)
-                parent_stack.setCurrentWidget(elaborate_ui)
-        except ImportError:
-            pass
-    elif level == 2:
-        try:
-            from screens import explain_screen
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                explain_ui = explain_screen.get_ui()
-                parent_stack.addWidget(explain_ui)
-                parent_stack.setCurrentWidget(explain_ui)
-        except ImportError:
-            pass
-    else:
-        # Level 3+ Incorrect -> Explore Screen
-        try:
-            from screens import explore_screen
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                explore_ui = explore_screen.get_ui()
-                parent_stack.addWidget(explore_ui)
-                parent_stack.setCurrentWidget(explore_ui)
-        except ImportError:
-            pass
+    # Delegate terminal routing completely accurately into isolated flow controller natively
+    try:
+        from core.flow_controller import flow_controller
+        parent_stack = window.parentWidget()
+        if parent_stack:
+            flow_controller.on_timeout(parent_stack)
+    except ImportError: pass
         
 def handle_key_press(action):
     global input_enabled, evaluate_timer, key_mapping, arcade_bgm, active_animations
@@ -320,14 +294,11 @@ def handle_key_press(action):
             arcade_bgm.stop()
             
         try:
-            from screens import break_screen
+            from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                break_ui = break_screen.get_ui()
-                parent_stack.addWidget(break_ui)
-                parent_stack.setCurrentWidget(break_ui)
-        except ImportError:
-            print("Warning: Could not transition to break screen.")
+                flow_controller.on_break(parent_stack)
+        except ImportError: pass
         return
         
     # L3 Control Affordance: Skip
@@ -343,57 +314,12 @@ def handle_key_press(action):
         if arcade_bgm:
             arcade_bgm.stop()
             
-        # Log Result
-        task_data = state_manager.get_current_task()
-        task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
-        student_id = state_manager.get_current_student() or "unknown"
-        
-        log_data = {
-            "student_id": student_id,
-            "task_id": task_id,
-            "result": "skipped",
-            "affordance_level_reached": state_manager.get_affordance_level(),
-            "path_taken": getattr(state_manager, "current_path", []) + ["skip"]
-        }
-        
-        if not hasattr(state_manager, 'session_logs'):
-            state_manager.session_logs = []
-        state_manager.session_logs.append(log_data)
-        
         try:
-            from core import firebase
-            firebase.log_event(log_data)
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.on_skip(parent_stack)
         except ImportError: pass
-            
-        # Advance Queue Natively
-        student_queue = state_manager.get_student_queue()
-        parent_stack = window.parentWidget()
-        
-        if student_queue:
-            next_stu = student_queue.pop(0)
-            state_manager.set_current_student(next_stu)
-            state_manager.set_student_queue(student_queue)
-            
-            if hasattr(state_manager, 'current_path'):
-                state_manager.current_path = []
-            state_manager.set_affordance_level(1)
-            
-            try:
-                from screens import greeting_screen
-                if parent_stack:
-                    greeting_ui = greeting_screen.get_ui()
-                    parent_stack.addWidget(greeting_ui)
-                    parent_stack.setCurrentWidget(greeting_ui)
-            except ImportError: pass
-        else:
-            try:
-                from screens import session_complete
-                if parent_stack:
-                    session_complete_ui = session_complete.get_ui()
-                    parent_stack.addWidget(session_complete_ui)
-                    parent_stack.setCurrentWidget(session_complete_ui)
-            except ImportError: pass
-            
         return
         
     # Normal Mapping Validation
@@ -435,60 +361,19 @@ def handle_key_press(action):
         evaluate_timer.stop()
     
     if selected_option == correct_option:
-        print(f"[Evaluate Screen] Answer VALIDATION: CORRECT! 🎉 (Level {state_manager.get_affordance_level()})")
-        
-        # Track historical routing string
-        level = state_manager.get_affordance_level()
-        if level >= 3:
-            state_manager.current_path = ["evaluate_L1", "elaborate", "evaluate_L2", "explain", "evaluate_L3"]
-        elif level == 2:
-            state_manager.current_path = ["evaluate_L1", "elaborate", "evaluate_L2"]
-        else:
-            state_manager.current_path = ["evaluate_L1"]
-            
+        print(f"[Evaluate Screen] Answer VALIDATION: CORRECT! 🎉")
         try:
-            from screens import celebration_screen
+            from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                celebration_ui = celebration_screen.get_ui()
-                parent_stack.addWidget(celebration_ui)
-                parent_stack.setCurrentWidget(celebration_ui)
-        except ImportError:
-            print("Warning: Could not transition to celebration screen.")
+                flow_controller.on_correct_answer(parent_stack)
+        except ImportError: pass
             
     else:
-        print(f"[Evaluate Screen] Answer VALIDATION: INCORRECT! ❌ (Selected: {selected_option}, Expected: {correct_option})")
-        
-        # Failure path via affordance metric
-        level = state_manager.get_affordance_level()
-        if level == 1:
-            try:
-                from screens import elaborate_screen
-                parent_stack = window.parentWidget()
-                if parent_stack:
-                    elaborate_ui = elaborate_screen.get_ui()
-                    parent_stack.addWidget(elaborate_ui)
-                    parent_stack.setCurrentWidget(elaborate_ui)
-            except ImportError:
-                print("Warning: Could not transition to elaborate screen.")
-        elif level == 2:
-            try:
-                from screens import explain_screen
-                parent_stack = window.parentWidget()
-                if parent_stack:
-                    explain_ui = explain_screen.get_ui()
-                    parent_stack.addWidget(explain_ui)
-                    parent_stack.setCurrentWidget(explain_ui)
-            except ImportError:
-                print("Warning: Could not transition to explain screen.")
-        else:
-            # Level 3 Incorrect -> Explore Screen
-            try:
-                from screens import explore_screen
-                parent_stack = window.parentWidget()
-                if parent_stack:
-                    explore_ui = explore_screen.get_ui()
-                    parent_stack.addWidget(explore_ui)
-                    parent_stack.setCurrentWidget(explore_ui)
-            except ImportError:
-                print("Warning: Could not transition to explore screen.")
+        print(f"[Evaluate Screen] Answer VALIDATION: INCORRECT! ❌")
+        try:
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.on_incorrect_answer(parent_stack)
+        except ImportError: pass
