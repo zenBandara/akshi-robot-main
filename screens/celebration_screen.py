@@ -1,7 +1,8 @@
 import os
 import random
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QTimer
+from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QEasingCurve
+from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 
 current_dir = os.path.dirname(__file__)
@@ -9,6 +10,7 @@ project_root = os.path.dirname(current_dir)
 ui_path = os.path.join(project_root, "ui", "celebrationUI.ui")
 
 window = None
+reward_anim = None
 
 def get_ui():
     global window
@@ -52,4 +54,28 @@ def on_show():
     clean_speech = selected_phrase.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
     print(f"🤖 ROBOT SPEAKS: \"{clean_speech.strip()}\"")
     
-    # TODO Step 20: Visual gamified reward timer will trigger here
+    # 5. Gamified Reward Animation (Level 1 Affective Affordance)
+    global reward_anim
+    effect = QGraphicsOpacityEffect(window.celebration_img)
+    window.celebration_img.setGraphicsEffect(effect)
+    
+    reward_anim = QPropertyAnimation(effect, b"opacity")
+    reward_anim.setDuration(600)
+    reward_anim.setStartValue(0.3)
+    reward_anim.setEndValue(1.0)
+    reward_anim.setLoopCount(-1)
+    reward_anim.setEasingCurve(QEasingCurve.InOutSine)
+    reward_anim.start()
+    
+    # 6. Show reward for 4 seconds, then move on
+    print("[Celebration Screen] Displaying gamified reward for 4 seconds...")
+    QTimer.singleShot(4000, end_celebration)
+
+def end_celebration():
+    global reward_anim
+    if reward_anim:
+        reward_anim.stop()
+        
+    print("[Celebration Screen] Celebration timeout reached.")
+    # TODO Step 21: Log the result
+    # TODO Step 22: Call next_student()
