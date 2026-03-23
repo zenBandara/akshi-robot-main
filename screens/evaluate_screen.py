@@ -17,6 +17,7 @@ window = None
 input_enabled = False
 active_animations = []
 evaluate_timer = None
+arcade_bgm = None
 key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 
 def get_ui():
@@ -50,10 +51,14 @@ def on_show():
     state_manager.set_current_screen("evaluate")
     
     # 0. Clean Resets
+    global arcade_bgm
     if evaluate_timer:
         evaluate_timer.stop()
     for anim in active_animations:
         anim.stop()
+    if arcade_bgm:
+        arcade_bgm.stop()
+        
     active_animations.clear()
     input_enabled = False
     
@@ -80,13 +85,24 @@ def on_show():
         window.card_4.hide()
         img_size = 350
         
-        # Physical Affordance: Acoustic Bell
+        # Physical Affordance: Acoustic Bell & Layout Ambience
+        window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #1A237E; border: 15px solid #FFD600; border-radius: 10px; font-family: 'Nunito', sans-serif; }")
+        
         bell_path = os.path.join(project_root, "assets", "sounds", "bell.wav")
         if os.path.exists(bell_path):
             try:
                 bell = pygame.mixer.Sound(bell_path)
-                bell.set_volume(0.4) # Soft calming volume
+                bell.set_volume(0.4)
                 bell.play()
+            except Exception as e:
+                pass
+                
+        bgm_path = os.path.join(project_root, "assets", "sounds", "arcade_bgm.wav")
+        if os.path.exists(bgm_path):
+            try:
+                arcade_bgm = pygame.mixer.Sound(bgm_path)
+                arcade_bgm.set_volume(0.15)
+                arcade_bgm.play(loops=-1)
             except Exception as e:
                 pass
         
@@ -102,6 +118,8 @@ def on_show():
             "2": chosen_keys[1]
         }
     else:
+        # Reset to base pastel cyan
+        window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #E0F7FA; font-family: 'Nunito', sans-serif; border: none; }")
         window.card_3.show()
         window.card_4.show()
         img_size = 220
@@ -179,7 +197,7 @@ def enable_input():
     evaluate_timer.start()
 
 def on_timer_expire():
-    global input_enabled
+    global input_enabled, arcade_bgm
     if not input_enabled:
         return
         
@@ -190,10 +208,13 @@ def on_timer_expire():
     for anim in active_animations:
         anim.stop()
         
+    if arcade_bgm:
+        arcade_bgm.stop()
+        
     # TODO: Trigger failure path via flow controller (Step 25+)
         
 def handle_key_press(action):
-    global input_enabled, evaluate_timer, key_mapping
+    global input_enabled, evaluate_timer, key_mapping, arcade_bgm
     if not input_enabled:
         return
         
@@ -204,10 +225,12 @@ def handle_key_press(action):
     input_enabled = False
     print(f"[Evaluate Screen] Student pressed physical key {action}.")
     
-    # Stop distracting animations gracefully
-    global active_animations
+    # Stop distracting animations and audio gracefully
+    global active_animations, arcade_bgm
     for anim in active_animations:
         anim.stop()
+    if arcade_bgm:
+        arcade_bgm.stop()
         
     # Highlight the chosen card visually via StyleSheet manipulation
     card_map = {
