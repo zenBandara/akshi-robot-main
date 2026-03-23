@@ -87,8 +87,8 @@ def end_celebration():
         "student_id": student_id,
         "task_id": task_id,
         "result": "correct",
-        "affordance_level_reached": 1,
-        "path_taken": ["evaluate_L1"]
+        "affordance_level_reached": state_manager.get_affordance_level(),
+        "path_taken": getattr(state_manager, "current_path", ["evaluate_L1"])
     }
     
     # Cache log locally

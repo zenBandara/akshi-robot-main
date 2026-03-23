@@ -211,7 +211,27 @@ def on_timer_expire():
     if arcade_bgm:
         arcade_bgm.stop()
         
-    # TODO: Trigger failure path via flow controller (Step 25+)
+    # Identical failure routing
+    if state_manager.get_affordance_level() == 1:
+        try:
+            from screens import elaborate_screen
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                elaborate_ui = elaborate_screen.get_ui()
+                parent_stack.addWidget(elaborate_ui)
+                parent_stack.setCurrentWidget(elaborate_ui)
+        except ImportError:
+            pass
+    else:
+        try:
+            from screens import explain_screen
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                explain_ui = explain_screen.get_ui()
+                parent_stack.addWidget(explain_ui)
+                parent_stack.setCurrentWidget(explain_ui)
+        except ImportError:
+            pass
         
 def handle_key_press(action):
     global input_enabled, evaluate_timer, key_mapping, arcade_bgm, active_animations
@@ -283,6 +303,12 @@ def handle_key_press(action):
     if selected_option == correct_option:
         print(f"[Evaluate Screen] Answer VALIDATION: CORRECT! 🎉 (Level {state_manager.get_affordance_level()})")
         
+        # Track historical routing string
+        if state_manager.get_affordance_level() >= 2:
+            state_manager.current_path = ["evaluate_L1", "elaborate", "evaluate_L2"]
+        else:
+            state_manager.current_path = ["evaluate_L1"]
+            
         try:
             from screens import celebration_screen
             parent_stack = window.parentWidget()
@@ -294,5 +320,26 @@ def handle_key_press(action):
             print("Warning: Could not transition to celebration screen.")
             
     else:
-        print(f"[Evaluate Screen L1] Answer VALIDATION: INCORRECT! ❌ (Selected: {selected_option}, Expected: {correct_option})")
-        # TODO: Trigger failure path (Step 25+ Elaborate Screen)
+        print(f"[Evaluate Screen] Answer VALIDATION: INCORRECT! ❌ (Selected: {selected_option}, Expected: {correct_option})")
+        
+        # Failure path via affordance metric
+        if state_manager.get_affordance_level() == 1:
+            try:
+                from screens import elaborate_screen
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    elaborate_ui = elaborate_screen.get_ui()
+                    parent_stack.addWidget(elaborate_ui)
+                    parent_stack.setCurrentWidget(elaborate_ui)
+            except ImportError:
+                print("Warning: Could not transition to elaborate screen.")
+        else:
+            try:
+                from screens import explain_screen
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    explain_ui = explain_screen.get_ui()
+                    parent_stack.addWidget(explain_ui)
+                    parent_stack.setCurrentWidget(explain_ui)
+            except ImportError:
+                print("Warning: Could not transition to explain screen.")
