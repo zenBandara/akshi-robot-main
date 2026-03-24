@@ -27,7 +27,7 @@
   "elaborate": {
     "task_type": "mcq_image",
     "task_title": "Choose the correct direction",
-    "speech_start": "Hmm, let's look at this one a little closer together. I know you can do this! Can you help me find the absolutely correct answer?",
+    "speech_start": "Hmm, let's look at this one a little closer together. Remember our fun trick? The hand that naturally makes an 'L' shape with your thumb and pointer finger is your left hand! Let's use that trick now. I know you can do this! Can you help me find the absolutely correct answer?",
     "speech_end": "Excellent! You are learning so fast, I am so incredibly proud of you!",
     "task_description": "Look at the pictures. Which one of these images shows the left hand?",
     "multiple_choices_word": {
@@ -37,10 +37,10 @@
       "op4": "No Hands"
     },
     "multiple_choices_images": {
-      "op1": "assets/placeholder.png",
-      "op2": "assets/placeholder.png",
-      "op3": "assets/placeholder.png",
-      "op4": "assets/placeholder.png"
+      "op1": "assets/images/front_left_hand.png",
+      "op2": "assets/images/front_right_hand.png",
+      "op3": "assets/images/front_both_hands.png",
+      "op4": "assets/images/human_foot.png"
     },
     "correct_option": "op1"
   },

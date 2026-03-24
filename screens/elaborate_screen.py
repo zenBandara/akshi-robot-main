@@ -49,6 +49,18 @@ def on_show():
     mc_words = elab_data.get("multiple_choices_word", {})
     mc_images = elab_data.get("multiple_choices_images", {})
     
+    for k in [window.key_1, window.key_2, window.key_3, window.key_4]:
+        k.setStyleSheet("min-width: 50px; max-width: 50px; min-height: 50px; max-height: 50px; font-size: 26px; font-weight: bold; color: white; background-color: #BA68C8; border-radius: 25px; margin: 0px 10px 10px 0px;")
+        try:
+            k.parentWidget().layout().setAlignment(k, Qt.AlignRight | Qt.AlignBottom)
+        except Exception: pass
+        
+    for img in [window.img_1, window.img_2, window.img_3, window.img_4]:
+        img.setStyleSheet("background-color: white; border-radius: 20px; padding: 10px;")
+        try:
+            img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
+        except Exception: pass
+        
     def setup_card(idx, text_widget, img_widget):
         key = f"op{idx}"
         text_widget.setText(mc_words.get(key, ""))
