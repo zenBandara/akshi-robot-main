@@ -44,7 +44,15 @@ def get_ui():
         window.student_name_label.setText(f"{display_name}! 🎉")
         
         # Mathematically construct the highly-professional, highly-conversational dynamically cached TTS execution loop
-        intro_msg = f"Hello my wonderful friends! Today, we are going to learn all about {task_name}! It is going to be so much fun. {display_name}, can you please come on up? It is your turn to shine!"
+        student_list = state_manager.get_student_list()
+        student_queue = state_manager.get_student_queue()
+        # It's the first chronological student if exactly one student has been popped from the queue
+        is_first_student = (len(student_queue) == len(student_list) - 1) if student_list else True
+        
+        if is_first_student:
+            intro_msg = f"Hello my wonderful friends! Today, we are going to learn all about {task_name}! It is going to be so much fun. {display_name}, can you please come on up? It is your turn to shine!"
+        else:
+            intro_msg = f"Wow, you guys are doing great! {display_name}, can you please come on up? It is your turn to shine!"
         
         print(f"[Robot Speaks]: {intro_msg}")
         voice_manager.speak(intro_msg, f"call_{display_name}_{task_name.replace(' ', '_').lower()}")
