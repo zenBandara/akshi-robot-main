@@ -5,6 +5,7 @@ from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
+from core.timer_widget import EmojiTimerWidget
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -12,6 +13,7 @@ ui_path = os.path.join(project_root, "ui", "elaborateUI.ui")
 
 window = None
 input_enabled = False
+elaborate_timer = None
 voice_manager = VoiceManager()
 
 def get_ui():
@@ -31,6 +33,9 @@ def get_ui():
 
 def on_show():
     print("[Elaborate Screen L1] Becoming active...")
+    global elaborate_timer
+    if elaborate_timer:
+        elaborate_timer.stop()
     state_manager.set_current_screen("elaborate_L1")
     
     # 1. Fetch Task Data for Elaborate Stage
@@ -94,12 +99,45 @@ def on_show():
     
     print(f"[Elaborate Screen L1] Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()
+    
+    print(f"Delaying visual clock countdown for {delay_ms}ms...")
+    if elaborate_timer:
+        QTimer.singleShot(delay_ms, elaborate_timer.start)
 
 def enable_input():
-    global input_enabled
+    global input_enabled, elaborate_timer
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
     print("[Elaborate Screen L1] Speech finished. Keyboard input enabled.")
+    
+    elaborate_timer = EmojiTimerWidget(
+        label_widget=window.timer_label,
+        total_seconds=20,
+        clock_count=10,
+        timeout_callback=on_timer_expire
+    )
+
+def on_timer_expire():
+    global input_enabled
+    if not input_enabled:
+        return
+        
+    input_enabled = False
+    print("[Elaborate Screen L1] Timer EXPIRED! ⏰ (Treating as Incorrect)")
+    
+    student_name = state_manager.get_current_student() or "friend"
+    timeout_speech = f"Oops {student_name}, looks like you're taking a little bit of time! Let's review this together instead!"
+    delay_ms = voice_manager.speak(timeout_speech, f"timeout_{student_name}")
+    
+    def transition_after_speech():
+        try:
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.on_timeout(parent_stack)
+        except ImportError: pass
+        
+    QTimer.singleShot(delay_ms, transition_after_speech)
 
 def handle_key_press(action):
     global input_enabled
@@ -112,6 +150,8 @@ def handle_key_press(action):
     # Lock out further inputs immediately
     input_enabled = False
     voice_manager.stop()
+    if elaborate_timer:
+        elaborate_timer.stop()
     print(f"[Elaborate Screen L1] Student pressed key {action}. Review complete!")
     
     # Highlight the chosen card visually via StyleSheet manipulation

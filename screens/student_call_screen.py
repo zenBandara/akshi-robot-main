@@ -60,20 +60,9 @@ def get_ui():
         if fade_anim:
             fade_effect.setOpacity(0.0)
             fade_anim.start()
-            
-        # Automatically transition exactly after the speech resolves
-        QTimer.singleShot(duration_ms, transition_to_evaluate)
 
     window.on_show = on_show
     return window
-    
-def transition_to_evaluate():
-    from core.keyboard_manager import keyboard_manager
-    keyboard_manager.unregister_handler()
-    print("Automatic transition triggered by exact audio duration resolving natively.")
-    state_manager.set_five_e_stage("evaluate")
-    state_manager.set_affordance_level(1)
-    navigator.navigate_to("evaluate")
 
 def setup_animations():
     global window, fade_anim, fade_effect
