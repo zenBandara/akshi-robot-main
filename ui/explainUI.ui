@@ -17,9 +17,9 @@
    <property name="leftMargin"><number>40</number></property>
    <property name="topMargin"><number>30</number></property>
    <property name="rightMargin"><number>40</number></property>
-   <property name="bottomMargin"><number>40</number></property>
-   <property name="spacing"><number>20</number></property>
-   
+   <property name="bottomMargin"><number>30</number></property>
+   <property name="spacing"><number>15</number></property>
+
    <!-- Title -->
    <item>
     <widget class="QLabel" name="title_label">
@@ -27,54 +27,53 @@
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <property name="styleSheet"><string>font-size: 36px; font-weight: bold; color: #E65100; background-color: white; border-radius: 15px; padding: 10px;</string></property>
      <property name="minimumHeight"><number>70</number></property>
+     <property name="maximumHeight"><number>80</number></property>
     </widget>
    </item>
-   
-   <!-- Core Content Area (Text + Media) -->
+
+   <!-- Centered Video Container with horizontal spacers -->
    <item>
-    <layout class="QHBoxLayout" name="contentLayout">
-     <property name="spacing"><number>30</number></property>
-     
-     <!-- Explanation Text -->
+    <layout class="QHBoxLayout" name="centerHLayout">
      <item>
-      <widget class="QLabel" name="explanation_label">
-       <property name="text"><string>Here is a detailed explanation of the concept we are trying to learn.</string></property>
-       <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
-       <property name="wordWrap"><bool>true</bool></property>
-       <property name="styleSheet"><string>font-size: 28px; color: #3E2723; padding: 20px; background-color: white; border-radius: 15px;</string></property>
-       <property name="minimumWidth"><number>400</number></property>
+      <spacer name="leftSpacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QWidget" name="video_container">
+       <property name="minimumSize">
+        <size>
+         <width>620</width>
+         <height>420</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>700</width>
+         <height>460</height>
+        </size>
+       </property>
+       <property name="styleSheet"><string>background-color: #FFF3E0;</string></property>
       </widget>
      </item>
-     
-     <!-- Media / Illustration -->
      <item>
-      <widget class="QLabel" name="media_label">
-       <property name="text"><string>🖼️</string></property>
-       <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="scaledContents"><bool>true</bool></property>
-       <property name="styleSheet"><string>font-size: 80px; background-color: #FFCC80; border-radius: 15px; border: 4px dashed #EF6C00;</string></property>
-       <property name="minimumSize"><size><width>350</width><height>350</height></size></property>
-      </widget>
+      <spacer name="rightSpacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
      </item>
-     
     </layout>
    </item>
 
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation"><enum>Qt::Vertical</enum></property>
-     <property name="sizeHint" stdset="0">
-      <size><width>20</width><height>20</height></size>
-     </property>
-    </spacer>
-   </item>
-
-   <!-- Robot Speech Transcript Context -->
+   <!-- Robot Speech / Prompt -->
    <item>
     <widget class="QLabel" name="robot_text_label">
      <property name="text"><string>🤖 Robot is explaining...</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="styleSheet"><string>font-size: 24px; font-style: italic; color: #F57C00;</string></property>
+     <property name="styleSheet"><string>font-size: 24px; font-style: italic; color: #F57C00; padding: 5px;</string></property>
+     <property name="minimumHeight"><number>40</number></property>
+     <property name="maximumHeight"><number>50</number></property>
     </widget>
    </item>
   </layout>

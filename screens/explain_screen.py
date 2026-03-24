@@ -1,7 +1,10 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Qt, QTimer
-from PySide6.QtGui import QPixmap
+from PySide6.QtCore import QFile, Qt, QTimer, QUrl
+from PySide6.QtGui import QPixmap, QImage, QPainterPath, QRegion
+from PySide6.QtWidgets import QVBoxLayout, QFrame
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtMultimediaWidgets import QVideoWidget
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
@@ -14,6 +17,9 @@ window = None
 input_enabled = False
 explain_data = {}
 voice_manager = VoiceManager()
+media_player = None
+audio_output = None
+video_widget = None
 
 def get_ui():
     global window
@@ -45,34 +51,90 @@ def on_show():
     # 1. Populate Title
     window.title_label.setText(explain_data.get("task_title", "Let's Understand This Better!"))
     
-    # 2. Populate Explanation Text
-    desc_text = explain_data.get("task_description", "")
-    if not desc_text:
-        # Fallback to the speech_start script if the JSON didn't include a physical description
-        desc_text = explain_data.get("speech_start", "Here is a detailed explanation.")
-    window.explanation_label.setText(desc_text)
+    # 2. Setup Video — following exact idle_screen.py pattern
+    setup_video(explain_data)
     
-    # 3. Populate Media Payload
-    media_url = explain_data.get("video_url", "")
-    if media_url:
-        abs_media_path = os.path.join(project_root, media_url)
-        if os.path.exists(abs_media_path):
-            pixmap = QPixmap(abs_media_path)
-            window.media_label.setPixmap(pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        else:
-            window.media_label.setText("🖼️\n[Media File Missing]")
-    else:
-        window.media_label.setText("🖼️\n[No Media Provided]")
-        
+    # 3. Speech
     speech_start = explain_data.get("speech_start", "Let's review this concept together.")
-    speech_end = explain_data.get("speech_end", "Take your time absorbing this. Press Enter when you are ready to continue.")
+    speech_end = explain_data.get("speech_end", "Press Enter when you are done.")
     full_speech = f"{speech_start} {speech_end}"
     
-    window.robot_text_label.setText(f"🤖 \"{full_speech}\"")
-    print(f"🤖 ROBOT SPEAKS: \"{full_speech}\"")
+    window.robot_text_label.setText(f'🤖 "{full_speech}"')
+    print(f'🤖 ROBOT SPEAKS: "{full_speech}"')
     voice_manager.speak(full_speech, f"explain_full_{task_data.get('task_id', 'id')}")
     
     enable_input()
+
+def apply_rounded_clip(widget, radius=20):
+    """Apply a rounded rectangle clip mask to a widget so its children are visually clipped."""
+    from PySide6.QtCore import QRectF
+    path = QPainterPath()
+    path.addRoundedRect(QRectF(widget.rect()), radius, radius)
+    region = QRegion(path.toFillPolygon().toPolygon())
+    widget.setMask(region)
+
+def setup_video(explain_data):
+    """Setup video player following the proven idle_screen.py architecture."""
+    global media_player, audio_output, video_widget
+    
+    # Resolve video path
+    media_url = explain_data.get("video_url", "")
+    if not media_url:
+        media_url = "assets/video/t_1-explain.mp4"
+    
+    abs_media_path = os.path.join(project_root, media_url)
+    if not os.path.exists(abs_media_path):
+        abs_media_path = os.path.join(project_root, "assets", "video", "t_1-explain.mp4")
+    
+    # Cleanup old player
+    if media_player:
+        media_player.stop()
+        media_player.deleteLater()
+        media_player = None
+    
+    # Create QVideoWidget exactly like idle_screen.py
+    video_widget = QVideoWidget()
+    
+    # Expand to fill, eliminating black letterbox bars
+    video_widget.setAspectRatioMode(Qt.KeepAspectRatioByExpanding)
+    
+    # Mount into the container layout (same pattern as idle_screen.py web_container)
+    container = window.video_container
+    
+    # If container doesn't have a layout yet, create one
+    if container.layout() is None:
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+    else:
+        # Clear existing widgets
+        while container.layout().count():
+            item = container.layout().takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        container.layout().setContentsMargins(0, 0, 0, 0)
+    
+    container.layout().addWidget(video_widget)
+    
+    # Apply rounded corner clip mask to the container (clips the QVideoWidget inside)
+    container.setStyleSheet("background-color: #FFF3E0; border: 4px solid #FFCC80; border-radius: 20px;")
+    QTimer.singleShot(100, lambda: apply_rounded_clip(container, 20))
+    
+    # Audio output (muted — robot voice handles narration)
+    audio_output = QAudioOutput()
+    audio_output.setVolume(0)
+    
+    # Media player
+    media_player = QMediaPlayer()
+    media_player.setAudioOutput(audio_output)
+    media_player.setVideoOutput(video_widget)
+    
+    if os.path.exists(abs_media_path):
+        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
+        media_player.setLoops(QMediaPlayer.Infinite)
+        media_player.play()
+        print(f"[Explain Screen] Video playing: {abs_media_path}")
+    else:
+        print(f"[Explain Screen] Video file not found: {abs_media_path}")
 
 def play_second_speech():
     pass # Deprecated by combined fluent speech
@@ -81,7 +143,7 @@ def enable_input():
     global input_enabled
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
-    window.robot_text_label.setText("🤖 Waiting for input...")
+    window.robot_text_label.setText("🤖 Press Enter when you are done.")
     print("[Explain Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
 
 def handle_key_press(action):
@@ -92,6 +154,8 @@ def handle_key_press(action):
     if action == "ENTER": # Hardware mapping for Return/Enter
         input_enabled = False
         voice_manager.stop()
+        if media_player:
+            media_player.stop()
         print("[Explain Screen] Student pressed ENTER. Logging failure and advancing...")
         
         # 1. Log the Failure Interaction natively
