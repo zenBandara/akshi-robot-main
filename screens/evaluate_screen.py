@@ -65,7 +65,6 @@ def on_show():
     eval_data = task_data["evaluate"]
     
     # 2. Set Question Text
-    title_text = eval_data.get("task_title", "Evaluation Phase")
     desc_text = eval_data.get("task_description", "What was the question?")
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     
@@ -73,14 +72,13 @@ def on_show():
         # Level 3 Affective Affordance: Personalized context and Escape Hatch control
         window.question_label.setText(f"Okay {student_name}, {desc_text.lower()}\n(Press S to Skip)")
     else:
-        window.question_label.setText(f"{title_text}: {desc_text}\nUse the numbers on your keyboard to pick an option!")
+        window.question_label.setText(desc_text)
     
     # 3. Apply Option Cards
     mc_words = eval_data.get("multiple_choices_word", {})
     mc_images = eval_data.get("multiple_choices_images", {})
     correct_option_key = eval_data.get("correct_option")
-    
-    img_size = 220
+    img_size = 130
     if level >= 2:
         window.card_3.hide()
         window.card_4.hide()
@@ -92,10 +90,16 @@ def on_show():
             window.question_label.setStyleSheet("font-size: 34px; font-weight: bold; color: #00838F; background-color: white; border-radius: 20px; padding: 15px;")
             for c in [window.card_1, window.card_2]:
                 c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #4DD0E1; }")
-            for t in [window.text_1, window.text_2]:
-                t.setStyleSheet("font-size: 24px; font-weight: bold; color: #00838F; border: none; background: transparent;")
             for k in [window.key_1, window.key_2]:
-                k.setStyleSheet("font-size: 20px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 12px; padding: 5px; margin: 0px 40px;")
+                k.setStyleSheet("min-width: 60px; max-width: 60px; min-height: 60px; max-height: 60px; font-size: 30px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 30px; margin: 0px 15px 15px 0px;")
+                try:
+                    k.parentWidget().layout().setAlignment(k, Qt.AlignRight | Qt.AlignBottom)
+                except Exception: pass
+            for img in [window.img_1, window.img_2]:
+                img.setStyleSheet("background-color: white; border-radius: 20px; padding: 10px;")
+                try:
+                    img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
+                except Exception: pass
                 
             sound_manager.play_bell()
             sound_manager.play_bgm("arcade")
@@ -106,10 +110,16 @@ def on_show():
             window.question_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #FFFF00; background-color: black; border-radius: 20px; padding: 15px; border: 2px solid #FFFF00;")
             for c in [window.card_1, window.card_2]:
                 c.setStyleSheet("QFrame { background-color: #000000; border-radius: 25px; border: 6px solid #FFFF00; }")
-            for t in [window.text_1, window.text_2]:
-                t.setStyleSheet("font-size: 32px; font-weight: bold; color: #FFFF00; border: none; background: transparent;")
             for k in [window.key_1, window.key_2]:
-                k.setStyleSheet("font-size: 26px; font-weight: bold; color: black; background-color: #FFFF00; border-radius: 12px; padding: 5px; margin: 0px 40px;")
+                k.setStyleSheet("min-width: 60px; max-width: 60px; min-height: 60px; max-height: 60px; font-size: 32px; font-weight: bold; color: black; background-color: #FFFF00; border-radius: 30px; margin: 0px 15px 15px 0px;")
+                try:
+                    k.parentWidget().layout().setAlignment(k, Qt.AlignRight | Qt.AlignBottom)
+                except Exception: pass
+            for img in [window.img_1, window.img_2]:
+                img.setStyleSheet("background-color: #000000; border-radius: 20px; padding: 10px;")
+                try:
+                    img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
+                except Exception: pass
         
         # Pick 1 correct and 1 random distractor
         distractors = [k for k in mc_words.keys() if k != correct_option_key]
@@ -123,33 +133,39 @@ def on_show():
             "2": chosen_keys[1]
         }
     else:
-        # Reset to base pastel cyan natively
-        window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #E0F7FA; font-family: 'Nunito', sans-serif; border: none; }")
-        window.question_label.setStyleSheet("font-size: 34px; font-weight: bold; color: #00838F; background-color: white; border-radius: 20px; padding: 15px;")
+        # Reset to base pristine layout natively
+        window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #FFFFFF; font-family: 'Nunito', sans-serif; border: none; }")
+        window.question_label.setStyleSheet("font-size: 38px; font-weight: bold; color: #1A237E; background-color: #F8FAFC; border-radius: 20px; padding: 15px;")
         for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
-            c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #4DD0E1; }")
-        for t in [window.text_1, window.text_2, window.text_3, window.text_4]:
-            t.setStyleSheet("font-size: 24px; font-weight: bold; color: #00838F; border: none; background: transparent;")
+            c.setStyleSheet("QFrame { background-color: #F8FAFC; border-radius: 25px; border: 4px solid #E2E8F0; }")
         for k in [window.key_1, window.key_2, window.key_3, window.key_4]:
-            k.setStyleSheet("font-size: 20px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 12px; padding: 5px; margin: 0px 40px;")
+            k.setStyleSheet("min-width: 50px; max-width: 50px; min-height: 50px; max-height: 50px; font-size: 26px; font-weight: bold; color: white; background-color: #1976D2; border-radius: 25px; margin: 0px 10px 10px 0px;")
+            try:
+                k.parentWidget().layout().setAlignment(k, Qt.AlignRight | Qt.AlignBottom)
+            except Exception: pass
+            
+        for img in [window.img_1, window.img_2, window.img_3, window.img_4]:
+            img.setStyleSheet("background-color: white; border-radius: 20px; padding: 10px;")
+            try:
+                img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
+            except Exception: pass
             
         window.card_3.show()
         window.card_4.show()
-        img_size = 220
+        img_size = 130
         key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
     
-    def setup_card(idx, text_widget, img_widget):
+    def setup_card(idx, img_widget):
         physical_key = str(idx)
         if physical_key not in key_mapping:
             # Hide card if not part of the current key_mapping
-            text_widget.parentWidget().hide()
+            img_widget.parentWidget().hide()
             return
             
-        text_widget.parentWidget().show() # Ensure it's visible if it's mapped
+        img_widget.parentWidget().show() # Ensure it's visible if it's mapped
         json_key = key_mapping[physical_key]
         
-        # Ensure text is populated
-        text_widget.setText(mc_words.get(json_key, ""))
+        # We explicitly skip setting any text, relying PURELY on image recognition payload
         
         # Ensure image is dynamically pulled from disk (or fallback)
         img_path = mc_images.get(json_key, "")
@@ -157,17 +173,19 @@ def on_show():
             abs_img_path = os.path.join(project_root, img_path)
             if os.path.exists(abs_img_path):
                 pixmap = QPixmap(abs_img_path)
-                # Keep aspect ratio safely bounded inside the grid
+                
+                # To prevent PySide6 image truncation bugs inside tight layouts, we measure the widget natively
+                # If the widget isn't fully drawn yet, img_size is safe
                 img_widget.setPixmap(pixmap.scaled(img_size, img_size, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             else:
                 img_widget.setText("\n\n[Image Missing]\n\n")
         else:
             img_widget.clear() # Clear any previous image if no new one
                 
-    setup_card(1, window.text_1, window.img_1)
-    setup_card(2, window.text_2, window.img_2)
-    setup_card(3, window.text_3, window.img_3)
-    setup_card(4, window.text_4, window.img_4)
+    setup_card(1, window.img_1)
+    setup_card(2, window.img_2)
+    setup_card(3, window.img_3)
+    setup_card(4, window.img_4)
 
     # 4. Bind Animations
     for anim in active_animations:
@@ -179,18 +197,9 @@ def on_show():
     
     print(f"\n[TESTING CHEAT] 🎯 The correct answer for this task is: Option {correct_physical_key} (Press '{correct_physical_key}')\n")
     
-    if level >= 3:
-        # Level 3 Physical Affordance: Aggressively Spotlight ONLY the correct answer
-        if correct_physical_key == "1":
-            active_animations.append(apply_pulse_glow(window.card_1))
-        elif correct_physical_key == "2":
-            active_animations.append(apply_pulse_glow(window.card_2))
-    else:
-        # Standard L1/L2 Layout: Pulse all available interactive objects evenly
-        if "1" in key_mapping: active_animations.append(apply_pulse_glow(window.card_1))
-        if "2" in key_mapping: active_animations.append(apply_pulse_glow(window.card_2))
-        if "3" in key_mapping: active_animations.append(apply_pulse_glow(window.card_3))
-        if "4" in key_mapping: active_animations.append(apply_pulse_glow(window.card_4))
+    # PER USER FEEDBACK: 
+    # All visual "blinking" / opacity pulsing animations have been strictly eradicated from this Screen!
+    # The layout remains purely static to maintain a highly professional Apple-like interface for the kids.
 
     # 5. Robot Speech & Input Delay
     input_enabled = False

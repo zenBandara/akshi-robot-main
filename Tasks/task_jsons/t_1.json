@@ -57,10 +57,10 @@
       "op4": "Down Arrow"
     },
     "multiple_choices_images": {
-      "op1": "assets/placeholder.png",
-      "op2": "assets/placeholder.png",
-      "op3": "assets/placeholder.png",
-      "op4": "assets/placeholder.png"
+      "op1": "assets/images/flat_left_arrow.png",
+      "op2": "assets/images/flat_right_arrow.png",
+      "op3": "assets/images/flat_up_arrow.png",
+      "op4": "assets/images/flat_down_arrow.png"
     },
     "correct_option": "op2"
   }
