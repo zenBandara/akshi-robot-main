@@ -65,27 +65,17 @@ def on_show():
         window.media_label.setText("🖼️\n[No Media Provided]")
         
     speech_start = explain_data.get("speech_start", "Let's review this concept together.")
-    window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
-    print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
-    voice_manager.speak(speech_start, f"explain_start_{task_data.get('task_id', 'id')}")
+    speech_end = explain_data.get("speech_end", "Take your time absorbing this. Press Enter when you are ready to continue.")
+    full_speech = f"{speech_start} {speech_end}"
     
-    words_count = len(speech_start.split())
-    delay_ms = max(2000, int((words_count / 1.8) * 1000))
-    QTimer.singleShot(delay_ms, play_second_speech)
+    window.robot_text_label.setText(f"🤖 \"{full_speech}\"")
+    print(f"🤖 ROBOT SPEAKS: \"{full_speech}\"")
+    voice_manager.speak(full_speech, f"explain_full_{task_data.get('task_id', 'id')}")
+    
+    enable_input()
 
 def play_second_speech():
-    global explain_data
-    speech_end = explain_data.get("speech_end", "Take your time absorbing this. Press Enter when you are ready to continue.")
-    
-    if speech_end:
-        window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
-        print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
-        voice_manager.speak(speech_end, f"explain_end_{explain_data.get('task_id', 'id')}")
-        words_count = len(speech_end.split())
-        delay_ms = max(2000, int((words_count / 1.8) * 1000))
-        QTimer.singleShot(delay_ms, enable_input)
-    else:
-        enable_input()
+    pass # Deprecated by combined fluent speech
 
 def enable_input():
     global input_enabled
@@ -101,6 +91,7 @@ def handle_key_press(action):
         
     if action == "ENTER": # Hardware mapping for Return/Enter
         input_enabled = False
+        voice_manager.stop()
         print("[Explain Screen] Student pressed ENTER. Logging failure and advancing...")
         
         # 1. Log the Failure Interaction natively

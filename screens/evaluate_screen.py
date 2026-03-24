@@ -227,8 +227,8 @@ def on_show():
         words_count = len(speech_text.split())
         delay_ms = max(2000, int((words_count / 1.8) * 1000))
     
-    print(f"Delaying keyboard input for {delay_ms}ms to allow speech to strictly finish...")
-    QTimer.singleShot(delay_ms, enable_input)
+    print(f"Enabling keyboard input immediately to allow for speech interruption.")
+    enable_input()
 
 def enable_input():
     global input_enabled, evaluate_timer
@@ -275,6 +275,7 @@ def handle_key_press(action):
     # L2 Control Affordance: Break
     if action == "BREAK" and state_manager.get_affordance_level() >= 2:
         input_enabled = False
+        voice_manager.stop()
         print("[Evaluate Screen] Student pressed BREAK. Suspending session...")
         
         # Cease physics
@@ -296,6 +297,7 @@ def handle_key_press(action):
     # L3 Control Affordance: Skip
     if action == "SKIP" and state_manager.get_affordance_level() >= 3:
         input_enabled = False
+        voice_manager.stop()
         print("[Evaluate Screen] Student pressed SKIP. Logging and skipping student...")
         
         # Cease physics
@@ -320,6 +322,7 @@ def handle_key_press(action):
         
     # Lock out further inputs immediately
     input_enabled = False
+    voice_manager.stop()
     print(f"[Evaluate Screen] Student pressed physical key {action}.")
     
     # Stop distracting animations and audio gracefully

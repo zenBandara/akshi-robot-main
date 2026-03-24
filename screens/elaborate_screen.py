@@ -96,8 +96,8 @@ def on_show():
     words_count = len(speech_text.split())
     delay_ms = max(2000, int((words_count / 1.8) * 1000))
     
-    print(f"[Elaborate Screen L1] Delaying keyboard input for {delay_ms}ms to let speech finish...")
-    QTimer.singleShot(delay_ms, enable_input)
+    print(f"[Elaborate Screen L1] Enabling keyboard input immediately to allow for speech interruption.")
+    enable_input()
 
 def enable_input():
     global input_enabled
@@ -115,6 +115,7 @@ def handle_key_press(action):
         
     # Lock out further inputs immediately
     input_enabled = False
+    voice_manager.stop()
     print(f"[Elaborate Screen L1] Student pressed key {action}. Review complete!")
     
     # Highlight the chosen card visually via StyleSheet manipulation

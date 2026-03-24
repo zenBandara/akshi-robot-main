@@ -3,7 +3,7 @@ import edge_tts
 import os
 import threading
 import hashlib
-from playsound import playsound
+import pygame
 
 
 class VoiceManager:
@@ -14,6 +14,10 @@ class VoiceManager:
         self.audio_folder = "voice_cache"
 
         os.makedirs(self.audio_folder, exist_ok=True)
+        try:
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+        except: pass
 
     async def generate_voice(self, text, filename, rate):
 
@@ -39,8 +43,16 @@ class VoiceManager:
 
         def play():
             try:
-                playsound(filename)
+                pygame.mixer.music.load(filename)
+                pygame.mixer.music.play()
             except Exception as e:
                 print(f"Error playing sound: {e}")
                 
         threading.Thread(target=play, daemon=True).start()
+
+    def stop(self):
+        try:
+            if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
+        except Exception:
+            pass

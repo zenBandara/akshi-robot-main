@@ -68,28 +68,17 @@ def on_show():
     speech_start = explore_data.get("speech_start", "Let's try a physical activity!")
     # Step 44: Physically Encourage Kinesthetic Output
     speech_start = f"Stand up! {speech_start}"
+    speech_end = explore_data.get("speech_end", "Press Enter when you're done exploring!")
+    full_speech = f"{speech_start} {speech_end}"
     
-    window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
-    print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
-    voice_manager.speak(speech_start, f"explore_start_{task_data.get('task_id', 'id')}")
+    window.robot_text_label.setText(f"🤖 \"{full_speech}\"")
+    print(f"🤖 ROBOT SPEAKS: \"{full_speech}\"")
+    voice_manager.speak(full_speech, f"explore_full_{task_data.get('task_id', 'id')}")
     
-    words_count = len(speech_start.split())
-    delay_ms = max(2000, int((words_count / 1.8) * 1000))
-    QTimer.singleShot(delay_ms, play_second_speech)
+    enable_input()
 
 def play_second_speech():
-    global explore_data
-    speech_end = explore_data.get("speech_end", "Press Enter when you're done exploring!")
-    
-    if speech_end:
-        window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
-        print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
-        voice_manager.speak(speech_end, f"explore_end_{explore_data.get('task_id', 'id')}")
-        words_count = len(speech_end.split())
-        delay_ms = max(2000, int((words_count / 1.8) * 1000))
-        QTimer.singleShot(delay_ms, enable_input)
-    else:
-        enable_input()
+    pass # Deprecated by combined fluent speech
 
 def enable_input():
     global input_enabled
@@ -106,6 +95,7 @@ def handle_key_press(action):
         
     if action == "ENTER":
         input_enabled = False
+        voice_manager.stop()
         print("[Explore Screen] Student pressed ENTER. Ending Exploration and moving to next student.")
         
         # Log Result (Deep Failure -> Explored)

@@ -61,29 +61,17 @@ def on_show():
         
     # 3. Multi-Stage Warm Emotional Speech Loop
     speech_start = engage_data.get("speech_start", "Let's review this together!")
+    speech_end = engage_data.get("speech_end", "Press Enter when you're ready to try one more time!")
+    full_speech = f"{speech_start} {speech_end}"
     
-    window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
-    print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{speech_start}\"")
-    voice_manager.speak(speech_start, f"engage_start_{task_data.get('task_id', 'id')}")
+    window.robot_text_label.setText(f"🤖 \"{full_speech}\"")
+    print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{full_speech}\"")
+    voice_manager.speak(full_speech, f"engage_full_{task_data.get('task_id', 'id')}")
     
-    # Extra slow, soothing computational cadence (1.8 words per second)
-    words_count = len(speech_start.split())
-    delay_ms = max(2500, int((words_count / 1.8) * 1000))
-    QTimer.singleShot(delay_ms, play_second_speech)
+    enable_input()
 
 def play_second_speech():
-    global engage_data
-    speech_end = engage_data.get("speech_end", "Press Enter when you're ready to try one more time!")
-    
-    if speech_end:
-        window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
-        print(f"🤖 ROBOT SPEAKS [EXTRA WARM & GENTLE TONE]: \"{speech_end}\"")
-        voice_manager.speak(speech_end, f"engage_end_{engage_data.get('task_id', 'id')}")
-        words_count = len(speech_end.split())
-        delay_ms = max(2500, int((words_count / 1.8) * 1000))
-        QTimer.singleShot(delay_ms, enable_input)
-    else:
-        enable_input()
+    pass # Deprecated by combined fluent speech
 
 def enable_input():
     global input_enabled
@@ -100,6 +88,7 @@ def handle_key_press(action):
         
     if action == "ENTER":
         input_enabled = False
+        voice_manager.stop()
         print("[Engage Screen] Student pressed ENTER. Entering absolute final Evaluation loop! (Level 3)")
         
         from core.flow_controller import flow_controller
