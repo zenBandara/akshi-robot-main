@@ -90,11 +90,7 @@ def on_show():
     speech_text = f"{student_name}, {speech_start} {question_text} Press the number to select your answer."
     
     print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
-    voice_manager.speak(speech_text, f"elaborate_question_{task_data.get('task_id', 'id')}_{student_name}")
-    
-    # Calculate rough delay based on text length (~2.5 words per second)
-    words_count = len(speech_text.split())
-    delay_ms = max(2000, int((words_count / 1.8) * 1000))
+    delay_ms = voice_manager.speak(speech_text, f"elaborate_question_{task_data.get('task_id', 'id')}_{student_name}")
     
     print(f"[Elaborate Screen L1] Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()
@@ -147,15 +143,12 @@ def handle_key_press(action):
             
         speech = "Great job! Now let's try the real question again."
         print(f"🤖 ROBOT SPEAKS: \"{speech}\"")
-        voice_manager.speak(speech, f"elaborate_correct_{student_name}")
+        delay_ms = voice_manager.speak(speech, f"elaborate_correct_{student_name}")
         
         # Advance FlowController natively to evaluate_L2 (Cascade Index 2)
         flow_controller.cascade_index = 2
         state_manager.set_affordance_level(2)
         state_manager.current_stage = "evaluate_L2"
-        
-        # Wait 3000ms for audio to resolve cleanly
-        delay_ms = 3000
         def proceed_to_eval():
             try:
                 from core.navigator import navigator
@@ -173,15 +166,11 @@ def handle_key_press(action):
         from core.dialogue import DialoguePool
         encouragement_speech = DialoguePool.get_phrase("incorrect_L1", student_name)
         print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
-        voice_manager.speak(encouragement_speech, f"elaborate_wrong_{student_name}")
+        delay_ms = voice_manager.speak(encouragement_speech, f"elaborate_wrong_{student_name}")
         
         # Advance FlowController completely bypassing L2 straight to explain (Cascade Index 3)
         flow_controller.cascade_index = 3
         state_manager.current_stage = "explain"
-        
-        clean_speech = encouragement_speech.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
-        words_count = len(clean_speech.split())
-        delay_ms = max(2000, int((words_count / 1.8) * 1000))
         
         def proceed_to_explain():
             try:

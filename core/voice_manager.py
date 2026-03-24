@@ -40,6 +40,14 @@ class VoiceManager:
         else:
             print("Generating audio:", filename)
             asyncio.run(self.generate_voice(text, filename, rate))
+            
+        try:
+            sound = pygame.mixer.Sound(filename)
+            duration_ms = int(sound.get_length() * 1000)
+        except Exception as e:
+            print("Could not get duration natively, falling back to estimation.", e)
+            words_count = len(text.split())
+            duration_ms = max(2000, int((words_count / 1.8) * 1000))
 
         def play():
             try:
@@ -49,6 +57,8 @@ class VoiceManager:
                 print(f"Error playing sound: {e}")
                 
         threading.Thread(target=play, daemon=True).start()
+        
+        return duration_ms
 
     def stop(self):
         try:

@@ -55,14 +55,25 @@ def get_ui():
             intro_msg = f"Wow, you guys are doing great! {display_name}, can you please come on up? It is your turn to shine!"
         
         print(f"[Robot Speaks]: {intro_msg}")
-        voice_manager.speak(intro_msg, f"call_{display_name}_{task_name.replace(' ', '_').lower()}")
+        duration_ms = voice_manager.speak(intro_msg, f"call_{display_name}_{task_name.replace(' ', '_').lower()}")
             
         if fade_anim:
             fade_effect.setOpacity(0.0)
             fade_anim.start()
+            
+        # Automatically transition exactly after the speech resolves
+        QTimer.singleShot(duration_ms, transition_to_evaluate)
 
     window.on_show = on_show
     return window
+    
+def transition_to_evaluate():
+    from core.keyboard_manager import keyboard_manager
+    keyboard_manager.unregister_handler()
+    print("Automatic transition triggered by exact audio duration resolving natively.")
+    state_manager.set_five_e_stage("evaluate")
+    state_manager.set_affordance_level(1)
+    navigator.navigate_to("evaluate")
 
 def setup_animations():
     global window, fade_anim, fade_effect
@@ -79,7 +90,8 @@ def setup_animations():
 def handle_key_press(mapped_action):
     if mapped_action == "ENTER" or mapped_action == "CONTINUE":
         keyboard_manager.unregister_handler()
-        print("Student ready! Transitioning to Evaluate Screen...")
+        voice_manager.stop()
+        print("Student cleanly interrupted intro! Transitioning to Evaluate Screen natively...")
         state_manager.set_five_e_stage("evaluate")
         state_manager.set_affordance_level(1)
         

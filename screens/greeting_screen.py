@@ -75,13 +75,14 @@ def on_ready():
     QTimer.singleShot(800, anim_2.start) # Execute exactly synchronized visually trailing title
     
     # Speak the greeting
+    duration_ms = 3000
     try:
-        voice_manager.speak(greeting_message, "greeting_message")
+        duration_ms = voice_manager.speak(greeting_message, "greeting_message")
     except Exception as e:
         print("VoiceManager error (ignoring for now):", e)
 
-    # Wait for 3 seconds then transition to teacher selection
-    QTimer.singleShot(3000, transition_to_teacher_select)
+    # Wait exactly for exact length, then transition to teacher selection
+    QTimer.singleShot(duration_ms, transition_to_teacher_select)
 
 def transition_to_teacher_select():
     print("Transitioning to Teacher Select...")

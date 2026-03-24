@@ -213,19 +213,11 @@ def on_show():
         # Step 38 & 39: Level 3 Speech Simplification, Cadence, & personalization
         speech_text = f"Okay {student_name}, look carefully! {speech_start} {desc_text}".strip()
         print(f"🤖 ROBOT SPEAKS [SLOW RATE -30%]: \"{speech_text}\"")
-        voice_manager.speak(speech_text, f"eval_l3_{student_name}_{task_data.get('task_id', 'id')}")
-        
-        # Slower 1.5 words-per-second computational cadence
-        words_count = len(speech_text.split())
-        delay_ms = max(3000, int((words_count / 1.8) * 1000))
+        delay_ms = voice_manager.speak(speech_text, f"eval_l3_{student_name}_{task_data.get('task_id', 'id')}")
     else:
         speech_text = f"{student_name}, {speech_start} {desc_text} Press the number to select your answer.".strip()
         print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
-        voice_manager.speak(speech_text, f"eval_l1_{student_name}_{task_data.get('task_id', 'id')}")
-        
-        # Standard 2.5 words-per-second computational cadence
-        words_count = len(speech_text.split())
-        delay_ms = max(2000, int((words_count / 1.8) * 1000))
+        delay_ms = voice_manager.speak(speech_text, f"eval_l1_{student_name}_{task_data.get('task_id', 'id')}")
     
     print(f"Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()
@@ -267,10 +259,7 @@ def on_timer_expire():
     # Provide playful user feedback directly on timeout
     student_name = state_manager.get_current_student() or "friend"
     timeout_speech = f"Oops {student_name}, looks like you're taking a little bit of time! Let's review this together instead!"
-    voice_manager.speak(timeout_speech, f"timeout_{student_name}")
-    
-    words = len(timeout_speech.split())
-    delay = max(2000, int((words / 1.8) * 1000))
+    delay_ms = voice_manager.speak(timeout_speech, f"timeout_{student_name}")
     
     # Displace the actual visual routing exactly aligning with new speech cadence natively
     def transition_after_speech():
@@ -281,7 +270,7 @@ def on_timer_expire():
                 flow_controller.on_timeout(parent_stack)
         except ImportError: pass
         
-    QTimer.singleShot(delay, transition_after_speech)
+    QTimer.singleShot(delay_ms, transition_after_speech)
         
 def handle_key_press(action):
     global input_enabled, evaluate_timer, key_mapping, active_animations
@@ -390,12 +379,7 @@ def handle_key_press(action):
         encouragement_speech = DialoguePool.get_phrase(dialogue_category, student_name)
         
         print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
-        voice_manager.speak(encouragement_speech, f"eval_encourage_{student_name}")
-        
-        # 2. Delay the cascade escalation to give the Robot time to finish speaking.
-        clean_speech = encouragement_speech.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
-        words_count = len(clean_speech.split())
-        delay_ms = max(2000, int((words_count / 1.8) * 1000))
+        delay_ms = voice_manager.speak(encouragement_speech, f"eval_encourage_{student_name}")
         
         from PySide6.QtCore import QTimer
         def proceed_to_incorrect_cascade():

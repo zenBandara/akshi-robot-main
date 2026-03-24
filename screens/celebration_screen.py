@@ -50,14 +50,14 @@ def on_show():
     clean_speech = selected_phrase.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
     clean_speech_str = clean_speech.strip()
     print(f"🤖 ROBOT SPEAKS: \"{clean_speech_str}\"")
-    voice_manager.speak(clean_speech_str, f"celebrate_{student_name}")
+    duration_ms = voice_manager.speak(clean_speech_str, f"celebrate_{student_name}")
     
     # 5. Gamified Reward statically (Level 1 Affective Affordance)
     # The blinking animation has been removed based on user feedback.
     
-    # 6. Show reward for 6 seconds, then move on
-    print("[Celebration Screen] Displaying gamified reward for 6 seconds...")
-    QTimer.singleShot(6000, end_celebration)
+    # 6. Wait directly exactly correlating to real physical text-to-speech lengths!
+    print(f"[Celebration Screen] Displaying gamified reward sequentially synced to audio track ({duration_ms}ms)...")
+    QTimer.singleShot(duration_ms, end_celebration)
 
 def end_celebration():
     global reward_anim

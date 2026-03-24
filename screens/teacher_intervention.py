@@ -47,12 +47,10 @@ def on_show():
     window.robot_text_label.setText(f"🤖 \"{speech_text}\"")
     
     print(f"🤖 ROBOT SPEAKS [CHEERFUL ENCOURAGING TONE]: \"{speech_text}\"")
-    voice_manager.speak(speech_text, f"teacher_intervention_{student_name}")
+    delay_ms = voice_manager.speak(speech_text, f"teacher_intervention_{student_name}")
     
-    # Calculate audio wait sequence (assume steady ~2.5 WPS to keep things calm but brisk)
-    words_count = len(speech_text.split())
-    delay_ms = max(2000, int((words_count / 1.8) * 1000))
-    QTimer.singleShot(delay_ms, enable_input)
+    print(f"Enabling keyboard input immediately to allow for speech interruption.")
+    enable_input()
     
 def enable_input():
     global input_enabled
@@ -68,6 +66,7 @@ def handle_key_press(action):
         
     if action == "CONTINUE":
         input_enabled = False
+        voice_manager.stop()
         print("[Teacher Intervention] Teacher pressed CONTINUE. Logging complete cascade and resetting.")
         
         # Log Result (Complete Cascade Failure -> Teacher Assisted)
