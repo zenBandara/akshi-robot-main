@@ -52,18 +52,8 @@ def on_show():
     print(f"🤖 ROBOT SPEAKS: \"{clean_speech_str}\"")
     voice_manager.speak(clean_speech_str, f"celebrate_{student_name}")
     
-    # 5. Gamified Reward Animation (Level 1 Affective Affordance)
-    global reward_anim
-    effect = QGraphicsOpacityEffect(window.celebration_img)
-    window.celebration_img.setGraphicsEffect(effect)
-    
-    reward_anim = QPropertyAnimation(effect, b"opacity")
-    reward_anim.setDuration(600)
-    reward_anim.setStartValue(0.3)
-    reward_anim.setEndValue(1.0)
-    reward_anim.setLoopCount(-1)
-    reward_anim.setEasingCurve(QEasingCurve.InOutSine)
-    reward_anim.start()
+    # 5. Gamified Reward statically (Level 1 Affective Affordance)
+    # The blinking animation has been removed based on user feedback.
     
     # 6. Show reward for 6 seconds, then move on
     print("[Celebration Screen] Displaying gamified reward for 6 seconds...")
