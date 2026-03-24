@@ -229,6 +229,11 @@ def on_show():
     
     print(f"Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()
+    
+    # Delay timer start until after speech actually finishes
+    print(f"Delaying visual clock countdown for {delay_ms}ms...")
+    if evaluate_timer:
+        QTimer.singleShot(delay_ms, evaluate_timer.start)
 
 def enable_input():
     global input_enabled, evaluate_timer
@@ -243,7 +248,7 @@ def enable_input():
         clock_count=10,
         timeout_callback=on_timer_expire
     )
-    evaluate_timer.start()
+    # The timer start will be triggered distinctly by QTimer.singleShot matching speech resolution
 
 def on_timer_expire():
     global input_enabled
@@ -259,13 +264,24 @@ def on_timer_expire():
         
     sound_manager.stop_bgm()
         
-    # Delegate terminal routing completely accurately into isolated flow controller natively
-    try:
-        from core.flow_controller import flow_controller
-        parent_stack = window.parentWidget()
-        if parent_stack:
-            flow_controller.on_timeout(parent_stack)
-    except ImportError: pass
+    # Provide playful user feedback directly on timeout
+    student_name = state_manager.get_current_student() or "friend"
+    timeout_speech = f"Oops {student_name}, looks like you're taking a little bit of time! Let's review this together instead!"
+    voice_manager.speak(timeout_speech, f"timeout_{student_name}")
+    
+    words = len(timeout_speech.split())
+    delay = max(2000, int((words / 1.8) * 1000))
+    
+    # Displace the actual visual routing exactly aligning with new speech cadence natively
+    def transition_after_speech():
+        try:
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.on_timeout(parent_stack)
+        except ImportError: pass
+        
+    QTimer.singleShot(delay, transition_after_speech)
         
 def handle_key_press(action):
     global input_enabled, evaluate_timer, key_mapping, active_animations

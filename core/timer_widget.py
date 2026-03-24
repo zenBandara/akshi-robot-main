@@ -48,6 +48,11 @@ class EmojiTimerWidget(QObject):
                 self.timeout_callback()
             return
             
+        try:
+            from core.sound_manager import sound_manager
+            sound_manager.play_tick()
+        except ImportError: pass
+            
         self.fade_anim.start()
         
     def _remove_clock(self):

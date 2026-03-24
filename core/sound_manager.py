@@ -20,7 +20,8 @@ class SoundManager:
                 "arcade": os.path.join(base_dir, "assets", "sounds", "arcade_bgm.wav"),
                 "correct": os.path.join(base_dir, "assets", "sounds", "correct.wav"),
                 "incorrect": os.path.join(base_dir, "assets", "sounds", "incorrect.wav"),
-                "celebration": os.path.join(base_dir, "assets", "sounds", "celebration.wav")
+                "celebration": os.path.join(base_dir, "assets", "sounds", "celebration.wav"),
+                "tick": os.path.join(base_dir, "assets", "sounds", "tick.wav")
             }
         except Exception as e:
             print(f"[SoundManager] Critical Failure initializing PyGame audio driver: {e}")
@@ -50,6 +51,9 @@ class SoundManager:
         
     def play_celebration(self, volume=0.6):
         self._play_sound("celebration", volume)
+        
+    def play_tick(self, volume=0.3):
+        self._play_sound("tick", volume)
 
     def play_bgm(self, name="arcade", volume=0.15):
         if not self.is_initialized: return
