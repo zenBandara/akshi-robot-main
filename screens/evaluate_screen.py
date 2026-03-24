@@ -88,45 +88,42 @@ def on_show():
         
         if level == 2:
             img_size = 350
-            # Physical Affordance: Premium Arcade Immersive Glow Background
+            # Level 2: Bright, engaging sky-blue theme — child-friendly & professional
             window.setStyleSheet("""
                 QWidget#EvaluateLevel1 { 
-                    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #1A2980, stop:1 #26D0CE); 
-                    border: 8px solid #00E5FF; 
-                    border-radius: 20px; 
+                    background-color: #E3F2FD; 
                     font-family: 'Nunito', sans-serif; 
                 }
             """)
             window.question_label.setStyleSheet("""
                 font-size: 38px; 
                 font-weight: 900; 
-                color: #FFFFFF; 
-                background-color: rgba(0, 0, 0, 100); 
+                color: #1565C0; 
+                background-color: #FFFFFF; 
                 border-radius: 25px; 
                 padding: 20px;
-                border: 2px solid rgba(255, 255, 255, 150);
+                border: 3px solid #90CAF9;
             """)
             
-            # Massive 3D physically-styled game buttons
+            # Clean, large white cards with soft blue borders
             for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
                 c.setStyleSheet("""
                     QFrame { 
                         background-color: #FFFFFF; 
-                        border-radius: 35px; 
-                        border: 6px solid #00E5FF;
-                        border-bottom: 12px solid #00B8D4; 
+                        border-radius: 30px; 
+                        border: 4px solid #90CAF9;
                     }
+                    QFrame:hover { border: 4px solid #1976D2; }
                 """)
                 
             for k in [window.key_1, window.key_2]:
                 k.setStyleSheet("""
-                    min-width: 70px; max-width: 70px; 
-                    min-height: 70px; max-height: 70px; 
-                    font-size: 36px; font-weight: 900; 
+                    min-width: 65px; max-width: 65px; 
+                    min-height: 65px; max-height: 65px; 
+                    font-size: 34px; font-weight: 900; 
                     color: #FFFFFF; 
-                    background-color: #FF1744; 
-                    border-radius: 35px; 
-                    border-bottom: 6px solid #B71C1C;
+                    background-color: #1976D2; 
+                    border-radius: 32px; 
                     margin: 0px 20px 20px 0px;
                 """)
                 try:
@@ -142,19 +139,47 @@ def on_show():
             sound_manager.play_bell()
             sound_manager.play_bgm("arcade")
         else:
-            # Level 3: Maximum Accessible High-Contrast
+            # Level 3: Warm peach/coral theme — maximum clarity, still child-friendly
             img_size = 400
-            window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #000000; font-family: 'Nunito', sans-serif; border: none; }")
-            window.question_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #FFFF00; background-color: black; border-radius: 20px; padding: 15px; border: 2px solid #FFFF00;")
+            window.setStyleSheet("""
+                QWidget#EvaluateLevel1 { 
+                    background-color: #FFF3E0; 
+                    font-family: 'Nunito', sans-serif; 
+                }
+            """)
+            window.question_label.setStyleSheet("""
+                font-size: 40px; 
+                font-weight: bold; 
+                color: #E65100; 
+                background-color: #FFFFFF; 
+                border-radius: 20px; 
+                padding: 15px; 
+                border: 3px solid #FFCC80;
+            """)
             for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
-                c.setStyleSheet("QFrame { background-color: #000000; border-radius: 25px; border: 6px solid #FFFF00; }")
+                c.setStyleSheet("""
+                    QFrame { 
+                        background-color: #FFFFFF; 
+                        border-radius: 25px; 
+                        border: 4px solid #FFCC80; 
+                    }
+                    QFrame:hover { border: 4px solid #FF9800; }
+                """)
             for k in [window.key_1, window.key_2]:
-                k.setStyleSheet("min-width: 60px; max-width: 60px; min-height: 60px; max-height: 60px; font-size: 32px; font-weight: bold; color: black; background-color: #FFFF00; border-radius: 30px; margin: 0px 15px 15px 0px;")
+                k.setStyleSheet("""
+                    min-width: 60px; max-width: 60px; 
+                    min-height: 60px; max-height: 60px; 
+                    font-size: 32px; font-weight: bold; 
+                    color: #FFFFFF; 
+                    background-color: #FF9800; 
+                    border-radius: 30px; 
+                    margin: 0px 15px 15px 0px;
+                """)
                 try:
                     k.parentWidget().layout().setAlignment(k, Qt.AlignRight | Qt.AlignBottom)
                 except Exception: pass
             for img in [window.img_1, window.img_2]:
-                img.setStyleSheet("background-color: #000000; border-radius: 20px; padding: 10px;")
+                img.setStyleSheet("background-color: transparent; border-radius: 20px; padding: 10px;")
                 try:
                     img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
                 except Exception: pass
