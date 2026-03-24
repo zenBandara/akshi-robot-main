@@ -71,6 +71,9 @@ def on_show():
     if level >= 3:
         # Level 3 Affective Affordance: Personalized context and Escape Hatch control
         window.question_label.setText(f"Okay {student_name}, {desc_text.lower()}\n(Press S to Skip)")
+    elif level == 2:
+        # Level 2 Control Affordance: Break Option
+        window.question_label.setText(f"{desc_text}\n(Press B to take a Break 🌿)")
     else:
         window.question_label.setText(desc_text)
     
@@ -85,18 +88,53 @@ def on_show():
         
         if level == 2:
             img_size = 350
-            # Physical Affordance: Layout Ambience L2
-            window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #1A237E; border: 15px solid #FFD600; border-radius: 10px; font-family: 'Nunito', sans-serif; }")
-            window.question_label.setStyleSheet("font-size: 34px; font-weight: bold; color: #00838F; background-color: white; border-radius: 20px; padding: 15px;")
-            for c in [window.card_1, window.card_2]:
-                c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #4DD0E1; }")
+            # Physical Affordance: Premium Arcade Immersive Glow Background
+            window.setStyleSheet("""
+                QWidget#EvaluateLevel1 { 
+                    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #1A2980, stop:1 #26D0CE); 
+                    border: 8px solid #00E5FF; 
+                    border-radius: 20px; 
+                    font-family: 'Nunito', sans-serif; 
+                }
+            """)
+            window.question_label.setStyleSheet("""
+                font-size: 38px; 
+                font-weight: 900; 
+                color: #FFFFFF; 
+                background-color: rgba(0, 0, 0, 100); 
+                border-radius: 25px; 
+                padding: 20px;
+                border: 2px solid rgba(255, 255, 255, 150);
+            """)
+            
+            # Massive 3D physically-styled game buttons
+            for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
+                c.setStyleSheet("""
+                    QFrame { 
+                        background-color: #FFFFFF; 
+                        border-radius: 35px; 
+                        border: 6px solid #00E5FF;
+                        border-bottom: 12px solid #00B8D4; 
+                    }
+                """)
+                
             for k in [window.key_1, window.key_2]:
-                k.setStyleSheet("min-width: 60px; max-width: 60px; min-height: 60px; max-height: 60px; font-size: 30px; font-weight: bold; color: white; background-color: #00BCD4; border-radius: 30px; margin: 0px 15px 15px 0px;")
+                k.setStyleSheet("""
+                    min-width: 70px; max-width: 70px; 
+                    min-height: 70px; max-height: 70px; 
+                    font-size: 36px; font-weight: 900; 
+                    color: #FFFFFF; 
+                    background-color: #FF1744; 
+                    border-radius: 35px; 
+                    border-bottom: 6px solid #B71C1C;
+                    margin: 0px 20px 20px 0px;
+                """)
                 try:
                     k.parentWidget().layout().setAlignment(k, Qt.AlignRight | Qt.AlignBottom)
                 except Exception: pass
+                
             for img in [window.img_1, window.img_2]:
-                img.setStyleSheet("background-color: white; border-radius: 20px; padding: 10px;")
+                img.setStyleSheet("background-color: transparent; padding: 15px;")
                 try:
                     img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
                 except Exception: pass
@@ -108,7 +146,7 @@ def on_show():
             img_size = 400
             window.setStyleSheet("QWidget#EvaluateLevel1 { background-color: #000000; font-family: 'Nunito', sans-serif; border: none; }")
             window.question_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #FFFF00; background-color: black; border-radius: 20px; padding: 15px; border: 2px solid #FFFF00;")
-            for c in [window.card_1, window.card_2]:
+            for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
                 c.setStyleSheet("QFrame { background-color: #000000; border-radius: 25px; border: 6px solid #FFFF00; }")
             for k in [window.key_1, window.key_2]:
                 k.setStyleSheet("min-width: 60px; max-width: 60px; min-height: 60px; max-height: 60px; font-size: 32px; font-weight: bold; color: black; background-color: #FFFF00; border-radius: 30px; margin: 0px 15px 15px 0px;")

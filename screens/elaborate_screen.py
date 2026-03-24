@@ -66,6 +66,9 @@ def on_show():
             img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
         except Exception: pass
         
+    for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
+        c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; } QFrame:hover { border: 4px solid #AB47BC; }")
+        
     def setup_card(idx, text_widget, img_widget):
         key = f"op{idx}"
         text_widget.setText(mc_words.get(key, ""))
