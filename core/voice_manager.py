@@ -44,19 +44,24 @@ class VoiceManager:
         try:
             sound = pygame.mixer.Sound(filename)
             duration_ms = int(sound.get_length() * 1000)
+            del sound  # Release the Sound object immediately to avoid channel conflicts
         except Exception as e:
             print("Could not get duration natively, falling back to estimation.", e)
             words_count = len(text.split())
             duration_ms = max(2000, int((words_count / 1.8) * 1000))
 
-        def play():
-            try:
-                pygame.mixer.music.load(filename)
-                pygame.mixer.music.play()
-            except Exception as e:
-                print(f"Error playing sound: {e}")
-                
-        threading.Thread(target=play, daemon=True).start()
+        # Stop any currently playing audio first to prevent overlap/stutter
+        try:
+            if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
+        except Exception:
+            pass
+            
+        try:
+            pygame.mixer.music.load(filename)
+            pygame.mixer.music.play()
+        except Exception as e:
+            print(f"Error playing sound: {e}")
         
         return duration_ms
 

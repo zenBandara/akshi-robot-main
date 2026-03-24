@@ -25,6 +25,7 @@ from screens import explore_screen
 from screens import teacher_intervention
 from screens import break_screen
 from screens import kinestatic
+from screens import task_intro_screen
 
 main_window = QMainWindow()
 main_window.setWindowTitle("Akshi Robot Interface")
@@ -67,6 +68,7 @@ screens = {
     "teacher_intervention": teacher_intervention.get_ui(),
     "break": break_screen.get_ui(),
     "kinestatic": kinestatic.get_ui(),
+    "task_intro": task_intro_screen.get_ui(),
 }
 
 # Register all valid screens in the navigator

@@ -116,6 +116,7 @@ def load_teachers():
 def handle_key_press(mapped_action):
     # E.g. mapped_action == "A"
     if mapped_action in teacher_map:
+        keyboard_manager.unregister_handler()  # Prevent duplicate key events from re-triggering the flow
         selected_teacher = teacher_map[mapped_action]
         print(f"Teacher selected: {selected_teacher}")
         

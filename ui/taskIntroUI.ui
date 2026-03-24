@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TaskIntroScreen</class>
+ <widget class="QWidget" name="TaskIntroScreen">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget { background-color: #E3F2FD; font-family: 'Nunito', sans-serif; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin"><number>60</number></property>
+   <property name="topMargin"><number>40</number></property>
+   <property name="rightMargin"><number>60</number></property>
+   <property name="bottomMargin"><number>40</number></property>
+   <property name="spacing"><number>15</number></property>
+
+   <item>
+    <spacer name="topSpacer">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+    </spacer>
+   </item>
+
+   <!-- Subtitle -->
+   <item>
+    <widget class="QLabel" name="subtitle_label">
+     <property name="text"><string>Today's Lesson 📚</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet"><string>font-size: 30px; font-weight: bold; color: #1565C0;</string></property>
+    </widget>
+   </item>
+
+   <!-- Task Name -->
+   <item>
+    <widget class="QLabel" name="task_name_label">
+     <property name="text"><string>Loading task...</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="styleSheet"><string>font-size: 52px; font-weight: 900; color: #1A237E; background-color: #FFFFFF; border-radius: 25px; padding: 30px; border: 3px solid #90CAF9;</string></property>
+     <property name="minimumHeight"><number>120</number></property>
+    </widget>
+   </item>
+
+   <!-- Emoji decoration -->
+   <item>
+    <widget class="QLabel" name="emoji_label">
+     <property name="text"><string>🌟 🧠 🌟</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet"><string>font-size: 60px; padding: 10px;</string></property>
+    </widget>
+   </item>
+
+   <item>
+    <spacer name="bottomSpacer">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

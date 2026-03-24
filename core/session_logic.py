@@ -19,4 +19,13 @@ def next_student():
     state_manager.set_affordance_level(1)
     
     print(f"Next student selected: {student}")
-    navigator.navigate_to("student_call")
+    
+    # First student gets the task introduction screen
+    student_list = state_manager.get_student_list()
+    queue = state_manager.get_student_queue()
+    is_first_student = (len(queue) == len(student_list) - 1) if student_list else True
+    
+    if is_first_student:
+        navigator.navigate_to("task_intro")
+    else:
+        navigator.navigate_to("student_call")
