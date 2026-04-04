@@ -104,20 +104,20 @@ def setup_video(explain_data):
     # If container doesn't have a layout yet, create one
     if container.layout() is None:
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(4, 4, 4, 4)  # Inset so border frame is visible
     else:
         # Clear existing widgets
         while container.layout().count():
             item = container.layout().takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-        container.layout().setContentsMargins(0, 0, 0, 0)
+        container.layout().setContentsMargins(4, 4, 4, 4)
     
     container.layout().addWidget(video_widget)
     
-    # Apply rounded corner clip mask to the container (clips the QVideoWidget inside)
-    container.setStyleSheet("background-color: #FFF3E0; border: 4px solid #FFCC80; border-radius: 20px;")
-    QTimer.singleShot(100, lambda: apply_rounded_clip(container, 20))
+    # Apply visible border frame and rounded clip mask to the container
+    container.setStyleSheet("background-color: #FFCC80; border: 4px solid #FFCC80; border-radius: 20px;")
+    QTimer.singleShot(300, lambda: apply_rounded_clip(container, 20))
     
     # Audio output (muted — robot voice handles narration)
     audio_output = QAudioOutput()

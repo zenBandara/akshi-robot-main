@@ -5,7 +5,7 @@ from components.robot_eyes import get_robot_eyes
 # Define the absolute deterministic sequence for a failing student
 CASCADE = [
     "evaluate_L1", 
-    "elaborate", 
+    "kinestatic", 
     "evaluate_L2", 
     "explain", 
     "evaluate_L3", 
@@ -97,7 +97,7 @@ class FlowController:
                 "evaluate_L1": "evaluate",
                 "evaluate_L2": "evaluate",
                 "evaluate_L3": "evaluate",
-                "elaborate": "elaborate",
+                "kinestatic": "kinestatic",
                 "explain": "explain",
                 "explore": "explore",
                 "engage": "engage",
@@ -196,7 +196,7 @@ class FlowController:
                 "evaluate_L1": "evaluate",
                 "evaluate_L2": "evaluate",
                 "evaluate_L3": "evaluate",
-                "elaborate": "elaborate",
+                "kinestatic": "kinestatic",
                 "explain": "explain",
                 "explore": "explore",
                 "engage": "engage",
