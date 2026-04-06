@@ -36,13 +36,10 @@
      <property name="spacing"><number>25</number></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      
-     <!-- Media / Illustration -->
+     <!-- Media / Video Container -->
      <item>
-      <widget class="QLabel" name="media_label">
-       <property name="text"><string>🌟</string></property>
-       <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="scaledContents"><bool>true</bool></property>
-       <property name="styleSheet"><string>font-size: 100px; background-color: #FFECB3; border-radius: 20px; border: 4px solid #FFCA28; margin: 10px 100px;</string></property>
+      <widget class="QWidget" name="video_container">
+       <property name="styleSheet"><string>background-color: transparent; margin: 10px 100px;</string></property>
        <property name="minimumSize"><size><width>350</width><height>350</height></size></property>
       </widget>
      </item>
@@ -73,6 +70,7 @@
     <widget class="QLabel" name="robot_text_label">
      <property name="text"><string>🤖 Robot is speaking...</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="wordWrap"><bool>true</bool></property>
      <property name="styleSheet"><string>font-size: 26px; font-style: italic; color: #E65100; margin-top: 10px;</string></property>
     </widget>
    </item>
