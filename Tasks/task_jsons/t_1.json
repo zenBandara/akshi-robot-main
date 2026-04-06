@@ -56,6 +56,12 @@
       "op3": "Up Arrow",
       "op4": "Down Arrow"
     },
+    "multiple_choices_speech": {
+      "op1": "Take a very close look at this lovely arrow! Is it showing us the magic direction we need?",
+      "op2": "Or what about this beautiful one right here? Does this arrow look like your perfect match?",
+      "op3": "Check out this super cool arrow! Do you think this is the secret winner we are looking for?",
+      "op4": "And here is our last fun arrow! How about this one, could this be the right choice?"
+    },
     "multiple_choices_images": {
       "op1": "assets/images/flat_left_arrow.png",
       "op2": "assets/images/flat_right_arrow.png",

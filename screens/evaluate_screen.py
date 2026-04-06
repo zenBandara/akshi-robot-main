@@ -277,18 +277,80 @@ def on_show():
         speech_text = f"Okay {student_name}, look carefully! {speech_start} {desc_text}".strip()
         print(f"🤖 ROBOT SPEAKS [SLOW RATE -30%]: \"{speech_text}\"")
         delay_ms = voice_manager.speak(speech_text, f"eval_l3_{student_name}_{task_data.get('task_id', 'id')}")
+        
+        print(f"Enabling keyboard input immediately to allow for speech interruption.")
+        enable_input()
+        
+        # Delay timer start until after speech actually finishes
+        print(f"Delaying visual clock countdown for {delay_ms}ms...")
+        if evaluate_timer:
+            QTimer.singleShot(delay_ms, evaluate_timer.start)
     else:
-        speech_text = f"{student_name}, {speech_start} {desc_text} Press the number to select your answer.".strip()
-        print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
-        delay_ms = voice_manager.speak(speech_text, f"eval_l1_{student_name}_{task_data.get('task_id', 'id')}")
-    
-    print(f"Enabling keyboard input immediately to allow for speech interruption.")
-    enable_input()
-    
-    # Delay timer start until after speech actually finishes
-    print(f"Delaying visual clock countdown for {delay_ms}ms...")
-    if evaluate_timer:
-        QTimer.singleShot(delay_ms, evaluate_timer.start)
+        # For Level 1 and 2, step through each option, highlighting it and speaking it.
+        speech_text = f"{student_name}, {speech_start} {desc_text}".strip()
+        print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_text}\"")
+        delay_ms = voice_manager.speak(speech_text, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}")
+        
+        keys_to_speak = sorted(list(key_mapping.keys()))
+        options_speech = eval_data.get("multiple_choices_speech", {})
+        
+        def reset_all_highlights():
+            card_map = {
+                "1": window.card_1,
+                "2": window.card_2,
+                "3": window.card_3,
+                "4": window.card_4
+            }
+            for k in keys_to_speak:
+                card = card_map.get(k)
+                if card:
+                    if level == 2:
+                        card.setStyleSheet("QFrame { background-color: #FFFFFF; border-radius: 30px; border: 4px solid #90CAF9; } QFrame:hover { border: 4px solid #1976D2; }")
+                    else:
+                        card.setStyleSheet("QFrame { background-color: #F8FAFC; border-radius: 25px; border: 4px solid #E2E8F0; }")
+
+        def highlight_card(key):
+            card_map = {
+                "1": window.card_1,
+                "2": window.card_2,
+                "3": window.card_3,
+                "4": window.card_4
+            }
+            selected_card = card_map.get(key)
+            if selected_card:
+                selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
+
+        def speak_next_option(idx=0):
+            # If user already pressed a key or timer expired, input_enabled becomes False
+            if not input_enabled:
+                return
+                
+            if idx >= len(keys_to_speak):
+                reset_all_highlights()
+                print(f"Option explanations finished. Starting timer.")
+                if evaluate_timer:
+                    evaluate_timer.start()
+                return
+                
+            reset_all_highlights()
+            current_key = keys_to_speak[idx]
+            op_code = key_mapping[current_key]
+            
+            highlight_card(current_key)
+            
+            op_speech = options_speech.get(op_code, f"Option {current_key}.")
+            instruction_speech = f"{op_speech} If you think the highlighted one is the answer, press number {current_key}."
+            
+            print(f"🤖 ROBOT SPEAKS OPTION {current_key}: \"{instruction_speech}\"")
+            op_delay_ms = voice_manager.speak(instruction_speech, f"eval_opt_{student_name}_{op_code}")
+            
+            QTimer.singleShot(op_delay_ms + 400, lambda: speak_next_option(idx + 1))
+
+        print(f"Enabling keyboard input allowing interruption.")
+        enable_input()
+        
+        print("Starting introduction speech before options...")
+        QTimer.singleShot(delay_ms + 300, speak_next_option)
 
 def enable_input():
     global input_enabled, evaluate_timer
