@@ -5,7 +5,7 @@ from components.robot_eyes import get_robot_eyes
 # Define the absolute deterministic sequence for a failing student
 CASCADE = [
     "evaluate_L1", 
-    "elaborate", 
+    "kinesthetic", 
     "evaluate_L2", 
     "explain", 
     "evaluate_L3", 
@@ -97,6 +97,7 @@ class FlowController:
                 "evaluate_L1": "evaluate",
                 "evaluate_L2": "evaluate",
                 "evaluate_L3": "evaluate",
+                "kinesthetic": "kinestatic",
                 "elaborate": "elaborate",
                 "explain": "explain",
                 "explore": "explore",
@@ -115,6 +116,35 @@ class FlowController:
     def on_timeout(self, parent_widget):
         """Treat an evaluation inactivity timeout identically to an incorrect answer cascade."""
         self.on_incorrect_answer(parent_widget, is_timeout=True)
+
+    def on_kinesthetic_fail(self, parent_widget):
+        """Handle failure of the physical Teacher-evaluated Kinesthetic task."""
+        current_node = self.get_current_node()
+        
+        if not hasattr(state_manager, 'current_path'):
+            state_manager.current_path = []
+        if current_node not in state_manager.current_path:
+            state_manager.current_path.append(current_node)
+            
+        print(f"[FlowController] Teacher failed Kinesthetic test at node: {current_node}")
+        get_robot_eyes().set_expression("encouraging")
+        
+        # Advance the pointer directly to "engage" per user requirement
+        try:
+            self.cascade_index = CASCADE.index("engage")
+        except ValueError:
+            self.cascade_index += 1
+            
+        next_node = self.get_current_node()
+        state_manager.current_stage = next_node
+        
+        print(f"[FlowController] Escalating directly to: {next_node}")
+        
+        try:
+            from core.navigator import navigator
+            navigator.navigate_to("engage")
+        except Exception as e:
+            print(f"[FlowController] Critical Routing Error to engage: {e}")
 
     def on_skip(self, parent_widget):
         """Handle an explicit student skip request natively."""
@@ -196,6 +226,7 @@ class FlowController:
                 "evaluate_L1": "evaluate",
                 "evaluate_L2": "evaluate",
                 "evaluate_L3": "evaluate",
+                "kinesthetic": "kinestatic",
                 "elaborate": "elaborate",
                 "explain": "explain",
                 "explore": "explore",

@@ -69,5 +69,13 @@
       "op4": "assets/images/flat_down_arrow.png"
     },
     "correct_option": "op2"
+  },
+  "kinesthetic": {
+    "task_title": "Kinesthetic Learning",
+    "video_url": "assets/video/t_1-kinesthetic.mp4",
+    "speech_start": "Let's try moving our beautiful bodies! What is the hand that you use for eating?",
+    "speech_step_1": "That is your right hand! Now, can you lift up the hand you use for eating nice and high?",
+    "speech_step_2": "Awesome! Now, what about your other hand? That is your left hand! Can you wiggle your left hand high in the air?",
+    "speech_end": "Wow! Now, go over to your teacher and show them your beautiful left and right hands!"
   }
 }
