@@ -119,6 +119,8 @@ def on_show():
                 selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
 
     def end_elaboration():
+        if not input_enabled:
+            return
         # Read final correct answer sequence
         get_robot_eyes().set_expression("surprised")
         reset_all_highlights()
@@ -131,10 +133,11 @@ def on_show():
         final_speech = elab_data.get("correct_option_speech", "This is the correct answer! Press Enter to try the real quiz again!")
         print(f"🤖 ROBOT SPEAKS CONCLUSION: \"{final_speech}\"")
         delay_ms = voice_manager.speak(final_speech, f"elaborate_{student_name}_conclusion")
-        
-        QTimer.singleShot(delay_ms + 400, enable_input)
 
     def speak_next_option(idx=0):
+        if not input_enabled:
+            return
+            
         if idx >= len(keys_to_speak):
             end_elaboration()
             return
@@ -157,6 +160,9 @@ def on_show():
     print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_start}\"")
     intro_delay = voice_manager.speak(speech_start, f"elaborate_intro_{student_name}")
     QTimer.singleShot(intro_delay + 300, speak_next_option)
+    
+    print(f"[Elaborate Screen Guided Mode] Enabling keyboard input immediately to allow interruption.")
+    enable_input()
 
 def enable_input():
     global input_enabled

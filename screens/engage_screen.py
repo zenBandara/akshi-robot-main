@@ -124,8 +124,7 @@ def on_show():
             window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
             print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
             voice_manager.speak(speech_end, f"engage_{student_name}_end")
-        enable_input()
-        
+            
     def play_middle():
         get_robot_eyes().set_expression("thinking")
         if speech_middle:
@@ -143,6 +142,9 @@ def on_show():
         QTimer.singleShot(start_delay + 600, play_middle)
     else:
         play_middle()
+        
+    print(f"[Engage Screen] Enabling keyboard input immediately to allow for speech interruption.")
+    enable_input()
 
 def enable_input():
     global input_enabled
