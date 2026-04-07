@@ -43,11 +43,26 @@ def apply_rounded_clip(widget, radius=20):
     region = QRegion(path.toFillPolygon().toPolygon())
     widget.setMask(region)
 
-def setup_video(engage_data):
-    global media_player, audio_output, video_widget
-    
-    media_url = engage_data.get("video_url", "")
+def swap_video(stage, engage_data):
+    """Dynamically hot-swaps the underlying QMediaPlayer layer matching the precise engagement vocal queue."""
+    global media_player
+    if not media_player:
+        return
+        
+    urls_dict = engage_data.get("video_urls", {})
+    media_url = urls_dict.get(stage, "")
     abs_media_path = os.path.join(project_root, media_url) if media_url else ""
+    
+    if os.path.exists(abs_media_path):
+        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
+        media_player.setLoops(QMediaPlayer.Infinite)
+        media_player.play()
+        print(f"[Engage Screen] Video playing stage '{stage}': {abs_media_path}")
+    else:
+        print(f"[Engage Screen] Video file not found for stage '{stage}': {abs_media_path}")
+
+def setup_video_container():
+    global media_player, audio_output, video_widget
     
     if media_player:
         media_player.stop()
@@ -79,14 +94,6 @@ def setup_video(engage_data):
     media_player = QMediaPlayer()
     media_player.setAudioOutput(audio_output)
     media_player.setVideoOutput(video_widget)
-    
-    if os.path.exists(abs_media_path):
-        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
-        media_player.setLoops(QMediaPlayer.Infinite)
-        media_player.play()
-        print(f"[Engage Screen] Video playing: {abs_media_path}")
-    else:
-        print(f"[Engage Screen] Video file not found: {abs_media_path}")
 
 
 def on_show():
@@ -108,8 +115,8 @@ def on_show():
     
     window.title_label.setText(engage_data.get("task_title", "Let's Try Again!"))
     
-    # Boot the video Engine
-    setup_video(engage_data)
+    # Boot the video infrastructure completely muted
+    setup_video_container()
         
     # 3. Multi-Stage Warm Emotional Speech Loop mapped sequentially
     speech_start = engage_data.get("speech_start", "Let's try something super fun safely together.")
@@ -119,6 +126,8 @@ def on_show():
     get_robot_eyes().set_expression("encouraging")
     
     def complete_engage():
+        if not input_enabled: return
+        swap_video("end", engage_data)
         get_robot_eyes().set_expression("default")
         if speech_end:
             window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
@@ -126,6 +135,8 @@ def on_show():
             voice_manager.speak(speech_end, f"engage_{student_name}_end")
             
     def play_middle():
+        if not input_enabled: return
+        swap_video("step_1", engage_data)
         get_robot_eyes().set_expression("thinking")
         if speech_middle:
             window.robot_text_label.setText(f"🤖 \"{speech_middle}\"")
@@ -136,6 +147,7 @@ def on_show():
             complete_engage()
             
     if speech_start:
+        swap_video("start", engage_data)
         window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
         print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
         start_delay = voice_manager.speak(speech_start, f"engage_{student_name}_start")
@@ -146,11 +158,13 @@ def on_show():
     print(f"[Engage Screen] Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()
 
+
 def enable_input():
     global input_enabled
     input_enabled = True
     print("[Engage Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
     keyboard_manager.register_handler(handle_key_press)
+
 
 def handle_key_press(action):
     global input_enabled
@@ -163,8 +177,7 @@ def handle_key_press(action):
         if media_player:
             media_player.stop()
             
-        print("[Engage Screen] Student pressed ENTER. Advancing sequential phase natively!")
-        
+        print("[Engage Screen] Student pressed ENTER. Flowing smoothly toward Evaluate L2 natively.")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()

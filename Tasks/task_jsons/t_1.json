@@ -5,7 +5,11 @@
   "engage": {
     "task_title": "The Magic Mirror Dance!",
     "description": "Engage the student actively with a rhythmic video mirror dance.",
-    "video_url": "assets/video/t_1-engage.mp4",
+    "video_urls": {
+      "start": "assets/video/t_1-eng-start.mp4",
+      "step_1": "assets/video/t_1-eng-step1.mp4",
+      "end": "assets/video/t_1-eng-end.mp4"
+    },
     "speech_start": "Oh no, that is totally okay! We are going to try something super fun safely together. Stand up! It is time for the Magic Mirror Dance!",
     "speech_middle": "Watch our character carefully on the screen! When they shake their arm with the red bracelet, that is the Left side! Let's shake our left arm right now!",
     "speech_end": "Now they are shaking the blue bracelet arm, that is the Right side! Superb! Shake your right arm! Press the Enter key when you are all done dancing and ready to try again!"
