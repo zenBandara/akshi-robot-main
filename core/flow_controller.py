@@ -13,6 +13,7 @@ CASCADE = [
     "explain", 
     "evaluate_L3", 
     "elaborate",
+    "evaluate_L3",
     "teacher_intervention"
 ]
 

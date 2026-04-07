@@ -5,7 +5,7 @@ from PySide6.QtGui import QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
-from core.timer_widget import EmojiTimerWidget
+from components.robot_eyes import get_robot_eyes
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -13,7 +13,6 @@ ui_path = os.path.join(project_root, "ui", "elaborateUI.ui")
 
 window = None
 input_enabled = False
-elaborate_timer = None
 voice_manager = VoiceManager()
 
 def get_ui():
@@ -32,13 +31,13 @@ def get_ui():
     return window
 
 def on_show():
-    print("[Elaborate Screen L1] Becoming active...")
-    global elaborate_timer
-    if elaborate_timer:
-        elaborate_timer.stop()
-    state_manager.set_current_screen("elaborate_L1")
+    print("[Elaborate Screen Guided Mode] Becoming active...")
+    state_manager.set_current_screen("elaborate")
     
-    # 1. Fetch Task Data for Elaborate Stage
+    # Hide the obsolete timer
+    window.timer_label.hide()
+    
+    # 1. Fetch Task Data
     task_data = state_manager.get_current_task()
     if not task_data or "elaborate" not in task_data:
         print("Error: No valid elaborate task found in state_manager.")
@@ -46,6 +45,7 @@ def on_show():
         return
         
     elab_data = task_data.get("elaborate", {})
+    student_name = state_manager.get_current_student() or "friend"
     
     # 2. Set Question Text
     window.question_label.setText(elab_data.get("task_description", "Let's review this together!"))
@@ -53,7 +53,10 @@ def on_show():
     # 3. Apply Option Cards
     mc_words = elab_data.get("multiple_choices_word", {})
     mc_images = elab_data.get("multiple_choices_images", {})
+    mc_speech = elab_data.get("multiple_choices_speech", {})
+    correct_option = elab_data.get("correct_option", "op1")
     
+    # 4. Beautiful Styling setup
     for k in [window.key_1, window.key_2, window.key_3, window.key_4]:
         k.setStyleSheet("min-width: 50px; max-width: 50px; min-height: 50px; max-height: 50px; font-size: 26px; font-weight: bold; color: white; background-color: #BA68C8; border-radius: 25px; margin: 0px 10px 10px 0px;")
         try:
@@ -66,8 +69,11 @@ def on_show():
             img.parentWidget().layout().setAlignment(img, Qt.AlignCenter)
         except Exception: pass
         
-    for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
-        c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; } QFrame:hover { border: 4px solid #AB47BC; }")
+    def reset_all_highlights():
+        for c in [window.card_1, window.card_2, window.card_3, window.card_4]:
+            c.setStyleSheet("QFrame { background-color: white; border-radius: 25px; border: 4px solid #CE93D8; }")
+            
+    reset_all_highlights()
         
     def setup_card(idx, text_widget, img_widget):
         key = f"op{idx}"
@@ -87,135 +93,91 @@ def on_show():
     setup_card(3, window.text_3, window.img_3)
     setup_card(4, window.text_4, window.img_4)
 
-    # 4. Robot Speech & Input Delay
+    # 5. Robot Explanation Loop
     global input_enabled
     input_enabled = False
+    voice_manager.stop()
     
-    student_name = state_manager.get_current_student() or "friend"
-    speech_start = elab_data.get("speech_start", "Oops! Let's try this one more time...")
-    question_text = elab_data.get("task_description", "Which option is correct?")
+    get_robot_eyes().set_expression("encouraging")
     
-    speech_text = f"{student_name}, {speech_start} {question_text} Press the number to select your answer."
+    speech_start = elab_data.get("speech_start", "Let's review this together!")
+    keys_to_speak = ["1", "2", "3", "4"]
+    key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
     
-    print(f"🤖 ROBOT SPEAKS: \"{speech_text}\"")
-    delay_ms = voice_manager.speak(speech_text, f"elaborate_question_{task_data.get('task_id', 'id')}_{student_name}")
-    
-    print(f"[Elaborate Screen L1] Enabling keyboard input immediately to allow for speech interruption.")
-    enable_input()
-    
-    print(f"Delaying visual clock countdown for {delay_ms}ms...")
-    if elaborate_timer:
-        QTimer.singleShot(delay_ms, elaborate_timer.start)
+    def highlight_card(action, is_correct=False):
+        card_map = {
+            "1": window.card_1,
+            "2": window.card_2,
+            "3": window.card_3,
+            "4": window.card_4
+        }
+        selected_card = card_map.get(action)
+        if selected_card:
+            if is_correct:
+                selected_card.setStyleSheet("QFrame { background-color: #C8E6C9; border-radius: 25px; border: 6px solid #4CAF50; }")
+            else:
+                selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
+
+    def end_elaboration():
+        # Read final correct answer sequence
+        get_robot_eyes().set_expression("surprised")
+        reset_all_highlights()
+        
+        # Reverse map correct_option ("op1") back to key ("1")
+        reverse_mapping = {v: k for k, v in key_mapping.items()}
+        correct_key = reverse_mapping.get(correct_option, "1")
+        highlight_card(correct_key, is_correct=True)
+        
+        final_speech = elab_data.get("correct_option_speech", "This is the correct answer! Press Enter to try the real quiz again!")
+        print(f"🤖 ROBOT SPEAKS CONCLUSION: \"{final_speech}\"")
+        delay_ms = voice_manager.speak(final_speech, f"elaborate_{student_name}_conclusion")
+        
+        QTimer.singleShot(delay_ms + 400, enable_input)
+
+    def speak_next_option(idx=0):
+        if idx >= len(keys_to_speak):
+            end_elaboration()
+            return
+
+        reset_all_highlights()
+        current_key = keys_to_speak[idx]
+        op_code = key_mapping[current_key]
+
+        highlight_card(current_key)
+
+        # Look up explicit explanation
+        op_speech = mc_speech.get(op_code, f"Let's look at option {current_key}.")
+        
+        print(f"🤖 ROBOT GUIDES OPTION {current_key}: \"{op_speech}\"")
+        op_delay_ms = voice_manager.speak(op_speech, f"elaborate_opt_{student_name}_{op_code}")
+
+        QTimer.singleShot(op_delay_ms + 400, lambda: speak_next_option(idx + 1))
+
+    # Start Introduction
+    print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_start}\"")
+    intro_delay = voice_manager.speak(speech_start, f"elaborate_intro_{student_name}")
+    QTimer.singleShot(intro_delay + 300, speak_next_option)
 
 def enable_input():
-    global input_enabled, elaborate_timer
+    global input_enabled
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
-    print("[Elaborate Screen L1] Speech finished. Keyboard input enabled.")
-    
-    elaborate_timer = EmojiTimerWidget(
-        label_widget=window.timer_label,
-        total_seconds=20,
-        clock_count=10,
-        timeout_callback=on_timer_expire
-    )
-
-def on_timer_expire():
-    global input_enabled
-    if not input_enabled:
-        return
-        
-    input_enabled = False
-    print("[Elaborate Screen L1] Timer EXPIRED! ⏰ (Treating as Incorrect)")
-    
-    student_name = state_manager.get_current_student() or "friend"
-    timeout_speech = f"Oops {student_name}, looks like you're taking a little bit of time! Let's review this together instead!"
-    delay_ms = voice_manager.speak(timeout_speech, f"timeout_{student_name}")
-    
-    def transition_after_speech():
-        try:
-            from core.flow_controller import flow_controller
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                flow_controller.on_timeout(parent_stack)
-        except ImportError: pass
-        
-    QTimer.singleShot(delay_ms, transition_after_speech)
+    print("[Elaborate Screen Guided Mode] Explanation complete. Keyboard hardware inputs enabled.")
 
 def handle_key_press(action):
     global input_enabled
     if not input_enabled:
         return
         
-    if action not in ["1", "2", "3", "4"]:
-        return
+    if action == "ENTER":
+        input_enabled = False
+        voice_manager.stop()
         
-    # Lock out further inputs immediately
-    input_enabled = False
-    voice_manager.stop()
-    if elaborate_timer:
-        elaborate_timer.stop()
-    print(f"[Elaborate Screen L1] Student pressed key {action}. Review complete!")
-    
-    # Highlight the chosen card visually via StyleSheet manipulation
-    card_map = {
-        "1": window.card_1,
-        "2": window.card_2,
-        "3": window.card_3,
-        "4": window.card_4
-    }
-    
-    selected_card = card_map.get(action)
-    
-    # Validation logic
-    task_data = state_manager.get_current_task()
-    elab_data = task_data.get("elaborate", {}) if task_data else {}
-    correct_option = elab_data.get("correct_option")
-    
-    # Map physical key stroke natively back to JSON structure
-    key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
-    selected_option = key_mapping.get(action)
-    
-    student_name = state_manager.get_current_student() or "friend"
-    from core.flow_controller import flow_controller
-    
-    if selected_option == correct_option:
-        print("[Elaborate Screen] Answer VALIDATION: CORRECT! 🎉")
-        if selected_card:
-            selected_card.setStyleSheet("QFrame { background-color: #C8E6C9; border-radius: 25px; border: 6px solid #4CAF50; }")
-            
-        speech = "Great job! Now let's try the real question again."
-        print(f"🤖 ROBOT SPEAKS: \"{speech}\"")
-        delay_ms = voice_manager.speak(speech, f"elaborate_correct_{student_name}")
+        print("[Elaborate Screen] Student pressed ENTER! Re-evaluating via FlowController Native Cascade.")
         
-        # Advance FlowController natively using the matrix pointer
-        def proceed_to_next():
-            try:
-                parent_stack = window.parentWidget()
-                if parent_stack:
-                    flow_controller.advance_cascade(parent_stack)
-            except Exception as e:
-                print(f"Warning: Could not advance sequence natively. {e}")
-                
-        QTimer.singleShot(delay_ms, proceed_to_next)
-        
-    else:
-        print("[Elaborate Screen] Answer VALIDATION: INCORRECT! ❌")
-        if selected_card:
-            selected_card.setStyleSheet("QFrame { background-color: #FFCCBC; border-radius: 25px; border: 6px solid #E64A19; }")
-            
-        from core.dialogue import DialoguePool
-        encouragement_speech = DialoguePool.get_phrase("incorrect_L1", student_name)
-        print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
-        delay_ms = voice_manager.speak(encouragement_speech, f"elaborate_wrong_{student_name}")
-        
-        # Advance FlowController straight down the matrix hierarchy naturally (Teacher Intervention)
-        def proceed_to_next():
-            try:
-                parent_stack = window.parentWidget()
-                if parent_stack:
-                    flow_controller.advance_cascade(parent_stack)
-            except Exception as e:
-                print(f"Warning: Could not advance sequence natively. {e}")
-                
-        QTimer.singleShot(delay_ms, proceed_to_next)
+        try:
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.advance_cascade(parent_stack)
+        except ImportError: pass
