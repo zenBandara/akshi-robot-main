@@ -6,12 +6,11 @@ from components.robot_eyes import get_robot_eyes
 CASCADE = [
     "evaluate_L1", 
     "kinesthetic", 
+    "engage", 
     "evaluate_L2", 
-    "explain", 
-    "evaluate_L3", 
     "explore", 
     "evaluate_L3", 
-    "engage", 
+    "explain", 
     "evaluate_L3", 
     "teacher_intervention"
 ]
@@ -113,38 +112,44 @@ class FlowController:
         except Exception as e:
             print(f"[FlowController] Critical Routing Error escalating out to {next_node}: {e}")
 
+    def advance_cascade(self, parent_widget=None):
+        """Cleanly advance the cascade sequence without marking it as a 'failure', e.g. for non-evaluation nodes like Engage."""
+        self.cascade_index += 1
+        next_node = self.get_current_node()
+        print(f"[FlowController] Continuing cascade sequence natively to: {next_node}")
+        
+        if next_node == "evaluate_L2":
+            state_manager.set_affordance_level(2)
+        elif next_node == "evaluate_L3":
+            state_manager.set_affordance_level(3)
+            
+        state_manager.current_stage = next_node
+        
+        try:
+            from core.navigator import navigator
+            screen_map = {
+                "evaluate_L1": "evaluate",
+                "evaluate_L2": "evaluate",
+                "evaluate_L3": "evaluate",
+                "kinesthetic": "kinestatic",
+                "elaborate": "elaborate",
+                "explain": "explain",
+                "explore": "explore",
+                "engage": "engage",
+                "teacher_intervention": "teacher_intervention"
+            }
+            nav_target = screen_map.get(next_node)
+            if nav_target:
+                navigator.navigate_to(nav_target)
+        except Exception: pass
+
     def on_timeout(self, parent_widget):
         """Treat an evaluation inactivity timeout identically to an incorrect answer cascade."""
         self.on_incorrect_answer(parent_widget, is_timeout=True)
 
     def on_kinesthetic_fail(self, parent_widget):
-        """Handle failure of the physical Teacher-evaluated Kinesthetic task."""
-        current_node = self.get_current_node()
-        
-        if not hasattr(state_manager, 'current_path'):
-            state_manager.current_path = []
-        if current_node not in state_manager.current_path:
-            state_manager.current_path.append(current_node)
-            
-        print(f"[FlowController] Teacher failed Kinesthetic test at node: {current_node}")
-        get_robot_eyes().set_expression("encouraging")
-        
-        # Advance the pointer directly to "engage" per user requirement
-        try:
-            self.cascade_index = CASCADE.index("engage")
-        except ValueError:
-            self.cascade_index += 1
-            
-        next_node = self.get_current_node()
-        state_manager.current_stage = next_node
-        
-        print(f"[FlowController] Escalating directly to: {next_node}")
-        
-        try:
-            from core.navigator import navigator
-            navigator.navigate_to("engage")
-        except Exception as e:
-            print(f"[FlowController] Critical Routing Error to engage: {e}")
+        # Escalate directly mimicking an evaluation failure
+        self.on_incorrect_answer(parent_widget)
 
     def on_skip(self, parent_widget):
         """Handle an explicit student skip request natively."""

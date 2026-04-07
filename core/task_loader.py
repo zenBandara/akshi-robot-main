@@ -142,8 +142,8 @@ def pick_random_task(exclude_ids=None):
         
     all_tasks = get_loaded_tasks()
     
-    # Filter out excluded tasks
-    available_tasks = [t for t in all_tasks if t.get("task_id") not in exclude_ids]
+    # Temporarily force lock strictly to "t_1" while in development
+    available_tasks = [t for t in all_tasks if t.get("task_id") == "t_1"]
     
     if not available_tasks:
         print("Warning: No available tasks to pick from (all excluded or none loaded).")

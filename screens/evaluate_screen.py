@@ -318,7 +318,10 @@ def on_show():
             }
             selected_card = card_map.get(key)
             if selected_card:
-                selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
+                if level == 2:
+                    selected_card.setStyleSheet("QFrame { background-color: #BBDEFB; border-radius: 30px; border: 6px solid #1565C0; }")
+                else:
+                    selected_card.setStyleSheet("QFrame { background-color: #FFF176; border-radius: 25px; border: 6px solid #FF9F1C; }")
 
         def speak_next_option(idx=0):
             # If user already pressed a key or timer expired, input_enabled becomes False

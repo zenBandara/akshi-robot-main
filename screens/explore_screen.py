@@ -125,14 +125,11 @@ def handle_key_press(action):
             
         print(f"[Explore Screen] LOGGED FINAL TASK RESULT: {log_data}")
         
-        # Advance to Evaluate Level 3 Natively
-        print("[Explore Screen] Transitioning back to Evaluate (Level 3)...")
-        from core.flow_controller import flow_controller
-        flow_controller.cascade_index = 6
-        state_manager.current_stage = "evaluate_L3"
-        state_manager.set_affordance_level(3)
+        # Advance sequence Natively via FlowController
+        print("[Explore Screen] Advancing sequence natively via FlowController...")
         try:
-            from core.navigator import navigator
-            navigator.navigate_to("evaluate")
-        except Exception as e:
-            print(f"Warning: Could not transition back to evaluate screen. {e}")
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.advance_cascade(parent_stack)
+        except ImportError: pass
