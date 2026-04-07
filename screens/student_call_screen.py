@@ -70,8 +70,15 @@ def handle_key_press(mapped_action):
         keyboard_manager.unregister_handler()
         voice_manager.stop()
         print("Student cleanly interrupted intro! Transitioning to Evaluate Screen natively...")
-        state_manager.set_five_e_stage("evaluate")
-        state_manager.set_affordance_level(1)
-        
-        # Navigate strictly to the new Phase 3 Evaluate Engine
-        navigator.navigate_to("evaluate")
+        # Trigger the 5E Matrix routing intelligently relying natively on RL Telemetry History
+        try:
+            from core.flow_controller import flow_controller
+            student_name = state_manager.get_current_student() or "friend"
+            target_node = flow_controller.setup_dynamic_start(student_name)
+            print(f"[Student Call Screen] Intelligence Routing strictly initializing into layer: {target_node}")
+            navigator.navigate_to(target_node)
+        except Exception as e:
+            print(f"[Student Call Error] Telemetry fetching crashed natively. Reverting to base Evaluator. {e}")
+            state_manager.set_five_e_stage("evaluate")
+            state_manager.set_affordance_level(1)
+            navigator.navigate_to("evaluate")

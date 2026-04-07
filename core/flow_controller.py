@@ -34,6 +34,60 @@ class FlowController:
         state_manager.set_affordance_level(1)
         # We do NOT wipe state_manager.current_path here because celebration_screen needs it to log Firebase telemetry first!
 
+    def setup_dynamic_start(self, student_name):
+        """Intelligently configures the 5E starting position using the student's proven RL SQL history."""
+        try:
+            import core.database as database
+            method_used, eval_passed = database.get_student_optimal_starting_method(student_name)
+        except Exception as e:
+            print(f"[FlowController] SQL Query Failure - Falling back to defaults: {e}")
+            method_used, eval_passed = None, None
+            
+        print(f"[RL Intelligence] Mined History for {student_name} -> Method: {method_used} | Passed: {eval_passed}")
+        
+        target_index = 0
+        affordance = 1
+        
+        if method_used == "none" and eval_passed == "kinesthetic":
+            target_index = 1 # kinesthetic
+        elif method_used == "engage":
+            target_index = 2 # engage
+            affordance = 2
+        elif method_used == "explore":
+            target_index = 4 # explore
+            affordance = 3
+        elif method_used == "explain":
+            target_index = 6 # explain
+            affordance = 3
+        elif method_used == "elaborate":
+            target_index = 8 # elaborate
+            affordance = 3
+        else:
+            # none + evaluate_L1, teacher_intervention, or fallback
+            target_index = 0
+            affordance = 1
+            
+        self.cascade_index = target_index
+        state_manager.set_affordance_level(affordance)
+        
+        target_node = self.get_current_node()
+        state_manager.current_stage = target_node
+        
+        # Screen literal mapping engine
+        screen_map = {
+            "evaluate_L1": "evaluate",
+            "evaluate_L2": "evaluate",
+            "evaluate_L3": "evaluate",
+            "kinesthetic": "kinestatic",
+            "elaborate": "elaborate",
+            "explain": "explain",
+            "explore": "explore",
+            "engage": "engage",
+            "teacher_intervention": "teacher_intervention"
+        }
+        
+        return screen_map.get(target_node, "evaluate")
+
     def on_correct_answer(self, parent_widget):
         """Handle a correct answer resolution."""
         current_node = self.get_current_node()

@@ -74,5 +74,28 @@ def log_student_metric(session_id, student_name, evaluation_passed, method_used)
     conn.close()
     print(f"[RL Telemetry Logged] Student:{student_name} | Passed:{evaluation_passed} | Method:{method_used}")
 
+def get_student_optimal_starting_method(student_name):
+    """
+    Inteligently fetches the historical behavioral success metric for the specified student.
+    Returns structurally: (method_used, evaluation_passed)
+    Returns (None, None) natively if no history officially exists.
+    """
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT method_used, evaluation_passed 
+        FROM student_metrics 
+        WHERE student_name = ? 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+    ''', (str(student_name),))
+    
+    row = cursor.fetchone()
+    conn.close()
+    
+    if row:
+        return row[0], row[1]
+    return None, None
+
 # Immediately initialize the DB upon module import securely
 init_db()
