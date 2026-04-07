@@ -30,33 +30,18 @@
     </widget>
    </item>
    
-   <!-- Core Content Area (Text + Media) -->
+   <!-- Core Content Area (Video Container) -->
    <item>
-    <layout class="QHBoxLayout" name="contentLayout">
-     <property name="spacing"><number>30</number></property>
+    <layout class="QVBoxLayout" name="contentLayout">
+     <property name="spacing"><number>25</number></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
      
-     <!-- Activity Text -->
      <item>
-      <widget class="QLabel" name="activity_label">
-       <property name="text"><string>Raise your left hand and show the teacher!</string></property>
-       <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="wordWrap"><bool>true</bool></property>
-       <property name="styleSheet"><string>font-size: 32px; font-weight: bold; color: #880E4F; padding: 30px; background-color: white; border-radius: 15px; border: 4px solid #F06292;</string></property>
-       <property name="minimumWidth"><number>450</number></property>
+      <widget class="QWidget" name="video_container">
+       <property name="minimumSize"><size><width>450</width><height>350</height></size></property>
+       <property name="styleSheet"><string>background-color: transparent;</string></property>
       </widget>
      </item>
-     
-     <!-- Media / Illustration -->
-     <item>
-      <widget class="QLabel" name="media_label">
-       <property name="text"><string>🖐️</string></property>
-       <property name="alignment"><set>Qt::AlignCenter</set></property>
-       <property name="scaledContents"><bool>true</bool></property>
-       <property name="styleSheet"><string>font-size: 100px; background-color: #F8BBD0; border-radius: 15px; border: 4px dashed #D81B60;</string></property>
-       <property name="minimumSize"><size><width>300</width><height>300</height></size></property>
-      </widget>
-     </item>
-     
     </layout>
    </item>
 
@@ -64,7 +49,7 @@
     <spacer name="verticalSpacer">
      <property name="orientation"><enum>Qt::Vertical</enum></property>
      <property name="sizeHint" stdset="0">
-      <size><width>20</width><height>20</height></size>
+      <size><width>20</width><height>10</height></size>
      </property>
     </spacer>
    </item>
@@ -74,16 +59,17 @@
     <widget class="QLabel" name="prompt_label">
      <property name="text"><string>Press Enter when you're done exploring!</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="styleSheet"><string>font-size: 26px; font-weight: bold; color: white; background-color: #D81B60; border-radius: 20px; padding: 15px;</string></property>
+     <property name="styleSheet"><string>font-size: 26px; font-weight: bold; color: white; background-color: #D81B60; border-radius: 20px; padding: 15px; margin: 0px 50px;</string></property>
     </widget>
    </item>
 
    <!-- Robot Speech Transcript Context -->
    <item>
     <widget class="QLabel" name="robot_text_label">
-     <property name="text"><string>🤖 Robot is explaining...</string></property>
+     <property name="text"><string>🤖 Robot is speaking...</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="styleSheet"><string>font-size: 24px; font-style: italic; color: #AD1457; margin-top: 10px;</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="styleSheet"><string>font-size: 26px; font-style: italic; color: #880E4F; margin-top: 10px;</string></property>
     </widget>
    </item>
   </layout>
