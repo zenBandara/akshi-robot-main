@@ -47,6 +47,28 @@ class FlowController:
         print(f"[FlowController] Success triggered at node: {current_node}")
         get_robot_eyes().set_expression("surprised")
         
+        # Log definitively to RL SQL database
+        try:
+            import core.database as database
+            session_id = state_manager.get_current_session()
+            student_name = state_manager.get_current_student() or "unknown"
+            
+            # Matrix logical translations mapping exact array cascade arrays
+            eval_map = {
+                0: ("evaluate_L1", "none"),
+                1: ("kinesthetic", "none"),
+                3: ("evaluate_L2", "engage"),
+                5: ("evaluate_L3", "explore"),
+                7: ("evaluate_L3", "explain"),
+                9: ("evaluate_L3", "elaborate")
+            }
+            
+            # Fetch strictly from index, fallback to logic if dynamically modified
+            eval_passed, method_used = eval_map.get(self.cascade_index, (current_node, "unknown"))
+            database.log_student_metric(session_id, student_name, eval_passed, method_used)
+        except Exception as db_err:
+            print(f"[FlowController] RL Telemetry Logging error: {db_err}")
+        
         # Reset cascade pointer safely for the next student
         self.reset_cascade()
         

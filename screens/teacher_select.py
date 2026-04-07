@@ -125,6 +125,12 @@ def handle_key_press(mapped_action):
         
         import random
         import core.task_loader as task_loader
+        import core.database as database
+        
+        # Start RL Database Telemetry Logger inherently establishing session parameters securely
+        current_session = database.start_session(selected_teacher)
+        state_manager.set_current_session(current_session)
+        print(f"[RL Logic Backend] Secure telemetry session generated inherently mapping as {current_session}")
         
         # Fetch students and lesson config to state manager
         students = firebase.get_students(selected_teacher)

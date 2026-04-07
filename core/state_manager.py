@@ -4,6 +4,7 @@ class StateManager:
         self._current_screen = "idle"
         
         # Session state
+        self._current_session_id = None
         self._selected_teacher = None
         self._current_student = None
         self._student_list = []
@@ -13,6 +14,13 @@ class StateManager:
         self._current_task = None
         self._affordance_level = 1
         self._five_e_stage = "evaluate"
+
+    # Session ID Tracking
+    def get_current_session(self):
+        return self._current_session_id
+        
+    def set_current_session(self, session_id):
+        self._current_session_id = session_id
 
     # Screen State
     def get_current_screen(self):

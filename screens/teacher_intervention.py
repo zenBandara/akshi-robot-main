@@ -100,6 +100,15 @@ def handle_key_press(action):
             
         print(f"[Teacher Intervention] LOGGED FINAL TASK RESULT: {log_data}")
         
+        # Log definitively completely exhausted cascade route natively to RL Database
+        try:
+            import core.database as database
+            session_id = state_manager.get_current_session()
+            student_name = state_manager.get_current_student() or "unknown"
+            database.log_student_metric(session_id, student_name, "null", "teacher_intervention")
+        except Exception as db_err:
+            print(f"[Teacher Intervention] RL SQLite Telemetry Logging error: {db_err}")
+        
         # Advance Queue Natively
         # Advance Queue Natively
         student_queue = state_manager.get_student_queue()
