@@ -1,13 +1,13 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QTimer, Qt, QUrl
+from PySide6.QtCore import QFile, Qt, QTimer, QUrl
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtGui import QPainterPath, QRegion
 from core.state_manager import state_manager
-from core.voice_manager import VoiceManager
 from core.keyboard_manager import keyboard_manager
+from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
 
 current_dir = os.path.dirname(__file__)
@@ -15,8 +15,8 @@ project_root = os.path.dirname(current_dir)
 ui_path = os.path.join(project_root, "ui", "kinestaticUI.ui")
 
 window = None
-voice_manager = VoiceManager()
 input_enabled = False
+voice_manager = VoiceManager()
 media_player = None
 audio_output = None
 video_widget = None
@@ -31,8 +31,9 @@ def get_ui():
             return None
         window = loader.load(file)
         file.close()
-
+        
         window.on_show = on_show
+        
     return window
 
 def apply_rounded_clip(widget, radius=20):
@@ -42,11 +43,26 @@ def apply_rounded_clip(widget, radius=20):
     region = QRegion(path.toFillPolygon().toPolygon())
     widget.setMask(region)
 
-def setup_video(kinesthetic_data):
-    global media_player, audio_output, video_widget
-    
-    media_url = kinesthetic_data.get("video_url", "")
+def swap_video(stage, kinesthetic_data):
+    """Dynamically hot-swaps the underlying QMediaPlayer layer matching the vocal queue."""
+    global media_player
+    if not media_player:
+        return
+        
+    urls_dict = kinesthetic_data.get("video_urls", {})
+    media_url = urls_dict.get(stage, "")
     abs_media_path = os.path.join(project_root, media_url) if media_url else ""
+    
+    if os.path.exists(abs_media_path):
+        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
+        media_player.setLoops(QMediaPlayer.Infinite)
+        media_player.play()
+        print(f"[Kinesthetic Screen] Video playing stage '{stage}': {abs_media_path}")
+    else:
+        print(f"[Kinesthetic Screen] Video file not found for stage '{stage}': {abs_media_path}")
+
+def setup_video_container():
+    global media_player, audio_output, video_widget
     
     if media_player:
         media_player.stop()
@@ -69,7 +85,7 @@ def setup_video(kinesthetic_data):
     container.layout().addWidget(video_widget)
     
     # Beautiful styling for the kinesthetic screen container
-    container.setStyleSheet("background-color: #E8F5E9; border-radius: 20px;") # Soft green kinesthetic tone
+    container.setStyleSheet("background-color: #E8F5E9; border-radius: 20px;")
     QTimer.singleShot(100, lambda: apply_rounded_clip(container, 20))
     
     audio_output = QAudioOutput()
@@ -78,14 +94,6 @@ def setup_video(kinesthetic_data):
     media_player = QMediaPlayer()
     media_player.setAudioOutput(audio_output)
     media_player.setVideoOutput(video_widget)
-    
-    if os.path.exists(abs_media_path):
-        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
-        media_player.setLoops(QMediaPlayer.Infinite)
-        media_player.play()
-        print(f"[Kinesthetic Screen] Video playing: {abs_media_path}")
-    else:
-        print(f"[Kinesthetic Screen] Video file not found: {abs_media_path}")
 
 
 def on_show():
@@ -102,10 +110,9 @@ def on_show():
     
     window.title_label.setText(kinesthetic_data.get("task_title", "Kinesthetic Learning"))
     
-    # Initialize UI video player
-    setup_video(kinesthetic_data)
+    # Boot UI Video Infrastructure
+    setup_video_container()
     
-    # 1. Start dialogue sequence generically
     speech_start = kinesthetic_data.get("speech_start", "")
     speech_step_1 = kinesthetic_data.get("speech_step_1", "")
     speech_step_2 = kinesthetic_data.get("speech_step_2", "")
@@ -114,14 +121,17 @@ def on_show():
     get_robot_eyes().set_expression("thinking")
     
     def step_4():
+        if not input_enabled: return
+        swap_video("end", kinesthetic_data)
         get_robot_eyes().set_expression("default")
         if speech_end:
             window.robot_text_label.setText(f"🤖 \"{speech_end}\"")
             print(f"🤖 ROBOT SPEAKS: \"{speech_end}\"")
             voice_manager.speak(speech_end, f"kin_{student_name}_end")
-        enable_input()
         
     def step_3():
+        if not input_enabled: return
+        swap_video("step_2", kinesthetic_data)
         get_robot_eyes().set_expression("surprised")
         if speech_step_2:
             window.robot_text_label.setText(f"🤖 \"{speech_step_2}\"")
@@ -132,6 +142,8 @@ def on_show():
             step_4()
             
     def step_2():
+        if not input_enabled: return
+        swap_video("step_1", kinesthetic_data)
         get_robot_eyes().set_expression("encouraging")
         if speech_step_1:
             window.robot_text_label.setText(f"🤖 \"{speech_step_1}\"")
@@ -140,52 +152,54 @@ def on_show():
             QTimer.singleShot(delay + 600, step_3)
         else:
             step_3()
-
+            
     if speech_start:
+        swap_video("start", kinesthetic_data)
         window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
         print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
-        delay_1 = voice_manager.speak(speech_start, f"kin_{student_name}_start")
-        QTimer.singleShot(delay_1 + 600, step_2)
+        start_delay = voice_manager.speak(speech_start, f"kin_{student_name}_start")
+        QTimer.singleShot(start_delay + 600, step_2)
     else:
         step_2()
+        
+    # Enable bypass immediately
+    print("[Kinesthetic Screen] Enabling keyboard block natively for developer bypass")
+    enable_input()
+
 
 def enable_input():
     global input_enabled
-    print("Waiting for Teacher Intervention (P to Pass, F to Fail)...")
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
+
 
 def handle_key_press(action):
     global input_enabled
     if not input_enabled:
         return
         
-    action_upper = action.upper()
-    
-    if action_upper == "P":
-        # Passed
+    if action == "P": # Teacher Overrides - PASS
         input_enabled = False
         voice_manager.stop()
         if media_player:
             media_player.stop()
-        print("[Kinesthetic Screen] Teacher initiated PASS. Transitioning...")
+        print("[Kinesthetic Screen] Teacher approved! Moving on to next student...")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.on_correct_answer(parent_stack)
+                flow_controller.on_correct_answer(parent_stack) # Passed fallback, skip next student
         except ImportError: pass
             
-    elif action_upper == "F":
-        # Failed
+    elif action == "F": # Teacher Overrides - FAIL
         input_enabled = False
         voice_manager.stop()
         if media_player:
             media_player.stop()
-        print("[Kinesthetic Screen] Teacher initiated FAIL. Transitioning to Engage...")
+        print("[Kinesthetic Screen] Teacher failed student. Proceeding down cascade.")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.on_kinesthetic_fail(parent_stack)
+                flow_controller.on_incorrect_answer(parent_stack)
         except ImportError: pass
