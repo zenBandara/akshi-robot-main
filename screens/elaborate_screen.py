@@ -188,18 +188,16 @@ def handle_key_press(action):
         print(f"🤖 ROBOT SPEAKS: \"{speech}\"")
         delay_ms = voice_manager.speak(speech, f"elaborate_correct_{student_name}")
         
-        # Advance FlowController natively to evaluate_L2 (Cascade Index 2)
-        flow_controller.cascade_index = 2
-        state_manager.set_affordance_level(2)
-        state_manager.current_stage = "evaluate_L2"
-        def proceed_to_eval():
+        # Advance FlowController natively using the matrix pointer
+        def proceed_to_next():
             try:
-                from core.navigator import navigator
-                navigator.navigate_to("evaluate")
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    flow_controller.advance_cascade(parent_stack)
             except Exception as e:
-                print(f"Warning: Could not transition back to evaluate screen. {e}")
+                print(f"Warning: Could not advance sequence natively. {e}")
                 
-        QTimer.singleShot(delay_ms, proceed_to_eval)
+        QTimer.singleShot(delay_ms, proceed_to_next)
         
     else:
         print("[Elaborate Screen] Answer VALIDATION: INCORRECT! ❌")
@@ -211,15 +209,13 @@ def handle_key_press(action):
         print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
         delay_ms = voice_manager.speak(encouragement_speech, f"elaborate_wrong_{student_name}")
         
-        # Advance FlowController completely bypassing L2 straight to explain (Cascade Index 3)
-        flow_controller.cascade_index = 3
-        state_manager.current_stage = "explain"
-        
-        def proceed_to_explain():
+        # Advance FlowController straight down the matrix hierarchy naturally (Teacher Intervention)
+        def proceed_to_next():
             try:
-                from core.navigator import navigator
-                navigator.navigate_to("explain")
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    flow_controller.advance_cascade(parent_stack)
             except Exception as e:
-                print(f"Warning: Could not transition back to explain screen. {e}")
+                print(f"Warning: Could not advance sequence natively. {e}")
                 
-        QTimer.singleShot(delay_ms, proceed_to_explain)
+        QTimer.singleShot(delay_ms, proceed_to_next)
