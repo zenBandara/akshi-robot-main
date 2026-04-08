@@ -26,13 +26,6 @@ def get_ui():
         print("[Session Complete Screen] Becoming active...")
         state_manager.set_current_screen("session_complete")
         keyboard_manager.register_handler(handle_key_press)
-        
-        import json
-        try:
-            with open("calibration_command.json", "w") as f:
-                json.dump({"type": "end_session"}, f)
-        except Exception as e:
-            print("Failed to dispatch session end to backend:", e)
 
     window.on_show = on_show
     return window

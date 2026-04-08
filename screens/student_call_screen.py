@@ -46,16 +46,6 @@ def get_ui():
         print(f"[Robot Speaks]: {intro_msg}")
         duration_ms = voice_manager.speak(intro_msg, f"call_{display_name}")
             
-        import json
-        try:
-            with open("calibration_command.json", "w") as f:
-                json.dump({
-                    "type": "start_session",
-                    "student_name": display_name,
-                    "task_id": state_manager.get_current_task() or "t_01"
-                }, f)
-        except Exception as e:
-            print("Failed to dispatch session start to backend:", e)
         if fade_anim:
             fade_effect.setOpacity(0.0)
             fade_anim.start()
