@@ -93,11 +93,23 @@ for name, widget in screens.items():
 navigator.navigate_to("idle")
 
 main_window.show()
+import signal
+
+def cleanup_and_exit(signum, frame):
+    print("\nForce quit detected. Shutting down background tracking process...")
+    backend_process.terminate()
+    backend_process.wait()
+    sys.exit(0)
+
+# Register signal handlers for robust termination (e.g. Ctrl+C)
+signal.signal(signal.SIGINT, cleanup_and_exit)
+signal.signal(signal.SIGTERM, cleanup_and_exit)
+
 print("Akshi app launched successfully!")
 try:
     sys.exit(app.exec())
 finally:
-    # Ensure backend process is killed when the UI closes
+    # Ensure backend process is killed when the UI closes naturally
     print("Shutting down background tracking process...")
     backend_process.terminate()
     backend_process.wait()
