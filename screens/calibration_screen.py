@@ -39,6 +39,10 @@ class CalibrationScreenUI(QWidget):
         state_manager.set_current_screen("calibration")
         keyboard_manager.register_handler(self.handle_key_press)
         
+        # Start backend face-tracking subprocess for this student
+        from core import backend_manager
+        backend_manager.start()
+        
         student_name = state_manager.get_current_student() or "friend"
         self.prompt_state = "init"
         
