@@ -47,10 +47,8 @@ def get_ui():
         duration_ms = voice_manager.speak(intro_msg, f"call_{display_name}")
             
         import json
-        import os
         try:
-            cmd_path = os.path.join(project_root, "akshi-the-robot", "calibration_command.json")
-            with open(cmd_path, "w") as f:
+            with open("calibration_command.json", "w") as f:
                 json.dump({
                     "type": "start_session",
                     "student_name": display_name,

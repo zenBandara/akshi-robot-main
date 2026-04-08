@@ -39,9 +39,6 @@ class CalibrationScreenUI(QWidget):
         state_manager.set_current_screen("calibration")
         keyboard_manager.register_handler(self.handle_key_press)
         
-        from core import backend_manager
-        backend_manager.start_backend()
-        
         student_name = state_manager.get_current_student() or "friend"
         self.prompt_state = "init"
         

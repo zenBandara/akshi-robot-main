@@ -9,7 +9,15 @@ from PySide6.QtCore import QObject, QEvent, Qt
 # CRITICAL BUGFIX: Core graphic resource engine MUST boot BEFORE Chromium memory allocations!
 app = QApplication(sys.argv)
 
-from core import backend_manager
+# Launch the background face tracking process silently
+print("Starting background tracking process...")
+backend_process = subprocess.Popen(
+    [sys.executable, "maincopy.py"],
+    cwd=os.path.join(os.path.dirname(os.path.abspath(__file__)), "akshi-the-robot"),
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL
+)
+
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 
@@ -89,7 +97,8 @@ import signal
 
 def cleanup_and_exit(signum, frame):
     print("\nForce quit detected. Shutting down background tracking process...")
-    backend_manager.stop_backend()
+    backend_process.terminate()
+    backend_process.wait()
     sys.exit(0)
 
 # Register signal handlers for robust termination (e.g. Ctrl+C)
@@ -102,4 +111,5 @@ try:
 finally:
     # Ensure backend process is killed when the UI closes naturally
     print("Shutting down background tracking process...")
-    backend_manager.stop_backend()
+    backend_process.terminate()
+    backend_process.wait()
