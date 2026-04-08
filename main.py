@@ -1,12 +1,22 @@
 import sys
 import os
 import datetime
+import subprocess
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PySide6.QtCore import QObject, QEvent, Qt
 
 # CRITICAL BUGFIX: Core graphic resource engine MUST boot BEFORE Chromium memory allocations!
 app = QApplication(sys.argv)
+
+# Launch the background face tracking process silently
+print("Starting background tracking process...")
+backend_process = subprocess.Popen(
+    [sys.executable, "maincopy.py"],
+    cwd=os.path.join(os.path.dirname(os.path.abspath(__file__)), "akshi-the-robot"),
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL
+)
 
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
@@ -26,7 +36,7 @@ from screens import teacher_intervention
 from screens import break_screen
 from screens import kinestatic
 from screens import task_intro_screen
-
+from screens import calibration_screen
 main_window = QMainWindow()
 main_window.setWindowTitle("Akshi Robot Interface")
 main_window.setMinimumSize(900, 700)
@@ -69,6 +79,7 @@ screens = {
     "break": break_screen.get_ui(),
     "kinestatic": kinestatic.get_ui(),
     "task_intro": task_intro_screen.get_ui(),
+    "calibration": calibration_screen.get_ui(),
 }
 
 # Register all valid screens in the navigator
@@ -83,4 +94,10 @@ navigator.navigate_to("idle")
 
 main_window.show()
 print("Akshi app launched successfully!")
-sys.exit(app.exec())
+try:
+    sys.exit(app.exec())
+finally:
+    # Ensure backend process is killed when the UI closes
+    print("Shutting down background tracking process...")
+    backend_process.terminate()
+    backend_process.wait()
