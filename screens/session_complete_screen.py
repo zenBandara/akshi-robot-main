@@ -31,8 +31,10 @@ def get_ui():
         backend_manager.stop_backend()
         
         import json
+        import os
         try:
-            with open("calibration_command.json", "w") as f:
+            cmd_path = os.path.join(project_root, "akshi-the-robot", "calibration_command.json")
+            with open(cmd_path, "w") as f:
                 json.dump({"type": "end_session"}, f)
         except Exception as e:
             print("Failed to dispatch session end to backend:", e)
