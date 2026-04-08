@@ -207,7 +207,7 @@ while running:
 
         if last_face_state == False:
             eyes.happy()
-            eyes.close()
+            # eyes.close()
             play_sound(FACE_OK_MP3)
 
         last_face_state = True
@@ -308,7 +308,7 @@ while running:
         if time.time() - no_face_start_time > NO_FACE_DELAY:
             if last_face_state == True:
                 eyes.sad()
-                eyes.close()
+                # eyes.close()
                 play_sound(NO_FACE_MP3)
                 last_face_state = False
 
