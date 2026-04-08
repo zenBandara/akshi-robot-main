@@ -3,6 +3,15 @@ from core.navigator import navigator
 
 def next_student():
     """Pick the next student from the queue and proceed to the Student Calling Screen."""
+    # End the current student's WebSocket session before moving on
+    import json
+    try:
+        with open("akshi-the-robot/calibration_command.json", "w") as f:
+            json.dump({"type": "end_session"}, f)
+        print("[Session Logic] Student session ended via IPC.")
+    except Exception as e:
+        print(f"[Session Logic] IPC end_session error: {e}")
+
     queue = state_manager.get_student_queue()
     
     if not queue:
