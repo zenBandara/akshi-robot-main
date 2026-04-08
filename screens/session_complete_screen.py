@@ -26,6 +26,15 @@ def get_ui():
         print("[Session Complete Screen] Becoming active...")
         state_manager.set_current_screen("session_complete")
         keyboard_manager.register_handler(handle_key_press)
+        
+        # Notify backend that the student's session has historically concluded so it saves to DB
+        import json
+        try:
+            with open("akshi-the-robot/calibration_command.json", "w") as f:
+                json.dump({"type": "end_session"}, f)
+            print("Session End dispatched to backend.")
+        except Exception as e:
+            print("IPC Error notifying end_session:", e)
 
     window.on_show = on_show
     return window
