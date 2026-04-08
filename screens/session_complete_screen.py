@@ -27,6 +27,9 @@ def get_ui():
         state_manager.set_current_screen("session_complete")
         keyboard_manager.register_handler(handle_key_press)
         
+        from core import backend_manager
+        backend_manager.stop_backend()
+        
         import json
         try:
             with open("calibration_command.json", "w") as f:
