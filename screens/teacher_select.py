@@ -132,6 +132,10 @@ def handle_key_press(mapped_action):
         state_manager.set_current_session(current_session)
         print(f"[RL Logic Backend] Secure telemetry session generated inherently mapping as {current_session}")
         
+        # Start backend face-tracking subprocess for the entire class session (WebSocket stays alive)
+        from core import backend_manager
+        backend_manager.start()
+        
         # Fetch students and lesson config to state manager
         students = firebase.get_students(selected_teacher)
         lesson_id = firebase.get_current_lesson(selected_teacher)

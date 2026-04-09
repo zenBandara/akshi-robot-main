@@ -26,6 +26,7 @@ class WebSocketServer:
 
         self.latest_frame = None
         self.last_client_data = None  # store received data
+        self.tracking_active = False  # Toggled by start_session/end_session IPC commands
 
     def update_frame(self, frame):
         self.latest_frame = frame
@@ -97,6 +98,15 @@ class WebSocketServer:
                         self.last_client_data = {"type": cmd.get("type", "unknown")}
                         with open("calibration_state.json", "w") as f:
                             json.dump(self.last_client_data, f)
+                        
+                        # Toggle tracking based on student session commands
+                        if cmd.get("type") == "start_session":
+                            self.tracking_active = True
+                            print("[WebSocket] Student session STARTED - tracking ON")
+                        elif cmd.get("type") == "end_session":
+                            self.tracking_active = False
+                            print("[WebSocket] Student session ENDED - tracking OFF")
+                        
                         print("Sent IPC command to server:", cmd)
                 except Exception as e:
                     pass

@@ -12,10 +12,6 @@ def next_student():
     except Exception as e:
         print(f"[Session Logic] IPC end_session error: {e}")
 
-    # Stop the backend face-tracking subprocess (releases camera for next student)
-    from core import backend_manager
-    backend_manager.stop()
-
     queue = state_manager.get_student_queue()
     
     if not queue:

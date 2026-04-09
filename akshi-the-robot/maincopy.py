@@ -193,13 +193,18 @@ while running:
 
     # center = get_face_center(frame)
     try:
-        center = get_face_center(frame)
+        center = get_face_center(frame) if ws.tracking_active else None
     except Exception as e:
         print("Face detection error:", e)
         center = None
 
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     ws.update_frame(frame)
+
+    # Only run tracking logic during an active student session
+    if not ws.tracking_active:
+        time.sleep(STEP_DT)
+        continue
 
     if center:
         # ===== FACE DETECTED EVENT =====
