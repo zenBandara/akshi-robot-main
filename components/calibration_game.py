@@ -26,6 +26,7 @@ _BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _IMG_DIR = os.path.join(_BASE_DIR, "assets", "images", "calibration")
 _OWL_PATH = os.path.join(_IMG_DIR, "owl.png")
 _BUNNY_PATH = os.path.join(_IMG_DIR, "bunny.png")
+_CELEBRATION_PATH = os.path.join(_IMG_DIR, "celebration.png")
 
 
 class Star:
@@ -139,14 +140,13 @@ class CalibrationGameWidget(QWidget):
         # Load character sprites
         self.owl_pixmap = QPixmap(_OWL_PATH) if os.path.exists(_OWL_PATH) else None
         self.bunny_pixmap = QPixmap(_BUNNY_PATH) if os.path.exists(_BUNNY_PATH) else None
+        self.celebration_pixmap = QPixmap(_CELEBRATION_PATH) if os.path.exists(_CELEBRATION_PATH) else None
 
         # Animation timer (30 FPS)
         self.anim_timer = QTimer(self)
         self.anim_timer.timeout.connect(self._animate)
         self.anim_timer.start(33)
 
-        # Breathing animation for bunny
-        self.breath_scale = 1.0
 
     def _generate_stars(self):
         """Pre-generate star positions (left 70% to avoid owl on right)."""
@@ -205,8 +205,7 @@ class CalibrationGameWidget(QWidget):
             for ff in self.fireflies:
                 ff.update(self.tick)
 
-        # Breathing animation
-        self.breath_scale = 1.0 + 0.02 * math.sin(self.tick * 0.06)
+        # Breathing animation (removed — user didn't like it)
 
         # Update confetti
         if self.phase == "done":
@@ -374,13 +373,18 @@ class CalibrationGameWidget(QWidget):
         p.setBrush(QColor(255, 250, 220))
         p.drawEllipse(QPointF(moon_x, moon_y), moon_radius, moon_radius)
 
-        # Dim stars in background
-        for i in range(25):
+        # Dim stars in background (proper star shapes)
+        for i in range(15):
             sx = (i * 163) % w
             sy = (i * 97) % int(h * 0.5)
-            alpha = int(40 + 30 * math.sin(self.tick * 0.06 + i * 0.7))
-            p.setBrush(QColor(200, 200, 255, alpha))
-            p.drawEllipse(QPointF(sx, sy), 1.5, 1.5)
+            alpha = int(50 + 40 * math.sin(self.tick * 0.06 + i * 0.7))
+            size = 3.0 + (i % 3)
+            star_color = QColor(220, 220, 255, alpha)
+            p.setPen(Qt.NoPen)
+            p.setBrush(star_color)
+            rotation = i * 37  # deterministic rotation per star
+            star_path = self._make_star_path(sx, sy, size, size * 0.4, 5, rotation)
+            p.drawPath(star_path)
 
         # Fireflies
         for ff in self.fireflies:
@@ -408,15 +412,12 @@ class CalibrationGameWidget(QWidget):
         meadow_grad.setColorAt(1, QColor(15, 35, 20))
         p.fillPath(ground_path, meadow_grad)
 
-        # Draw bunny character with breathing animation
+        # Draw bunny character (static, no wiggle)
         if self.bunny_pixmap:
-            bunny_size = min(300, int(h * 0.4))
-            base_scaled = self.bunny_pixmap.scaled(bunny_size, bunny_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            bw = int(base_scaled.width() * self.breath_scale)
-            bh = int(base_scaled.height() * self.breath_scale)
-            scaled = self.bunny_pixmap.scaled(bw, bh, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            bunny_h = min(380, int(h * 0.50))
+            scaled = self.bunny_pixmap.scaledToHeight(bunny_h, Qt.SmoothTransformation)
             bunny_x = w // 2 - scaled.width() // 2
-            bunny_y = int(h * 0.52)
+            bunny_y = int(h * 0.46)
             p.drawPixmap(bunny_x, bunny_y, scaled)
 
         # Moon progress arc (near the moon)
@@ -488,19 +489,12 @@ class CalibrationGameWidget(QWidget):
                               QColor(255, 255, 255), QColor(200, 150, 255, 80),
                               QRectF(0, h * 0.30, w, 50))
 
-        # Draw both characters dancing
-        dance_offset = 8 * math.sin(self.tick * 0.12)
-        if self.owl_pixmap:
-            size = min(180, int(h * 0.28))
-            scaled = self.owl_pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            p.drawPixmap(int(w * 0.25 - scaled.width() / 2),
-                         int(h * 0.5 + dance_offset), scaled)
-
-        if self.bunny_pixmap:
-            size = min(180, int(h * 0.28))
-            scaled = self.bunny_pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            p.drawPixmap(int(w * 0.75 - scaled.width() / 2),
-                         int(h * 0.5 - dance_offset), scaled)
+        # Draw celebration image (single combined owl+bunny, centered, static)
+        if self.celebration_pixmap:
+            cel_h = min(350, int(h * 0.50))
+            scaled = self.celebration_pixmap.scaledToHeight(cel_h, Qt.SmoothTransformation)
+            p.drawPixmap(int(w / 2 - scaled.width() / 2),
+                         int(h * 0.42), scaled)
 
     # ─────────────────── HELPERS ───────────────────
     def _draw_progress_arc(self, p: QPainter, cx, cy, radius, progress, color: QColor):
