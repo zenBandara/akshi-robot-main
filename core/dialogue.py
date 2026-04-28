@@ -45,6 +45,32 @@ class DialoguePool:
         "You've got this, {name}! Which picture do you think is the answer? Go ahead and press the number!"
     ]
 
+    MOTIVATION_NUDGE_L2 = [
+        "Come on {name}, you can do it! Look at the two pictures really carefully. Which one feels right? Just press 1 or 2!",
+        "Hey {name}! I know you know this! Take a deep breath and pick the one that looks correct. You're so close!",
+        "{name}, you're a champion! Don't be shy, just pick one! There's only two choices, you've got a great chance!",
+        "I'm rooting for you, {name}! Just look one more time and press the number. You've totally got this!",
+        "{name}, you're one of the smartest kids I know! Just pick the picture that looks right. I believe in you!"
+    ]
+
+    BREAK_STORY = [
+        "Hey {name}! I can see you're thinking really hard! Let's take a super fun break! Can you stand up and hop like a bunny? Hop around and come back to me! Ready? Go!",
+        "Oh {name}, you look like you could use some energy! Let's play a fun game! Stand up, hop like a little bunny rabbit, go for a round, and hop back! Ready? Let's go!",
+        "Time for a bunny break, {name}! Stand up, stretch your legs, and hop hop hop like a cute little rabbit! Go around and come back when you hear me call! Ready? Hop!"
+    ]
+
+    BREAK_RETURN = [
+        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and press the green Enter button when you're ready to try again!",
+        "Great job hopping, {name}! You're such a fast bunny! Now come back to your seat and press Enter. Let's try the question again!",
+        "Awesome, {name}! What fantastic hopping! Come back, sit down, and press Enter when you're ready. I know you can do it this time!"
+    ]
+
+    BREAK_HURRY = [
+        "Come on {name}, I'm waiting for you! Hop back to your seat and press Enter! We've got more fun things to do!",
+        "{name}, the break is almost over! Come back quick and press Enter! I miss you!",
+        "Hey {name}, hurry back! Press Enter when you're in your seat! Let's keep going!"
+    ]
+
     WAITING_THINKING = [
         "Hmm, this is an interesting one...",
         "I wonder what the answer could be...",
@@ -62,6 +88,10 @@ class DialoguePool:
             "incorrect_L3": cls.INCORRECT_L3,
             "timeout": cls.TIMEOUT,
             "motivation_nudge": cls.MOTIVATION_NUDGE,
+            "motivation_nudge_l2": cls.MOTIVATION_NUDGE_L2,
+            "break_story": cls.BREAK_STORY,
+            "break_return": cls.BREAK_RETURN,
+            "break_hurry": cls.BREAK_HURRY,
             "thinking": cls.WAITING_THINKING
         }
         

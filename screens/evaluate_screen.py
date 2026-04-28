@@ -398,51 +398,74 @@ def on_motivation_nudge():
     
     motivation_given = True
     student_name = state_manager.get_current_student() or "friend"
+    level = state_manager.get_affordance_level()
     
     from core.dialogue import DialoguePool
-    nudge = DialoguePool.get_phrase("motivation_nudge", student_name)
-    
-    print(f"⏰ [1 MIN NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge}\"")
+    # Use stronger L2 motivation when applicable
+    if level >= 2:
+        nudge = DialoguePool.get_phrase("motivation_nudge_l2", student_name)
+        print(f"⏰ [1 MIN NUDGE L2] 🤖 ROBOT MOTIVATES (STRONG): \"{nudge}\"")
+    else:
+        nudge = DialoguePool.get_phrase("motivation_nudge", student_name)
+        print(f"⏰ [1 MIN NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge}\"")
     voice_manager.speak(nudge, f"motivation_{student_name}")
 
 def on_timer_expire():
-    """Called at 3 minutes — auto-escalate to kinesthetic test."""
+    """Called at 3 minutes — L1: escalate to kinesthetic, L2: rabbit jump break."""
     global input_enabled, motivation_timer
     if not input_enabled:
         return
         
     input_enabled = False
-    print("[Evaluate Screen L1] ⏰ 3-MINUTE TIMER EXPIRED! Escalating to kinesthetic test...")
+    level = state_manager.get_affordance_level()
+    print(f"[Evaluate Screen] ⏰ 3-MINUTE TIMER EXPIRED at Level {level}!")
     
-    # Stop motivation timer if it's still somehow active
+    # Stop motivation timer if it's still active
     if motivation_timer:
         motivation_timer.stop()
         motivation_timer = None
+    
+    if evaluate_timer:
+        evaluate_timer.stop()
     
     global active_animations
     for anim in active_animations:
         anim.stop()
         
     sound_manager.stop_bgm()
-        
-    # Provide feedback before transition
     student_name = state_manager.get_current_student() or "friend"
-    if motivation_given:
-        timeout_speech = f"That's okay {student_name}! Let's try something different. We're going to do a fun activity instead!"
-    else:
-        timeout_speech = f"Oops {student_name}, looks like you need a little more help! Let's try a fun activity together!"
-    delay_ms = voice_manager.speak(timeout_speech, f"timeout_3min_{student_name}")
     
-    # Route to the flow controller timeout handler
-    def transition_after_speech():
-        try:
-            from core.flow_controller import flow_controller
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                flow_controller.on_timeout(parent_stack)
-        except ImportError: pass
+    if level >= 2:
+        # ── L2: Route to Rabbit Jump Break screen ──
+        print(f"[Evaluate Screen] 🐰 L2 timeout → Rabbit Jump Break for {student_name}!")
+        timeout_speech = f"Hey {student_name}! I think you need some energy! Let's do something super fun!"
+        delay_ms = voice_manager.speak(timeout_speech, f"timeout_break_{student_name}")
         
-    QTimer.singleShot(delay_ms, transition_after_speech)
+        def go_to_break():
+            try:
+                from core.navigator import navigator
+                navigator.navigate_to("break")
+            except Exception as e:
+                print(f"[Evaluate Screen] Error navigating to break: {e}")
+        
+        QTimer.singleShot(delay_ms, go_to_break)
+    else:
+        # ── L1: Normal cascade timeout (kinesthetic test) ──
+        if motivation_given:
+            timeout_speech = f"That's okay {student_name}! Let's try something different. We're going to do a fun activity instead!"
+        else:
+            timeout_speech = f"Oops {student_name}, looks like you need a little more help! Let's try a fun activity together!"
+        delay_ms = voice_manager.speak(timeout_speech, f"timeout_3min_{student_name}")
+        
+        def transition_after_speech():
+            try:
+                from core.flow_controller import flow_controller
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    flow_controller.on_timeout(parent_stack)
+            except ImportError: pass
+        
+        QTimer.singleShot(delay_ms, transition_after_speech)
         
 def handle_key_press(action):
     global input_enabled, evaluate_timer, key_mapping, active_animations, motivation_timer
