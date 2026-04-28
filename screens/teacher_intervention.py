@@ -91,7 +91,7 @@ class TeacherInterventionWidget(QWidget):
         p.drawRoundedRect(card_rect, 20, 20)
 
         # Title text — matches #1565C0 bold blue
-        p.setFont(QFont("Georgia", 36, QFont.Bold))
+        p.setFont(QFont("Helvetica", 36, QFont.Bold))
         p.setPen(QColor(21, 101, 192))             # #1565C0
         p.drawText(card_rect, Qt.AlignCenter, "Teacher Time! 👩‍🏫")
 
@@ -100,7 +100,7 @@ class TeacherInterventionWidget(QWidget):
         margin = 70
         msg_rect = QRectF(margin, 155, w - margin * 2, 50)
 
-        p.setFont(QFont("Georgia", 26))
+        p.setFont(QFont("Helvetica", 26))
         p.setPen(QColor(13, 71, 161))              # #0D47A1
         p.drawText(msg_rect, Qt.AlignCenter | Qt.TextWordWrap,
                    f"Dear teacher, {self.student_name} could use a little extra help! 😊")
@@ -120,7 +120,7 @@ class TeacherInterventionWidget(QWidget):
         inner_margin = 30
 
         # "Question" label — small, muted
-        p.setFont(QFont("Georgia", 13))
+        p.setFont(QFont("Helvetica", 13))
         p.setPen(QColor(100, 116, 139))             # muted slate
         p.drawText(QRectF(margin + inner_margin, card_y + 16, 200, 22),
                    Qt.AlignLeft, "📝  Question for this student:")
@@ -132,7 +132,7 @@ class TeacherInterventionWidget(QWidget):
                    int(w - margin - inner_margin), int(line_y))
 
         # Question text — big, bold, deep blue — matches #1A237E from evaluateLevel1UI
-        p.setFont(QFont("Georgia", 28, QFont.Bold))
+        p.setFont(QFont("Helvetica", 28, QFont.Bold))
         p.setPen(QColor(26, 35, 126))               # #1A237E
         question_rect = QRectF(margin + inner_margin, line_y + 14,
                                w - margin * 2 - inner_margin * 2,
@@ -143,7 +143,7 @@ class TeacherInterventionWidget(QWidget):
     # ─── ROBOT SPEECH — italic, green, matches other screens ───
     def _draw_robot_speech(self, p, w, h):
         speech_y = int(h * 0.62)
-        p.setFont(QFont("Georgia", 20))
+        p.setFont(QFont("Helvetica", 20))
         p.setPen(QColor(21, 101, 192))              # #1565C0 italic style
         speech_rect = QRectF(50, speech_y, w - 100, 50)
         p.drawText(speech_rect, Qt.AlignCenter | Qt.TextWordWrap,
@@ -164,12 +164,12 @@ class TeacherInterventionWidget(QWidget):
         p.drawRoundedRect(btn_rect, 15, 15)
 
         # Button text
-        p.setFont(QFont("Georgia", 22, QFont.Bold))
+        p.setFont(QFont("Helvetica", 22, QFont.Bold))
         p.setPen(QColor(255, 255, 255))
         p.drawText(btn_rect, Qt.AlignCenter, "Teacher, press C to continue")
 
         # Hint below
-        p.setFont(QFont("Georgia", 14))
+        p.setFont(QFont("Helvetica", 14))
         p.setPen(QColor(100, 116, 139))             # #64748B muted
         p.drawText(QRectF(0, btn_y + actual_h + 12, w, 30), Qt.AlignCenter,
                    "Please assist the student with the question above")
