@@ -18,6 +18,8 @@ window = None
 input_enabled = False
 active_animations = []
 evaluate_timer = None
+motivation_timer = None
+motivation_given = False
 key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 voice_manager = VoiceManager()
 
@@ -38,7 +40,7 @@ def get_ui():
     return window
 
 def on_show():
-    global evaluate_timer, active_animations, input_enabled, key_mapping
+    global evaluate_timer, active_animations, input_enabled, key_mapping, motivation_timer, motivation_given
     level = state_manager.get_affordance_level()
     
     print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
@@ -47,6 +49,10 @@ def on_show():
     # 0. Clean Resets
     if evaluate_timer:
         evaluate_timer.stop()
+    if motivation_timer:
+        motivation_timer.stop()
+        motivation_timer = None
+    motivation_given = False
     for anim in active_animations:
         anim.stop()
         
@@ -284,7 +290,11 @@ def on_show():
         # Delay timer start until after speech actually finishes
         print(f"Delaying visual clock countdown for {delay_ms}ms...")
         if evaluate_timer:
-            QTimer.singleShot(delay_ms, evaluate_timer.start)
+            def start_both_timers():
+                evaluate_timer.start()
+                if motivation_timer:
+                    motivation_timer.start()
+            QTimer.singleShot(delay_ms, start_both_timers)
     else:
         # For Level 1 and 2, step through each option, highlighting it and speaking it.
         speech_text = f"{student_name}, {speech_start} {desc_text}".strip()
@@ -333,6 +343,8 @@ def on_show():
                 print(f"Option explanations finished. Starting timer.")
                 if evaluate_timer:
                     evaluate_timer.start()
+                if motivation_timer:
+                    motivation_timer.start()
                 return
                 
             reset_all_highlights()
@@ -356,27 +368,56 @@ def on_show():
         QTimer.singleShot(delay_ms + 300, speak_next_option)
 
 def enable_input():
-    global input_enabled, evaluate_timer
+    global input_enabled, evaluate_timer, motivation_timer, motivation_given
     input_enabled = True
+    motivation_given = False
     keyboard_manager.register_handler(handle_key_press)
     print("[Evaluate Screen L1] Speech finished. Keyboard input enabled.")
     
-    # Spin up the evaluation timer seamlessly after speech finishes
+    # ── Main Timer: 3 MINUTES (180 seconds) total before auto-escalation ──
     evaluate_timer = EmojiTimerWidget(
         label_widget=window.timer_label,
-        total_seconds=20,
-        clock_count=10,
+        total_seconds=180,
+        clock_count=18,
         timeout_callback=on_timer_expire
     )
     # The timer start will be triggered distinctly by QTimer.singleShot matching speech resolution
+    
+    # ── Motivation Timer: 1 MINUTE (60 seconds) nudge ──
+    motivation_timer = QTimer()
+    motivation_timer.setSingleShot(True)
+    motivation_timer.setInterval(60_000)  # 60 seconds
+    motivation_timer.timeout.connect(on_motivation_nudge)
+    print("[Evaluate Screen] Motivation nudge scheduled at 60 seconds, timeout at 180 seconds.")
+
+def on_motivation_nudge():
+    """At 1 minute of no response, give the student an encouraging push."""
+    global motivation_given
+    if not input_enabled:
+        return  # Student already answered
+    
+    motivation_given = True
+    student_name = state_manager.get_current_student() or "friend"
+    
+    from core.dialogue import DialoguePool
+    nudge = DialoguePool.get_phrase("motivation_nudge", student_name)
+    
+    print(f"⏰ [1 MIN NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge}\"")
+    voice_manager.speak(nudge, f"motivation_{student_name}")
 
 def on_timer_expire():
-    global input_enabled
+    """Called at 3 minutes — auto-escalate to kinesthetic test."""
+    global input_enabled, motivation_timer
     if not input_enabled:
         return
         
     input_enabled = False
-    print("[Evaluate Screen L1] Timer EXPIRED! ⏰ (Treating as Incorrect)")
+    print("[Evaluate Screen L1] ⏰ 3-MINUTE TIMER EXPIRED! Escalating to kinesthetic test...")
+    
+    # Stop motivation timer if it's still somehow active
+    if motivation_timer:
+        motivation_timer.stop()
+        motivation_timer = None
     
     global active_animations
     for anim in active_animations:
@@ -384,12 +425,15 @@ def on_timer_expire():
         
     sound_manager.stop_bgm()
         
-    # Provide playful user feedback directly on timeout
+    # Provide feedback before transition
     student_name = state_manager.get_current_student() or "friend"
-    timeout_speech = f"Oops {student_name}, looks like you're taking a little bit of time! Let's review this together instead!"
-    delay_ms = voice_manager.speak(timeout_speech, f"timeout_{student_name}")
+    if motivation_given:
+        timeout_speech = f"That's okay {student_name}! Let's try something different. We're going to do a fun activity instead!"
+    else:
+        timeout_speech = f"Oops {student_name}, looks like you need a little more help! Let's try a fun activity together!"
+    delay_ms = voice_manager.speak(timeout_speech, f"timeout_3min_{student_name}")
     
-    # Displace the actual visual routing exactly aligning with new speech cadence natively
+    # Route to the flow controller timeout handler
     def transition_after_speech():
         try:
             from core.flow_controller import flow_controller
@@ -401,7 +445,7 @@ def on_timer_expire():
     QTimer.singleShot(delay_ms, transition_after_speech)
         
 def handle_key_press(action):
-    global input_enabled, evaluate_timer, key_mapping, active_animations
+    global input_enabled, evaluate_timer, key_mapping, active_animations, motivation_timer
     if not input_enabled:
         return
         
@@ -414,6 +458,9 @@ def handle_key_press(action):
         # Cease physics
         if evaluate_timer:
             evaluate_timer.stop()
+        if motivation_timer:
+            motivation_timer.stop()
+            motivation_timer = None
         for anim in active_animations:
             anim.stop()
             
@@ -436,6 +483,9 @@ def handle_key_press(action):
         # Cease physics
         if evaluate_timer:
             evaluate_timer.stop()
+        if motivation_timer:
+            motivation_timer.stop()
+            motivation_timer = None
         for anim in active_animations:
             anim.stop()
             
@@ -458,7 +508,10 @@ def handle_key_press(action):
     voice_manager.stop()
     print(f"[Evaluate Screen] Student pressed physical key {action}.")
     
-    # Stop distracting animations and audio gracefully
+    # Stop distracting animations, audio, and motivation timer gracefully
+    if motivation_timer:
+        motivation_timer.stop()
+        motivation_timer = None
     for anim in active_animations:
         anim.stop()
         

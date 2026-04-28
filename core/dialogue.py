@@ -36,6 +36,15 @@ class DialoguePool:
         "No rush, {name}. Thinking takes time!"
     ]
 
+    MOTIVATION_NUDGE = [
+        "Hey {name}, you're doing great! Take a nice look at the pictures and pick the one you think is right!",
+        "Don't worry {name}! There's no wrong answer here. Just pick the one that feels right to you!",
+        "I believe in you, {name}! Look at each picture carefully. You can do this!",
+        "{name}, remember, you're a superstar! Just press the number of the picture you think is correct!",
+        "Hey {name}! It's okay to take your time. Look at the pictures one more time and give it a try!",
+        "You've got this, {name}! Which picture do you think is the answer? Go ahead and press the number!"
+    ]
+
     WAITING_THINKING = [
         "Hmm, this is an interesting one...",
         "I wonder what the answer could be...",
@@ -52,6 +61,7 @@ class DialoguePool:
             "incorrect_L2": cls.INCORRECT_L2,
             "incorrect_L3": cls.INCORRECT_L3,
             "timeout": cls.TIMEOUT,
+            "motivation_nudge": cls.MOTIVATION_NUDGE,
             "thinking": cls.WAITING_THINKING
         }
         
