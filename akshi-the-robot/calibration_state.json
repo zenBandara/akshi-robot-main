@@ -1,1 +1,1 @@
-{"calibration_status": "Not started yet"}
+{"type": "metrics", "calibration_status": "DONE", "overall": 92.0, "eye": 89.81, "face": 94.18, "emotion": "neutral", "timestamp": 1777355730.141838}

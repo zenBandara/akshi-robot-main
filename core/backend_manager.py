@@ -17,14 +17,17 @@ def start():
         print("[Backend Manager] Process already running, skipping start.")
         return
     
-    print("[Backend Manager] Starting face-tracking subprocess...")
+    # ── DUMMY MODE: Launch dummyBackend/run.py instead of the real robot ──
+    # To switch back to the real robot, replace "run.py" with "maincopy.py"
+    # and change the cwd back to "akshi-the-robot"
+    _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    print("[Backend Manager] Starting DUMMY backend subprocess...")
     _process = subprocess.Popen(
-        [sys.executable, "maincopy.py"],
-        cwd=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "akshi-the-robot"),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        [sys.executable, os.path.join(_project_root, "dummyBackend", "run.py")],
+        cwd=_project_root,
     )
-    print(f"[Backend Manager] Subprocess started (PID: {_process.pid})")
+    print(f"[Backend Manager] Dummy backend started (PID: {_process.pid})")
 
 def stop():
     """Stop the backend face-tracking subprocess if running."""
