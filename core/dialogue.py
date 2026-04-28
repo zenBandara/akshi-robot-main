@@ -53,6 +53,19 @@ class DialoguePool:
         "{name}, you're one of the smartest kids I know! Just pick the picture that looks right. I believe in you!"
     ]
 
+    MOTIVATION_NUDGE_L3 = [
+        "{name}, take a deep breath. You are doing amazing! Pick the answer that feels right to you.",
+        "It's okay to feel stuck, {name}. Just give it your best guess! I'm proud of you no matter what.",
+        "Take all the time you need, {name}. Look at the choices and pick your favorite one.",
+        "You've worked so hard today, {name}! Just one more try. You're doing wonderful!"
+    ]
+
+    SKIP_L3 = [
+        "It looks like you're feeling really tired, {name}. That's totally okay! We'll stop here for now. You did a great job today!",
+        "Let's take a rest, {name}. You've done enough hard work today! I'm very proud of you. We'll let the next friend have a turn.",
+        "I think we've done enough thinking for today, {name}! You were amazing. Let's move on to the next student!"
+    ]
+
     BREAK_STORY = [
         "Hey {name}! I can see you're thinking really hard! Let's take a super fun break! Can you stand up and hop like a bunny? Hop around and come back to me! Ready? Go!",
         "Oh {name}, you look like you could use some energy! Let's play a fun game! Stand up, hop like a little bunny rabbit, go for a round, and hop back! Ready? Let's go!",
@@ -89,6 +102,8 @@ class DialoguePool:
             "timeout": cls.TIMEOUT,
             "motivation_nudge": cls.MOTIVATION_NUDGE,
             "motivation_nudge_l2": cls.MOTIVATION_NUDGE_L2,
+            "motivation_nudge_l3": cls.MOTIVATION_NUDGE_L3,
+            "skip_l3": cls.SKIP_L3,
             "break_story": cls.BREAK_STORY,
             "break_return": cls.BREAK_RETURN,
             "break_hurry": cls.BREAK_HURRY,

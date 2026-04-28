@@ -401,8 +401,11 @@ def on_motivation_nudge():
     level = state_manager.get_affordance_level()
     
     from core.dialogue import DialoguePool
-    # Use stronger L2 motivation when applicable
-    if level >= 2:
+    # Use level-specific motivation
+    if level >= 3:
+        nudge = DialoguePool.get_phrase("motivation_nudge_l3", student_name)
+        print(f"⏰ [1 MIN NUDGE L3] 🤖 ROBOT MOTIVATES (GENTLE): \"{nudge}\"")
+    elif level == 2:
         nudge = DialoguePool.get_phrase("motivation_nudge_l2", student_name)
         print(f"⏰ [1 MIN NUDGE L2] 🤖 ROBOT MOTIVATES (STRONG): \"{nudge}\"")
     else:
@@ -435,7 +438,23 @@ def on_timer_expire():
     sound_manager.stop_bgm()
     student_name = state_manager.get_current_student() or "friend"
     
-    if level >= 2:
+    if level >= 3:
+        # ── L3: Student is too unresponsive, skip entirely to next student ──
+        print(f"[Evaluate Screen] ⏭️ L3 timeout → Skipping student {student_name}!")
+        skip_speech = DialoguePool.get_phrase("skip_l3", student_name)
+        delay_ms = voice_manager.speak(skip_speech, f"timeout_skip_{student_name}")
+        
+        def skip_student():
+            try:
+                from core.flow_controller import flow_controller
+                parent_stack = window.parentWidget()
+                if parent_stack:
+                    flow_controller.on_skip(parent_stack)
+            except Exception as e:
+                print(f"[Evaluate Screen] Error skipping student: {e}")
+        
+        QTimer.singleShot(delay_ms, skip_student)
+    elif level == 2:
         # ── L2: Route to Rabbit Jump Break screen ──
         print(f"[Evaluate Screen] 🐰 L2 timeout → Rabbit Jump Break for {student_name}!")
         timeout_speech = f"Hey {student_name}! I think you need some energy! Let's do something super fun!"
