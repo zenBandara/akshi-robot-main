@@ -1,23 +1,18 @@
 """
-👩‍🏫 Teacher Intervention Screen
-=================================
-A gamified, playful screen that shows the teacher:
-  - Which student needs help
-  - The exact question and all answer options (with images)
-  - The correct answer highlighted with a star
-  - The learning path the student went through
-
-Press [C] to continue to the next student.
+Teacher Intervention Screen
+=============================
+A clean screen for the teacher to take over.
+Shows the student name, the question, and a "Press C" prompt.
+Matches the app's existing light pastel + blue typography design language.
 """
 
 import os
 import math
-import random
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer, QRectF, QPointF
 from PySide6.QtGui import (
-    QPainter, QColor, QRadialGradient, QLinearGradient,
-    QFont, QPen, QPixmap, QPainterPath
+    QPainter, QColor, QLinearGradient,
+    QFont, QPen
 )
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
@@ -33,68 +28,29 @@ voice_manager = VoiceManager()
 
 
 class TeacherInterventionWidget(QWidget):
-    """Full-screen painted widget for the teacher intervention screen."""
+    """Painted teacher intervention screen matching the app's light/blue design theme."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumSize(800, 600)
         self.tick = 0
 
-        # Data holders
         self.student_name = ""
         self.question_text = ""
-        self.correct_option = ""
-        self.options = []  # list of {"key": "op1", "label": "Left Arrow", "pixmap": QPixmap or None, "is_correct": bool}
+        self.affordance_level = 3
         self.path_taken = []
 
-        # Decorative particles
-        self.sparkles = []
-
-        # Animation timer (20 FPS — lightweight)
+        # Subtle animation (15 FPS)
         self.anim_timer = QTimer(self)
         self.anim_timer.timeout.connect(self._animate)
-        self.anim_timer.start(50)
+        self.anim_timer.start(66)
 
-    def load_task_data(self, student_name, task_data, path_taken=None):
-        """Populate with the current evaluation question."""
+    def load_data(self, student_name, task_data, level=3, path=None):
         self.student_name = student_name
-        self.path_taken = path_taken or []
-        self.options = []
-
+        self.affordance_level = level
+        self.path_taken = path or []
         eval_data = task_data.get("evaluate", {}) if task_data else {}
         self.question_text = eval_data.get("task_description", "Question not available")
-        self.correct_option = eval_data.get("correct_option", "")
-
-        mc_words = eval_data.get("multiple_choices_word", {})
-        mc_images = eval_data.get("multiple_choices_images", {})
-
-        for key in sorted(mc_words.keys()):
-            label = mc_words[key]
-            img_path = mc_images.get(key, "")
-            pixmap = None
-            if img_path:
-                abs_path = os.path.join(project_root, img_path)
-                if os.path.exists(abs_path):
-                    pixmap = QPixmap(abs_path)
-
-            self.options.append({
-                "key": key,
-                "label": label,
-                "pixmap": pixmap,
-                "is_correct": (key == self.correct_option)
-            })
-
-        # Generate sparkles
-        self.sparkles = []
-        for _ in range(12):
-            self.sparkles.append({
-                "x": random.uniform(0, 1),
-                "y": random.uniform(0, 1),
-                "size": random.uniform(3, 7),
-                "phase": random.uniform(0, math.pi * 2),
-                "hue": random.choice([45, 200, 280, 330, 120])
-            })
-
         self.update()
 
     def _animate(self):
@@ -104,263 +60,123 @@ class TeacherInterventionWidget(QWidget):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.TextAntialiasing)
         w, h = self.width(), self.height()
 
-        self._draw_background(p, w, h)
-        self._draw_header(p, w, h)
-        self._draw_question(p, w, h)
-        self._draw_options(p, w, h)
-        self._draw_footer(p, w, h)
-        self._draw_sparkles(p, w, h)
+        self._draw_bg(p, w, h)
+        self._draw_title_card(p, w, h)
+        self._draw_message(p, w, h)
+        self._draw_question_card(p, w, h)
+        self._draw_robot_speech(p, w, h)
+        self._draw_action_button(p, w, h)
 
         p.end()
 
-    def _draw_background(self, p, w, h):
-        """Warm pastel gradient background."""
-        bg = QLinearGradient(0, 0, w, h)
-        bg.setColorAt(0, QColor(232, 245, 253))    # Light blue
-        bg.setColorAt(0.5, QColor(243, 229, 245))   # Soft lavender
-        bg.setColorAt(1, QColor(255, 243, 224))      # Warm peach
+    # ─── BACKGROUND — matches #E3F2FD (teacher intervention original) ───
+    def _draw_bg(self, p, w, h):
+        bg = QLinearGradient(0, 0, 0, h)
+        bg.setColorAt(0, QColor(227, 242, 253))   # #E3F2FD
+        bg.setColorAt(1, QColor(207, 232, 252))    # slightly deeper at bottom
         p.fillRect(0, 0, w, h, bg)
 
-        # Subtle polka dots
-        p.setPen(Qt.NoPen)
-        for i in range(30):
-            dx = (i * 137 + 50) % w
-            dy = (i * 89 + 30) % h
-            alpha = 15 + 8 * math.sin(self.tick * 0.03 + i)
-            p.setBrush(QColor(150, 100, 200, int(alpha)))
-            p.drawEllipse(QPointF(dx, dy), 15, 15)
+    # ─── TITLE CARD — white rounded card with bold blue text ───
+    def _draw_title_card(self, p, w, h):
+        margin = 50
+        card_h = 90
+        card_rect = QRectF(margin, 40, w - margin * 2, card_h)
 
-    def _draw_header(self, p, w, h):
-        """Title bar with student name."""
-        # Title card background
-        card_y = int(h * 0.02)
-        card_h = int(h * 0.12)
-        card_margin = int(w * 0.05)
-        card_rect = QRectF(card_margin, card_y, w - card_margin * 2, card_h)
-
-        p.setPen(Qt.NoPen)
-        p.setBrush(QColor(255, 255, 255, 200))
+        # White card with border — matches evaluateLevel1UI cards
+        p.setPen(QPen(QColor(100, 181, 246), 4))   # #64B5F6 border
+        p.setBrush(QColor(255, 255, 255))
         p.drawRoundedRect(card_rect, 20, 20)
 
-        # Border
-        p.setPen(QPen(QColor(100, 149, 237, 120), 3))
-        p.setBrush(Qt.NoBrush)
+        # Title text — matches #1565C0 bold blue
+        p.setFont(QFont("Georgia", 36, QFont.Bold))
+        p.setPen(QColor(21, 101, 192))             # #1565C0
+        p.drawText(card_rect, Qt.AlignCenter, "Teacher Time! 👩‍🏫")
+
+    # ─── MESSAGE — "Student needs help" ───
+    def _draw_message(self, p, w, h):
+        margin = 70
+        msg_rect = QRectF(margin, 155, w - margin * 2, 50)
+
+        p.setFont(QFont("Georgia", 26))
+        p.setPen(QColor(13, 71, 161))              # #0D47A1
+        p.drawText(msg_rect, Qt.AlignCenter | Qt.TextWordWrap,
+                   f"Dear teacher, {self.student_name} could use a little extra help! 😊")
+
+    # ─── QUESTION CARD — the main feature ───
+    def _draw_question_card(self, p, w, h):
+        margin = 50
+        card_y = 230
+        card_h = int(h * 0.30)
+        card_rect = QRectF(margin, card_y, w - margin * 2, card_h)
+
+        # White card — same style as evaluate question_label: #F8FAFC bg, rounded
+        p.setPen(QPen(QColor(226, 232, 240), 4))   # #E2E8F0 border
+        p.setBrush(QColor(248, 250, 252))           # #F8FAFC
         p.drawRoundedRect(card_rect, 20, 20)
 
-        # Title text
-        title_font = QFont("Georgia", 28, QFont.Bold)
-        p.setFont(title_font)
-        p.setPen(QColor(21, 101, 192))
-        pulse = 1.0 + 0.02 * math.sin(self.tick * 0.06)
-        emoji_bounce = "👩‍🏫" if int(self.tick * 0.05) % 2 == 0 else "🧑‍🏫"
-        p.drawText(card_rect, Qt.AlignCenter,
-                   f"{emoji_bounce}  Teacher Time!  {emoji_bounce}")
+        inner_margin = 30
 
-        # Student name badge (pill shape)
-        badge_font = QFont("Georgia", 16, QFont.Bold)
-        p.setFont(badge_font)
-        badge_text = f"🌟 Student: {self.student_name}"
-        badge_w = min(350, int(w * 0.35))
-        badge_h = 36
-        badge_x = w // 2 - badge_w // 2
-        badge_y = card_y + card_h + 8
+        # "Question" label — small, muted
+        p.setFont(QFont("Georgia", 13))
+        p.setPen(QColor(100, 116, 139))             # muted slate
+        p.drawText(QRectF(margin + inner_margin, card_y + 16, 200, 22),
+                   Qt.AlignLeft, "📝  Question for this student:")
 
-        p.setPen(Qt.NoPen)
-        p.setBrush(QColor(255, 193, 7, 200))
-        p.drawRoundedRect(badge_x, badge_y, badge_w, badge_h, badge_h // 2, badge_h // 2)
-        p.setPen(QColor(80, 50, 0))
-        p.drawText(QRectF(badge_x, badge_y, badge_w, badge_h), Qt.AlignCenter, badge_text)
+        # Separator line
+        line_y = card_y + 46
+        p.setPen(QPen(QColor(226, 232, 240), 1))
+        p.drawLine(int(margin + inner_margin), int(line_y),
+                   int(w - margin - inner_margin), int(line_y))
 
-    def _draw_question(self, p, w, h):
-        """Question card with decorative borders."""
-        q_y = int(h * 0.20)
-        q_h = int(h * 0.10)
-        q_margin = int(w * 0.06)
-        q_rect = QRectF(q_margin, q_y, w - q_margin * 2, q_h)
+        # Question text — big, bold, deep blue — matches #1A237E from evaluateLevel1UI
+        p.setFont(QFont("Georgia", 28, QFont.Bold))
+        p.setPen(QColor(26, 35, 126))               # #1A237E
+        question_rect = QRectF(margin + inner_margin, line_y + 14,
+                               w - margin * 2 - inner_margin * 2,
+                               card_h - 70)
+        p.drawText(question_rect, Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
+                   self.question_text)
 
-        # Card background
-        p.setPen(Qt.NoPen)
-        p.setBrush(QColor(255, 255, 255, 230))
-        p.drawRoundedRect(q_rect, 16, 16)
+    # ─── ROBOT SPEECH — italic, green, matches other screens ───
+    def _draw_robot_speech(self, p, w, h):
+        speech_y = int(h * 0.62)
+        p.setFont(QFont("Georgia", 20))
+        p.setPen(QColor(21, 101, 192))              # #1565C0 italic style
+        speech_rect = QRectF(50, speech_y, w - 100, 50)
+        p.drawText(speech_rect, Qt.AlignCenter | Qt.TextWordWrap,
+                   "🤖  \"Let's ask teacher for some help!\"")
 
-        # Decorative left accent bar
-        accent_rect = QRectF(q_margin, q_y, 6, q_h)
-        p.setBrush(QColor(100, 149, 237))
-        p.drawRoundedRect(accent_rect, 3, 3)
-
-        # Question text
-        q_font = QFont("Georgia", 20, QFont.Bold)
-        p.setFont(q_font)
-        p.setPen(QColor(30, 30, 80))
-        text_rect = QRectF(q_margin + 20, q_y, w - q_margin * 2 - 30, q_h)
-        p.drawText(text_rect, Qt.AlignVCenter | Qt.AlignLeft | Qt.TextWordWrap,
-                   f"❓  {self.question_text}")
-
-    def _draw_options(self, p, w, h):
-        """Draw answer option cards in a grid."""
-        if not self.options:
-            return
-
-        count = len(self.options)
-        cols = min(count, 4) if count <= 4 else 2
-        rows = math.ceil(count / cols)
-
-        grid_top = int(h * 0.33)
-        grid_bottom = int(h * 0.82)
-        grid_left = int(w * 0.06)
-        grid_right = int(w * 0.94)
-        grid_w = grid_right - grid_left
-        grid_h = grid_bottom - grid_top
-
-        card_gap = 16
-        card_w = (grid_w - (cols - 1) * card_gap) // cols
-        card_h = (grid_h - (rows - 1) * card_gap) // rows
-
-        for idx, opt in enumerate(self.options):
-            col = idx % cols
-            row = idx // cols
-
-            cx = grid_left + col * (card_w + card_gap)
-            cy = grid_top + row * (card_h + card_gap)
-            card_rect = QRectF(cx, cy, card_w, card_h)
-
-            # Card styling
-            if opt["is_correct"]:
-                # Correct answer — glowing green
-                glow_alpha = int(180 + 40 * math.sin(self.tick * 0.1))
-                p.setPen(QPen(QColor(46, 125, 50, glow_alpha), 4))
-                p.setBrush(QColor(200, 255, 200, 240))
-            else:
-                p.setPen(QPen(QColor(180, 180, 200, 100), 2))
-                p.setBrush(QColor(255, 255, 255, 200))
-
-            p.drawRoundedRect(card_rect, 18, 18)
-
-            # Option number badge
-            badge_size = 32
-            badge_x = cx + 8
-            badge_y = cy + 8
-            if opt["is_correct"]:
-                p.setPen(Qt.NoPen)
-                p.setBrush(QColor(46, 125, 50))
-            else:
-                p.setPen(Qt.NoPen)
-                p.setBrush(QColor(100, 149, 237))
-            p.drawRoundedRect(int(badge_x), int(badge_y), badge_size, badge_size, badge_size // 2, badge_size // 2)
-
-            badge_font = QFont("Georgia", 14, QFont.Bold)
-            p.setFont(badge_font)
-            p.setPen(QColor(255, 255, 255))
-            option_num = str(idx + 1)
-            p.drawText(QRectF(badge_x, badge_y, badge_size, badge_size), Qt.AlignCenter, option_num)
-
-            # Image
-            if opt["pixmap"]:
-                img_area_top = cy + 44
-                img_area_h = card_h - 90
-                img_size = min(int(card_w * 0.7), int(img_area_h))
-                scaled = opt["pixmap"].scaled(img_size, img_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                img_x = cx + (card_w - scaled.width()) // 2
-                img_y = int(img_area_top + (img_area_h - scaled.height()) // 2)
-                p.drawPixmap(int(img_x), int(img_y), scaled)
-
-            # Label text at the bottom of card
-            label_font = QFont("Georgia", 13)
-            p.setFont(label_font)
-            p.setPen(QColor(50, 50, 80))
-            label_rect = QRectF(cx + 4, cy + card_h - 36, card_w - 8, 30)
-            p.drawText(label_rect, Qt.AlignCenter, opt["label"])
-
-            # Correct answer star marker
-            if opt["is_correct"]:
-                star_font = QFont("Georgia", 22)
-                p.setFont(star_font)
-                p.setPen(QColor(255, 193, 7))
-                p.drawText(QRectF(cx + card_w - 40, cy + 4, 36, 36), Qt.AlignCenter, "⭐")
-
-                # "CORRECT" tag
-                tag_w = 80
-                tag_h = 22
-                tag_x = cx + card_w - tag_w - 8
-                tag_y = cy + card_h - 58
-                p.setPen(Qt.NoPen)
-                p.setBrush(QColor(46, 125, 50, 220))
-                p.drawRoundedRect(int(tag_x), int(tag_y), tag_w, tag_h, 10, 10)
-                tag_font = QFont("Georgia", 11, QFont.Bold)
-                p.setFont(tag_font)
-                p.setPen(QColor(255, 255, 255))
-                p.drawText(QRectF(tag_x, tag_y, tag_w, tag_h), Qt.AlignCenter, "✓ CORRECT")
-
-    def _draw_footer(self, p, w, h):
-        """Bottom bar with continue prompt and path summary."""
-        footer_y = int(h * 0.85)
-
-        # Continue button
-        pulse = 0.9 + 0.1 * abs(math.sin(self.tick * 0.07))
-        btn_w = int(280 * pulse)
-        btn_h = int(52 * pulse)
+    # ─── ACTION BUTTON — blue rounded pill, matches #1976D2 system buttons ───
+    def _draw_action_button(self, p, w, h):
+        btn_w = 360
+        btn_h = 60
         btn_x = w // 2 - btn_w // 2
-        btn_y = footer_y + 10
+        btn_y = int(h * 0.77)
 
-        # Shadow
+        btn_rect = QRectF(btn_x, btn_y, btn_w, btn_h)
+
+        # Blue button — #1976D2 matching all other action buttons in the app
         p.setPen(Qt.NoPen)
-        p.setBrush(QColor(0, 0, 0, 30))
-        p.drawRoundedRect(btn_x + 2, btn_y + 3, btn_w, btn_h, 15, 15)
+        p.setBrush(QColor(25, 118, 210))            # #1976D2
+        p.drawRoundedRect(btn_rect, 15, 15)
 
-        # Button body
-        btn_grad = QLinearGradient(btn_x, btn_y, btn_x, btn_y + btn_h)
-        btn_grad.setColorAt(0, QColor(25, 118, 210))
-        btn_grad.setColorAt(1, QColor(13, 71, 161))
-        p.setBrush(btn_grad)
-        p.setPen(QPen(QColor(255, 255, 255, 80), 2))
-        p.drawRoundedRect(btn_x, btn_y, btn_w, btn_h, 15, 15)
-
-        btn_font = QFont("Georgia", 18, QFont.Bold)
-        p.setFont(btn_font)
+        # Button text
+        p.setFont(QFont("Georgia", 22, QFont.Bold))
         p.setPen(QColor(255, 255, 255))
-        p.drawText(QRectF(btn_x, btn_y, btn_w, btn_h), Qt.AlignCenter, "Press  C  to Continue")
+        p.drawText(btn_rect, Qt.AlignCenter, "Teacher, press C to continue")
 
-        # Path summary (tiny breadcrumb trail)
-        if self.path_taken:
-            path_y = btn_y + btn_h + 12
-            path_font = QFont("Georgia", 10)
-            p.setFont(path_font)
-            p.setPen(QColor(120, 100, 150, 160))
-            trail = " → ".join(self.path_taken[-6:])  # last 6 steps
-            p.drawText(QRectF(0, path_y, w, 20), Qt.AlignCenter, f"Learning path: {trail}")
-
-    def _draw_sparkles(self, p, w, h):
-        """Decorative animated sparkles."""
-        p.setPen(Qt.NoPen)
-        for sp in self.sparkles:
-            alpha = int(80 + 60 * math.sin(self.tick * 0.06 + sp["phase"]))
-            color = QColor.fromHsl(sp["hue"], 200, 200, alpha)
-            p.setBrush(color)
-            sx = sp["x"] * w
-            sy = sp["y"] * h
-            size = sp["size"] + 1.5 * math.sin(self.tick * 0.08 + sp["phase"])
-            # 4-point star shape
-            path = QPainterPath()
-            for i in range(4):
-                angle = math.radians(i * 90 - 45)
-                ox = sx + size * math.cos(angle)
-                oy = sy + size * math.sin(angle)
-                if i == 0:
-                    path.moveTo(ox, oy)
-                else:
-                    path.lineTo(ox, oy)
-                mid_angle = math.radians(i * 90 + 45 - 45)
-                mx = sx + size * 0.3 * math.cos(mid_angle)
-                my = sy + size * 0.3 * math.sin(mid_angle)
-                path.lineTo(mx, my)
-            path.closeSubpath()
-            p.drawPath(path)
+        # Hint below
+        p.setFont(QFont("Georgia", 14))
+        p.setPen(QColor(100, 116, 139))             # #64748B muted
+        p.drawText(QRectF(0, btn_y + actual_h + 12, w, 30), Qt.AlignCenter,
+                   "Please assist the student with the question above")
 
 
 def get_ui():
-    """Create the teacher intervention screen with the painted widget."""
+    """Create the teacher intervention screen."""
     global window, game_widget
     if window is None:
         window = QWidget()
@@ -385,14 +201,13 @@ def on_show():
 
     input_enabled = False
 
-    # 1. Load task data into the widget
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     task_data = state_manager.get_current_task()
+    level = state_manager.get_affordance_level()
     path = getattr(state_manager, 'current_path', [])
 
-    game_widget.load_task_data(student_name, task_data, path)
+    game_widget.load_data(student_name, task_data, level, path)
 
-    # 2. Robot speech
     speech_text = f"Let's ask teacher for some help! Don't worry {student_name}, you did great trying!"
     print(f"🤖 ROBOT SPEAKS [CHEERFUL ENCOURAGING TONE]: \"{speech_text}\"")
     delay_ms = voice_manager.speak(speech_text, f"teacher_intervention_{student_name}")
@@ -423,7 +238,6 @@ def handle_key_press(action):
         task_id = task_data.get("task_id", "unknown") if task_data else "unknown"
         student_id = state_manager.get_current_student() or "unknown"
 
-        # Use the actual path taken if available, otherwise fallback
         if not hasattr(state_manager, 'current_path') or not state_manager.current_path:
             state_manager.current_path = [
                 "evaluate_L1", "elaborate", "evaluate_L2", "explain",
@@ -459,7 +273,7 @@ def handle_key_press(action):
         except Exception as db_err:
             print(f"[Teacher Intervention] RL SQLite Telemetry Logging error: {db_err}")
 
-        # Advance Queue Natively
+        # Advance Queue
         student_queue = state_manager.get_student_queue()
 
         if student_queue:
@@ -467,7 +281,6 @@ def handle_key_press(action):
             state_manager.set_current_student(next_stu)
             state_manager.set_student_queue(student_queue)
 
-            # Wipe affordance tracking state completely for the next child
             state_manager.current_path = []
             state_manager.set_affordance_level(1)
 
