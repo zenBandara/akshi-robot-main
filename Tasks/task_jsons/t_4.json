@@ -55,10 +55,10 @@
       "op4": "A Book"
     },
     "multiple_choices_images": {
-      "op1": "assets/placeholder.png",
-      "op2": "assets/placeholder.png",
-      "op3": "assets/placeholder.png",
-      "op4": "assets/placeholder.png"
+      "op1": "assets/images/evaluate/box.png",
+      "op2": "assets/images/evaluate/ball.png",
+      "op3": "assets/images/evaluate/pyramid.png",
+      "op4": "assets/images/evaluate/book.png"
     },
     "correct_option": "op2"
   }

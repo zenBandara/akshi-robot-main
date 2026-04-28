@@ -55,10 +55,10 @@
       "op4": "Four Stars"
     },
     "multiple_choices_images": {
-      "op1": "assets/placeholder.png",
-      "op2": "assets/placeholder.png",
-      "op3": "assets/placeholder.png",
-      "op4": "assets/placeholder.png"
+      "op1": "assets/images/evaluate/one_star.png",
+      "op2": "assets/images/evaluate/two_stars.png",
+      "op3": "assets/images/evaluate/three_stars.png",
+      "op4": "assets/images/evaluate/four_stars.png"
     },
     "correct_option": "op3"
   }

@@ -2,13 +2,14 @@ from PySide6.QtCore import QTimer, QPropertyAnimation, QObject
 from PySide6.QtWidgets import QGraphicsOpacityEffect
 
 class EmojiTimerWidget(QObject):
-    def __init__(self, label_widget, total_seconds=20, clock_count=10, timeout_callback=None):
+    def __init__(self, label_widget, total_seconds=20, clock_count=10, timeout_callback=None, progress_callback=None):
         super().__init__()
         self.label_widget = label_widget
         self.total_seconds = total_seconds
         self.clock_count = clock_count
         self.remaining_clocks = clock_count
         self.timeout_callback = timeout_callback
+        self.progress_callback = progress_callback
         
         self.timer = QTimer()
         self.timer.timeout.connect(self._trigger_fade)
@@ -58,6 +59,10 @@ class EmojiTimerWidget(QObject):
     def _remove_clock(self):
         self.remaining_clocks -= 1
         self._update_display()
+
+        if self.progress_callback:
+            progress = self.remaining_clocks / self.clock_count if self.clock_count > 0 else 0.0
+            self.progress_callback(progress)
         
         if self.remaining_clocks <= 0:
             self.stop()

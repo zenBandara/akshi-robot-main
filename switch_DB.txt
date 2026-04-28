@@ -1,0 +1,12 @@
+Currently (Dummy mode):
+_process = subprocess.Popen(
+    [sys.executable, os.path.join(_project_root, "dummyBackend", "run.py")],
+    cwd=_project_root,
+)
+
+To switch to Real Robot:
+_process = subprocess.Popen(
+    [sys.executable, os.path.join(_project_root, "akshi-the-robot", "maincopy.py")],
+    cwd=os.path.join(_project_root, "akshi-the-robot"),
+)
+

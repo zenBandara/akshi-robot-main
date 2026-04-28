@@ -55,10 +55,10 @@
       "op4": "A Bus"
     },
     "multiple_choices_images": {
-      "op1": "assets/placeholder.png",
-      "op2": "assets/placeholder.png",
-      "op3": "assets/placeholder.png",
-      "op4": "assets/placeholder.png"
+      "op1": "assets/images/evaluate/car_small.png",
+      "op2": "assets/images/evaluate/bug.png",
+      "op3": "assets/images/evaluate/bicycle.png",
+      "op4": "assets/images/evaluate/bus.png"
     },
     "correct_option": "op2"
   }

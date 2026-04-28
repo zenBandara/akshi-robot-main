@@ -55,10 +55,10 @@
       "op4": "Yellow Car"
     },
     "multiple_choices_images": {
-      "op1": "assets/placeholder.png",
-      "op2": "assets/placeholder.png",
-      "op3": "assets/placeholder.png",
-      "op4": "assets/placeholder.png"
+      "op1": "assets/images/evaluate/blue_car.png",
+      "op2": "assets/images/evaluate/red_car.png",
+      "op3": "assets/images/evaluate/green_car.png",
+      "op4": "assets/images/evaluate/yellow_car.png"
     },
     "correct_option": "op2"
   }
