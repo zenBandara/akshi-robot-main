@@ -52,8 +52,6 @@ class KeyboardManager:
             0x05: "CONTINUE",   # "Teacher continue"
             0x06: "SKIP",       # "Skip"
             0x07: "BREAK",      # "Take a break"
-            0x08: "P",          # "Pass"
-            0x09: "F",          # "Fail"
         }
 
         # ── Voice Input Thread (Raspberry Pi only) ──

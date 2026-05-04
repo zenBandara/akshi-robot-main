@@ -191,7 +191,7 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    if action == "P": # Teacher Overrides - PASS
+    if action in ("P", "ENTER"): # Teacher Overrides - PASS (P key or "OK" voice command)
         input_enabled = False
         voice_manager.stop()
         if frame_timer:
@@ -204,7 +204,7 @@ def handle_key_press(action):
                 flow_controller.on_correct_answer(parent_stack) # Passed fallback, skip next student
         except ImportError: pass
             
-    elif action == "F": # Teacher Overrides - FAIL
+    elif action in ("F", "NO"): # Teacher Overrides - FAIL (F key or "No" voice command)
         input_enabled = False
         voice_manager.stop()
         if frame_timer:

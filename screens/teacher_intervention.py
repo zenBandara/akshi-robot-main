@@ -228,10 +228,10 @@ def handle_key_press(action):
     if not input_enabled:
         return
 
-    if action == "CONTINUE":
+    if action in ("CONTINUE", "ENTER"):
         input_enabled = False
         voice_manager.stop()
-        print("[Teacher Intervention] Teacher pressed CONTINUE. Logging complete cascade and resetting.")
+        print("[Teacher Intervention] Teacher pressed ENTER/CONTINUE. Logging complete cascade and resetting.")
 
         # Log Result (Complete Cascade Failure -> Teacher Assisted)
         task_data = state_manager.get_current_task()
