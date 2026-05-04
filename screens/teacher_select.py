@@ -46,7 +46,20 @@ def load_teachers():
         if child.widget(): child.widget().deleteLater()
     
     from PySide6.QtWidgets import QLabel, QFrame, QHBoxLayout
-    from PySide6.QtCore import Qt
+    from PySide6.QtCore import Qt, Signal
+
+    class ClickableCard(QFrame):
+        clicked = Signal(str)
+        
+        def __init__(self, action_id, parent=None):
+            super().__init__(parent)
+            self.action_id = action_id
+            self.setCursor(Qt.PointingHandCursor)
+            
+        def mousePressEvent(self, event):
+            if event.button() == Qt.LeftButton:
+                self.clicked.emit(self.action_id)
+            super().mousePressEvent(event)
 
     if not teachers:
         error_label = QLabel("No teachers found.\nPlease check connection.")
@@ -67,13 +80,18 @@ def load_teachers():
         teacher_map[mapped_action] = teacher_id
         
         # Build highly-professional CSS Teacher Card component natively
-        card = QFrame()
+        card = ClickableCard(mapped_action)
+        card.clicked.connect(handle_key_press)
         card.setFixedHeight(75)
         card.setStyleSheet("""
             QFrame {
                 background-color: #F8FAFC;
                 border: 2px solid #E2E8F0;
                 border-radius: 12px;
+            }
+            QFrame:hover {
+                background-color: #E3F2FD;
+                border: 2px solid #90CAF9;
             }
         """)
         card_layout = QHBoxLayout(card)
