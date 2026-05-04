@@ -156,13 +156,12 @@ def handle_key_press(mapped_action):
         random.shuffle(student_queue)
         state_manager.set_student_queue(student_queue)
         
-        print("Teacher selected. Proceeding to select first student...")
-        window.title_label.setText(f"Loading session for {selected_teacher}...")
+        print("Teacher selected and session initialized. Robot is now going to sleep (Idle) waiting for the class to begin...")
+        window.title_label.setText(f"Session ready. Sleeping...")
         
         # Strip all dynamically generated teacher cards visibly immediately indicating process consumption
         while window.cards_container.layout().count():
             child = window.cards_container.layout().takeAt(0)
             if child.widget(): child.widget().deleteLater()
         
-        import core.session_logic as session_logic
-        session_logic.next_student()
+        navigator.navigate_to("idle")

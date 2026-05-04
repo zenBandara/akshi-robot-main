@@ -81,7 +81,7 @@ for name, widget in screens.items():
         print(f"Warning: UI for '{name}' failed to load.")
 
 # Set startup screen
-navigator.navigate_to("idle")
+navigator.navigate_to("teacher_select")
 
 main_window.show()
 import signal

@@ -81,9 +81,10 @@ def on_ready():
     except Exception as e:
         print("VoiceManager error (ignoring for now):", e)
 
-    # Wait exactly for exact length, then transition to teacher selection
-    QTimer.singleShot(duration_ms, transition_to_teacher_select)
+    # Wait exactly for exact length, then transition to the first student
+    QTimer.singleShot(duration_ms, transition_to_first_student)
 
-def transition_to_teacher_select():
-    print("Transitioning to Teacher Select...")
-    navigator.navigate_to("teacher_select")
+def transition_to_first_student():
+    print("Transitioning to first student...")
+    import core.session_logic as session_logic
+    session_logic.next_student()
