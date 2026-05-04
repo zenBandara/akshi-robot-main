@@ -39,6 +39,7 @@ def get_ui():
         display_name = student_name if student_name else "Buddy"
         
         window.student_name_label.setText(f"{display_name}! 🎉")
+        window.hint_label.setText("Say 'Okay' when you're ready! 🌟")
         
         # Simple call — the task introduction is handled by the dedicated task_intro_screen
         intro_msg = f"{display_name}, can you please come on up? It is your turn to shine!"
