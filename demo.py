@@ -63,7 +63,8 @@ def build_app():
     """Create the main window + stack + key listener."""
     main_window = QMainWindow()
     main_window.setWindowTitle("🎬 Akshi Demo")
-    main_window.setMinimumSize(900, 700)
+    # Enforce a strict 16:9 aspect ratio natively
+    main_window.setFixedSize(1280, 720)
     main_window.setFocusPolicy(Qt.StrongFocus)
 
     stack = QStackedWidget()

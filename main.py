@@ -29,7 +29,8 @@ from screens import task_intro_screen
 from screens import calibration_screen
 main_window = QMainWindow()
 main_window.setWindowTitle("Akshi Robot Interface")
-main_window.setMinimumSize(900, 700)
+# Enforce a strict 16:9 aspect ratio natively
+main_window.setFixedSize(1280, 720)
 main_window.setFocusPolicy(Qt.StrongFocus) # Crucial for key events on empty windows!
 
 stack = QStackedWidget()
