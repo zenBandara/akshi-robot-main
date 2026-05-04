@@ -183,9 +183,14 @@ def present_option(idx):
     options_speech = eval_data.get("multiple_choices_speech", {})
 
     if idx >= len(presentation_keys):
-        # Student said NO to every option (including the correct one) → treat as incorrect
-        game_widget.clear_highlight()
-        print(f"[Evaluate Screen] Student rejected ALL options. Treating as INCORRECT.")
+        # Reached the end without finding the correct answer
+        print(f"[Evaluate Screen] Exhausted all options without correct selection. Treating as INCORRECT.")
+        
+        # User requested: if we reach the end (e.g. said NO to everything), mark the last answer red.
+        if len(presentation_keys) > 0:
+            last_key = presentation_keys[-1]
+            game_widget.highlight_answer(key_mapping[last_key], correct=False)
+            
         awaiting_yes_no = False
         current_presenting_idx = -1
         _process_answer(is_correct=False)
@@ -198,8 +203,8 @@ def present_option(idx):
     current_key = presentation_keys[idx]
     op_code = key_mapping[current_key]
 
-    # Highlight this option
-    game_widget.highlight_answer(op_code, correct=True)
+    # Highlight this option in BLUE to indicate it's the current one being asked
+    game_widget.highlight_answer(op_code, correct="present")
 
     # Speak the option explanation + ask YES/NO
     op_speech = options_speech.get(op_code, f"Option {int(current_key)}.")
@@ -407,13 +412,23 @@ def handle_key_press(action):
         correct_option = eval_data.get("correct_option")
 
         is_correct = (selected_option == correct_option)
-        game_widget.highlight_answer(selected_option, correct=is_correct)
 
         print(f"[Evaluate Screen] Student said YES to option {current_key} ({selected_option}). Correct: {is_correct}")
 
-        input_enabled = False
-        current_presenting_idx = -1
-        _process_answer(is_correct)
+        if is_correct:
+            # Highlight green and finish
+            game_widget.highlight_answer(selected_option, correct=True)
+            input_enabled = False
+            current_presenting_idx = -1
+            _process_answer(True)
+        else:
+            # Student said YES to a wrong answer! We found what they were thinking.
+            # Mark it red permanently and immediately go to the incorrect cascade (next step).
+            game_widget.mark_wrong(selected_option)
+            print(f"[Evaluate Screen] ❌ Student confidently selected a wrong answer! Moving to incorrect cascade.")
+            input_enabled = False
+            current_presenting_idx = -1
+            _process_answer(False)
         return
 
     if action == "NO" and awaiting_yes_no and current_presenting_idx >= 0:
@@ -423,23 +438,11 @@ def handle_key_press(action):
         current_key = presentation_keys[current_presenting_idx]
         selected_option = key_mapping[current_key]
 
-        task_data = state_manager.get_current_task()
-        eval_data = task_data.get("evaluate", {}) if task_data else {}
-        correct_option = eval_data.get("correct_option")
-
         print(f"[Evaluate Screen] Student said NO to option {current_key} ({selected_option}).")
 
-        if selected_option == correct_option:
-            # Student rejected the correct answer → treat as INCORRECT
-            print(f"[Evaluate Screen] ❌ Student rejected the CORRECT answer!")
-            game_widget.highlight_answer(selected_option, correct=False)
-            input_enabled = False
-            current_presenting_idx = -1
-            _process_answer(is_correct=False)
-        else:
-            # Move to the next option
-            print(f"[Evaluate Screen] Moving to next option...")
-            present_option(current_presenting_idx + 1)
+        # Always move to the next option, even if they rejected the correct answer
+        print(f"[Evaluate Screen] Moving to next option...")
+        present_option(current_presenting_idx + 1)
         return
 
 

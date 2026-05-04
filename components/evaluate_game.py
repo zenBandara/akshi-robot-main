@@ -83,8 +83,9 @@ class EvaluateGameWidget(QWidget):
         self.level = 1
         self.student_name = ""
         self.highlighted_key = None
-        self.highlight_correct = None  # True=green, False=red, None=none
+        self.highlight_correct = None  # True=green, False=red, 'present'=blue, None=none
         self.highlight_tick = 0
+        self.wrong_keys = set()  # Keys permanently marked as wrong
 
         # Timer progress (0.0 → 1.0, decreasing)
         self.timer_progress = 1.0
@@ -125,6 +126,7 @@ class EvaluateGameWidget(QWidget):
         self.student_name = student_name
         self.highlighted_key = None
         self.highlight_correct = None
+        self.wrong_keys.clear()
         self.timer_progress = 1.0
         self.update()
 
@@ -134,10 +136,15 @@ class EvaluateGameWidget(QWidget):
         self.update()
 
     def highlight_answer(self, key, correct=True):
-        """Flash an answer card green (correct) or red (wrong)."""
+        """Flash an answer card green (correct), red (wrong), or blue ('present')."""
         self.highlighted_key = key
         self.highlight_correct = correct
         self.highlight_tick = self.tick
+        self.update()
+
+    def mark_wrong(self, key):
+        """Permanently mark a card as wrong (red)."""
+        self.wrong_keys.add(key)
         self.update()
 
     def clear_highlight(self):
@@ -363,9 +370,13 @@ class EvaluateGameWidget(QWidget):
             border_color = QColor(46, 125, 50)
             bg_color = QColor(200, 255, 200, 240)
             border_w = 5
-        elif is_highlighted and self.highlight_correct is False:
+        elif (is_highlighted and self.highlight_correct is False) or (key in getattr(self, "wrong_keys", set())):
             border_color = QColor(211, 47, 47)
             bg_color = QColor(255, 210, 210, 240)
+            border_w = 5
+        elif is_highlighted and self.highlight_correct == "present":
+            border_color = QColor(25, 118, 210)  # Blue for presenting
+            bg_color = QColor(227, 242, 253, 240)
             border_w = 5
         else:
             border_color = QColor(200, 180, 140, 180)
@@ -485,5 +496,6 @@ class EvaluateGameWidget(QWidget):
         self.options = []
         self.highlighted_key = None
         self.highlight_correct = None
+        self.wrong_keys = set()
         self.timer_progress = 1.0
         self.update()
