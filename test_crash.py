@@ -2,6 +2,8 @@ import sys
 import os
 import pygame
 
+# text
+
 # Simulate what main.py has
 os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox --disable-gpu-sandbox --disable-gpu"
 

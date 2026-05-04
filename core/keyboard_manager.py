@@ -8,6 +8,8 @@ from PySide6.QtCore import Qt, QObject, Signal
 USE_VOICE_INPUT = False
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# Test
+
 
 class VoiceSignalBridge(QObject):
     """Thread-safe bridge: emits a Qt Signal from the serial thread
