@@ -41,6 +41,6 @@ def get_ui():
 
 def handle_key_press(mapped_action):
     # W to return to idle
-    if mapped_action == "WAKE" or mapped_action == "CONTINUE":
+    if mapped_action == "WAKE":
         print("Returning to idle...")
         navigator.navigate_to("idle")

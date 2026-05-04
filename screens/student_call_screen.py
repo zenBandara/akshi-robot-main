@@ -66,7 +66,7 @@ def setup_animations():
     fade_anim.setEasingCurve(QEasingCurve.OutCubic)
 
 def handle_key_press(mapped_action):
-    if mapped_action == "ENTER" or mapped_action == "CONTINUE":
+    if mapped_action == "ENTER":
         keyboard_manager.unregister_handler()
         voice_manager.stop()
         print("Student cleanly interrupted intro! Transitioning to Calibration Screen...")

@@ -166,7 +166,7 @@ class TeacherInterventionWidget(QWidget):
         # Button text
         p.setFont(QFont("Helvetica", 22, QFont.Bold))
         p.setPen(QColor(255, 255, 255))
-        p.drawText(btn_rect, Qt.AlignCenter, "Teacher, press C to continue")
+        p.drawText(btn_rect, Qt.AlignCenter, "Teacher, say 'Okay' to continue")
 
         # Hint below
         p.setFont(QFont("Helvetica", 14))
@@ -228,7 +228,7 @@ def handle_key_press(action):
     if not input_enabled:
         return
 
-    if action in ("CONTINUE", "ENTER"):
+    if action == "ENTER":
         input_enabled = False
         voice_manager.stop()
         print("[Teacher Intervention] Teacher pressed ENTER/CONTINUE. Logging complete cascade and resetting.")

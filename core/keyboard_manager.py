@@ -24,7 +24,6 @@ class KeyboardManager:
             Qt.Key_W: "WAKE",
             Qt.Key_S: "SKIP",
             Qt.Key_B: "BREAK",
-            Qt.Key_C: "CONTINUE",
             Qt.Key_Return: "ENTER",
             Qt.Key_Enter: "ENTER",
         }
@@ -49,7 +48,6 @@ class KeyboardManager:
             0x02: "YES",        # "Yes"
             0x03: "NO",         # "No"
             0x04: "ENTER",      # "Okay" / "Next"
-            0x05: "CONTINUE",   # "Teacher continue"
             0x06: "SKIP",       # "Skip"
             0x07: "BREAK",      # "Take a break"
         }
