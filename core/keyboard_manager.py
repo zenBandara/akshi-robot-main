@@ -43,13 +43,14 @@ class KeyboardManager:
         self.key_mapping[Qt.Key_2] = "NO"
 
         # ── Voice Command Hex Mappings (VC-02 → Action) ──
+        # Based on lecturer's pre-programmed AI Thinker firmware
         self.voice_hex_mapping = {
-            0x01: "WAKE",       # "Hey Akshi" / "Wake up"
-            0x02: "YES",        # "Yes"
-            0x03: "NO",         # "No"
-            0x04: "ENTER",      # "Okay" / "Next"
-            0x06: "SKIP",       # "Skip"
-            0x07: "BREAK",      # "Take a break"
+            0x01: "WAKE",       # "Start Command 'Ging-lu'"
+            0x02: "YES",        # "Said Yes"
+            0x03: "NO",         # "Said No"
+            0x04: "SKIP",       # "Go Forward" (Reusing for Skip)
+            0x08: "BREAK",      # "I'm tired" (Reusing for Take a break)
+            0x09: "ENTER",      # "Said Ok" (Used for pass/continue)
         }
 
         # ── Voice Input Thread (Raspberry Pi only) ──
