@@ -141,16 +141,14 @@ def pick_random_task(exclude_ids=None):
         exclude_ids = []
         
     all_tasks = get_loaded_tasks()
-    
-    # Temporarily force lock strictly to "t_1" while in development
-    available_tasks = [t for t in all_tasks if t.get("task_id") == "t_1"]
+    available_tasks = [t for t in all_tasks if t.get("task_id") not in exclude_ids]
     
     if not available_tasks:
         print("Warning: No available tasks to pick from (all excluded or none loaded).")
         return None
         
     picked_task = random.choice(available_tasks)
-    print(f"Picked random task: '{picked_task.get('task_name')}' (ID: {picked_task.get('task_id')})")
+    print(f"Picked random task: '{picked_task.get('task_name')}' (ID: {picked_task.get('task_id')})") 
     
     # Store in state manager
     state_manager.set_current_task(picked_task)
@@ -159,8 +157,8 @@ def pick_random_task(exclude_ids=None):
 
 def build_task_queue(exclude_ids=None):
     """
-    Builds a shuffled queue of all available tasks for a student to work through.
-    Returns a list of task dictionaries.
+    Builds an ordered queue of all available tasks sorted sequentially by task_id
+    (t_1, t_2, t_3, ...). Tasks are served one by one in this fixed order.
     """
     if exclude_ids is None:
         exclude_ids = []
@@ -172,7 +170,8 @@ def build_task_queue(exclude_ids=None):
         print("[TaskLoader] Warning: No tasks available for queue!")
         return []
     
-    queue = available.copy()
-    random.shuffle(queue)
-    print(f"[TaskLoader] Built task queue with {len(queue)} questions.")
-    return queue
+    # Sort by task_id numerically (t_1 < t_2 < t_3 ...)
+    available.sort(key=lambda t: int(t.get("task_id", "t_0").split("_")[-1]))
+    
+    print(f"[TaskLoader] Built sequential task queue: {[t.get('task_id') for t in available]}")
+    return available

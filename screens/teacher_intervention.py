@@ -273,15 +273,17 @@ def handle_key_press(action):
         except Exception as db_err:
             print(f"[Teacher Intervention] RL SQLite Telemetry Logging error: {db_err}")
 
-        # After teacher intervention, the phase identification is complete.
-        # Set the identified phase to "elaborate" (most scaffolded) and move to next question.
+        # After teacher intervention, phase is identified as 'elaborate' (most scaffolded)
         from core.flow_controller import flow_controller
+        student_name = state_manager.get_current_student() or "unknown"
         flow_controller.identified_phase = "elaborate"
         flow_controller.progression_state = "CONFIRMING"
         flow_controller.baseline_confirms = 0
+        flow_controller._save_student_state(student_name)
         
         state_manager.current_path = []
         state_manager.set_affordance_level(1)
         
-        print("[Teacher Intervention] Phase set to 'elaborate'. Moving to next question...")
-        flow_controller._start_next_question()
+        print("[Teacher Intervention] Phase set to 'elaborate'. Moving to next student...")
+        import core.session_logic as session_logic
+        session_logic.next_student()
