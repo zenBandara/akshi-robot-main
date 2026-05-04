@@ -10,7 +10,7 @@ import signal
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Toggle this to switch between dummy and real robot
-USE_DUMMY = False
+USE_DUMMY = True
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 _process = None
