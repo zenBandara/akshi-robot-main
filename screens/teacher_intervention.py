@@ -273,25 +273,15 @@ def handle_key_press(action):
         except Exception as db_err:
             print(f"[Teacher Intervention] RL SQLite Telemetry Logging error: {db_err}")
 
-        # Advance Queue
-        student_queue = state_manager.get_student_queue()
-
-        if student_queue:
-            next_stu = student_queue.pop(0)
-            state_manager.set_current_student(next_stu)
-            state_manager.set_student_queue(student_queue)
-
-            state_manager.current_path = []
-            state_manager.set_affordance_level(1)
-
-            try:
-                from core.navigator import navigator
-                navigator.navigate_to("student_call")
-            except Exception as e:
-                print(f"Warning: Could not transition back to student_call screen. {e}")
-        else:
-            try:
-                from core.navigator import navigator
-                navigator.navigate_to("session_complete")
-            except Exception as e:
-                print(f"Warning: Could not transition back to session_complete screen. {e}")
+        # After teacher intervention, the phase identification is complete.
+        # Set the identified phase to "elaborate" (most scaffolded) and move to next question.
+        from core.flow_controller import flow_controller
+        flow_controller.identified_phase = "elaborate"
+        flow_controller.progression_state = "CONFIRMING"
+        flow_controller.baseline_confirms = 0
+        
+        state_manager.current_path = []
+        state_manager.set_affordance_level(1)
+        
+        print("[Teacher Intervention] Phase set to 'elaborate'. Moving to next question...")
+        flow_controller._start_next_question()

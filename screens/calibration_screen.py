@@ -193,14 +193,9 @@ class CalibrationScreenUI(QWidget):
             self.proceed_to_task()
 
     def proceed_to_task(self):
-        print("Calibration completed or skipped. Proceeding to task routing...")
-        student_name = state_manager.get_current_student() or "friend"
-        try:
-            from core.flow_controller import flow_controller
-            target_node = flow_controller.setup_dynamic_start(student_name)
-            navigator.navigate_to(target_node)
-        except Exception as e:
-            navigator.navigate_to("evaluate")
+        print("Calibration completed or skipped. Starting adaptive question flow...")
+        import core.session_logic as session_logic
+        session_logic.start_student_questions()
 
 
 def get_ui():

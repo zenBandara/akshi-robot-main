@@ -38,3 +38,11 @@ def next_student():
         navigator.navigate_to("task_intro")
     else:
         navigator.navigate_to("student_call")
+
+def start_student_questions():
+    """Called after calibration/student_call is done. Kicks off the flow_controller's
+    adaptive progression system for the current student."""
+    from core.flow_controller import flow_controller
+    student_name = state_manager.get_current_student() or "unknown"
+    print(f"[Session Logic] Starting adaptive question flow for: {student_name}")
+    flow_controller.start_student_flow(student_name)

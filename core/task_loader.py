@@ -156,3 +156,23 @@ def pick_random_task(exclude_ids=None):
     state_manager.set_current_task(picked_task)
     
     return picked_task
+
+def build_task_queue(exclude_ids=None):
+    """
+    Builds a shuffled queue of all available tasks for a student to work through.
+    Returns a list of task dictionaries.
+    """
+    if exclude_ids is None:
+        exclude_ids = []
+    
+    all_tasks = get_loaded_tasks()
+    available = [t for t in all_tasks if t.get("task_id") not in exclude_ids]
+    
+    if not available:
+        print("[TaskLoader] Warning: No tasks available for queue!")
+        return []
+    
+    queue = available.copy()
+    random.shuffle(queue)
+    print(f"[TaskLoader] Built task queue with {len(queue)} questions.")
+    return queue

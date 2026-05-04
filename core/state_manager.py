@@ -12,6 +12,7 @@ class StateManager:
         
         # Task state
         self._current_task = None
+        self._task_queue = []  # Ordered tasks remaining for current student
         self._affordance_level = 1
         self._five_e_stage = "evaluate"
 
@@ -61,6 +62,12 @@ class StateManager:
         
     def set_current_task(self, task):
         self._current_task = task
+
+    def get_task_queue(self):
+        return self._task_queue
+
+    def set_task_queue(self, queue):
+        self._task_queue = queue
 
     def get_affordance_level(self):
         return self._affordance_level

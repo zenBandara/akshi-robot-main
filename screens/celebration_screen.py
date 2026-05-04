@@ -93,6 +93,6 @@ def end_celebration():
         
     print(f"[Celebration Screen] LOGGED SUCCESS: {log_data}")
     
-    # 8. Delegate structurally safely to the Global Session Logic sequence
-    import core.session_logic as session_logic
-    session_logic.next_student()
+    # 8. Delegate to FlowController to load the next question (or next student if no more questions)
+    from core.flow_controller import flow_controller
+    flow_controller._start_next_question()

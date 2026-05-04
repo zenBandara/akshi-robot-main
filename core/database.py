@@ -97,5 +97,21 @@ def get_student_optimal_starting_method(student_name):
         return row[0], row[1]
     return None, None
 
+def update_student_phase(session_id, student_name, new_phase):
+    """
+    Called when a student is promoted to a new phase during the advancement staircase.
+    Logs a new metric entry with the promoted phase as the method_used.
+    """
+    now_str = datetime.datetime.now().isoformat()
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO student_metrics (session_id, student_name, evaluation_passed, method_used, timestamp)
+    VALUES (?, ?, ?, ?, ?)
+    ''', (str(session_id), str(student_name), "promoted", str(new_phase), now_str))
+    conn.commit()
+    conn.close()
+    print(f"[RL Telemetry] PHASE PROMOTION: Student:{student_name} promoted to phase: {new_phase}")
+
 # Immediately initialize the DB upon module import securely
 init_db()

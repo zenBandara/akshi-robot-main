@@ -191,28 +191,15 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    if action in ("P", "ENTER"): # Teacher Overrides - PASS (P key or "OK" voice command)
+    if action in ("P", "ENTER"): # Teacher says "OK" — activity is complete
         input_enabled = False
         voice_manager.stop()
         if frame_timer:
             frame_timer.stop()
-        print("[Kinesthetic Screen] Teacher approved! Returning to evaluation...")
+        print("[Kinesthetic Screen] Activity complete! Returning to evaluation...")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.return_to_evaluation(parent_stack)
-        except ImportError: pass
-            
-    elif action in ("F", "NO"): # Teacher Overrides - FAIL (F key or "No" voice command)
-        input_enabled = False
-        voice_manager.stop()
-        if frame_timer:
-            frame_timer.stop()
-        print("[Kinesthetic Screen] Teacher failed student. Returning to evaluation anyway to try again.")
-        try:
-            from core.flow_controller import flow_controller
-            parent_stack = window.parentWidget()
-            if parent_stack:
-                flow_controller.return_to_evaluation(parent_stack)
+                flow_controller.advance_after_kinesthetic(parent_stack)
         except ImportError: pass
