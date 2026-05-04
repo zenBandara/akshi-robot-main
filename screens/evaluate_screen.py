@@ -31,6 +31,11 @@ input_enabled = False
 active_animations = []
 evaluate_timer = None
 motivation_timer = None
+
+# ── Sequential YES/NO presentation state ──
+current_presenting_idx = -1   # Which option index is currently highlighted (-1 = not presenting)
+presentation_keys = []        # Ordered list of physical keys being presented
+awaiting_yes_no = False       # True when robot finished explaining and is waiting for YES/NO
 motivation_given = False
 key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 voice_manager = VoiceManager()
@@ -153,62 +158,64 @@ def on_show():
     speech_start = eval_data.get("speech_start", "Let's try a task.")
     desc_text = eval_data.get("task_description", "")
 
-    if level >= 3:
-        speech_text = f"Okay {student_name}, look carefully! {speech_start} {desc_text}".strip()
-        print(f"🤖 ROBOT SPEAKS [SLOW RATE -30%]: \"{speech_text}\"")
-        delay_ms = voice_manager.speak(speech_text, f"eval_l3_{student_name}_{task_data.get('task_id', 'id')}")
+    # ── All levels now use the sequential YES/NO presentation ──
+    speech_text = f"{student_name}, {speech_start} {desc_text}".strip()
+    print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_text}\"")
+    delay_ms = voice_manager.speak(speech_text, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}")
 
-        print(f"Enabling keyboard input immediately to allow for speech interruption.")
-        enable_input()
+    enable_input()
 
-        print(f"Delaying visual clock countdown for {delay_ms}ms...")
-        if evaluate_timer:
-            def start_both_timers():
-                evaluate_timer.start()
-                if motivation_timer:
-                    motivation_timer.start()
-            QTimer.singleShot(delay_ms, start_both_timers)
-    else:
-        speech_text = f"{student_name}, {speech_start} {desc_text}".strip()
-        print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_text}\"")
-        delay_ms = voice_manager.speak(speech_text, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}")
+    # Begin sequential option presentation after intro finishes
+    QTimer.singleShot(delay_ms + 300, lambda: present_option(0))
 
-        keys_to_speak = sorted(list(key_mapping.keys()))
-        options_speech = eval_data.get("multiple_choices_speech", {})
+def present_option(idx):
+    """Highlight option at index `idx`, explain it, then ask YES/NO."""
+    global current_presenting_idx, presentation_keys, awaiting_yes_no
+    global key_mapping, input_enabled
 
-        def speak_next_option(idx=0):
-            if not input_enabled:
-                return
+    if not input_enabled:
+        return
 
-            if idx >= len(keys_to_speak):
-                game_widget.clear_highlight()
-                print(f"Option explanations finished. Starting timer.")
-                if evaluate_timer:
-                    evaluate_timer.start()
-                if motivation_timer:
-                    motivation_timer.start()
-                return
+    presentation_keys = sorted(list(key_mapping.keys()))
+    student_name = str(state_manager.get_current_student() or "friend").capitalize()
+    task_data = state_manager.get_current_task()
+    eval_data = task_data.get("evaluate", {}) if task_data else {}
+    options_speech = eval_data.get("multiple_choices_speech", {})
 
-            game_widget.clear_highlight()
-            current_key = keys_to_speak[idx]
-            op_code = key_mapping[current_key]
+    if idx >= len(presentation_keys):
+        # Student said NO to every option (including the correct one) → treat as incorrect
+        game_widget.clear_highlight()
+        print(f"[Evaluate Screen] Student rejected ALL options. Treating as INCORRECT.")
+        awaiting_yes_no = False
+        current_presenting_idx = -1
+        _process_answer(is_correct=False)
+        return
 
-            # Highlight the current option in the game widget
-            game_widget.highlight_answer(op_code, correct=True)
+    current_presenting_idx = idx
+    awaiting_yes_no = False  # Not yet — wait for speech to finish
 
-            op_speech = options_speech.get(op_code, f"Option {current_key}.")
-            instruction_speech = f"{op_speech} If you think the highlighted one is the answer, press number {current_key}."
+    game_widget.clear_highlight()
+    current_key = presentation_keys[idx]
+    op_code = key_mapping[current_key]
 
-            print(f"🤖 ROBOT SPEAKS OPTION {current_key}: \"{instruction_speech}\"")
-            op_delay_ms = voice_manager.speak(instruction_speech, f"eval_opt_{student_name}_{op_code}")
+    # Highlight this option
+    game_widget.highlight_answer(op_code, correct=True)
 
-            QTimer.singleShot(op_delay_ms + 400, lambda: speak_next_option(idx + 1))
+    # Speak the option explanation + ask YES/NO
+    op_speech = options_speech.get(op_code, f"Option {int(current_key)}.")
+    ask_speech = f"{op_speech} Is this your answer? Say yes or no."
 
-        print(f"Enabling keyboard input allowing interruption.")
-        enable_input()
+    print(f"🤖 ROBOT ASKS OPTION {current_key}: \"{ask_speech}\"")
+    op_delay_ms = voice_manager.speak(ask_speech, f"eval_ask_{student_name}_{op_code}")
 
-        print("Starting introduction speech before options...")
-        QTimer.singleShot(delay_ms + 300, speak_next_option)
+    # Enable YES/NO input AFTER the robot finishes speaking
+    def unlock_input():
+        global awaiting_yes_no
+        if input_enabled and current_presenting_idx == idx:
+            awaiting_yes_no = True
+            print(f"[Evaluate Screen] Waiting for YES/NO on option {current_key}...")
+
+    QTimer.singleShot(op_delay_ms + 200, unlock_input)
 
 def enable_input():
     global input_enabled, evaluate_timer, motivation_timer, motivation_given
@@ -332,12 +339,14 @@ def on_timer_expire():
 
 def handle_key_press(action):
     global input_enabled, evaluate_timer, key_mapping, active_animations, motivation_timer
+    global current_presenting_idx, awaiting_yes_no, presentation_keys
     if not input_enabled:
         return
 
     # L2 Control Affordance: Break
     if action == "BREAK" and state_manager.get_affordance_level() >= 2:
         input_enabled = False
+        awaiting_yes_no = False
         voice_manager.stop()
         print("[Evaluate Screen] Student pressed BREAK. Suspending session...")
 
@@ -362,6 +371,7 @@ def handle_key_press(action):
     # L3 Control Affordance: Skip
     if action == "SKIP" and state_manager.get_affordance_level() >= 3:
         input_enabled = False
+        awaiting_yes_no = False
         voice_manager.stop()
         print("[Evaluate Screen] Student pressed SKIP. Logging and skipping student...")
 
@@ -383,16 +393,63 @@ def handle_key_press(action):
         except ImportError: pass
         return
 
-    # Normal Mapping Validation
-    if action not in key_mapping:
+    # ── YES/NO Sequential Answer Flow ──
+    if action == "YES" and awaiting_yes_no and current_presenting_idx >= 0:
+        awaiting_yes_no = False
+        voice_manager.stop()
+
+        # Student said YES to the currently highlighted option
+        current_key = presentation_keys[current_presenting_idx]
+        selected_option = key_mapping[current_key]
+
+        task_data = state_manager.get_current_task()
+        eval_data = task_data.get("evaluate", {}) if task_data else {}
+        correct_option = eval_data.get("correct_option")
+
+        is_correct = (selected_option == correct_option)
+        game_widget.highlight_answer(selected_option, correct=is_correct)
+
+        print(f"[Evaluate Screen] Student said YES to option {current_key} ({selected_option}). Correct: {is_correct}")
+
+        input_enabled = False
+        current_presenting_idx = -1
+        _process_answer(is_correct)
         return
 
-    # Lock out further inputs immediately
-    input_enabled = False
-    voice_manager.stop()
-    print(f"[Evaluate Screen] Student pressed physical key {action}.")
+    if action == "NO" and awaiting_yes_no and current_presenting_idx >= 0:
+        awaiting_yes_no = False
+        voice_manager.stop()
+
+        current_key = presentation_keys[current_presenting_idx]
+        selected_option = key_mapping[current_key]
+
+        task_data = state_manager.get_current_task()
+        eval_data = task_data.get("evaluate", {}) if task_data else {}
+        correct_option = eval_data.get("correct_option")
+
+        print(f"[Evaluate Screen] Student said NO to option {current_key} ({selected_option}).")
+
+        if selected_option == correct_option:
+            # Student rejected the correct answer → treat as INCORRECT
+            print(f"[Evaluate Screen] ❌ Student rejected the CORRECT answer!")
+            game_widget.highlight_answer(selected_option, correct=False)
+            input_enabled = False
+            current_presenting_idx = -1
+            _process_answer(is_correct=False)
+        else:
+            # Move to the next option
+            print(f"[Evaluate Screen] Moving to next option...")
+            present_option(current_presenting_idx + 1)
+        return
+
+
+def _process_answer(is_correct):
+    """Shared logic for processing a correct or incorrect answer."""
+    global evaluate_timer, motivation_timer, active_animations
 
     # Stop timers
+    if evaluate_timer:
+        evaluate_timer.stop()
     if motivation_timer:
         motivation_timer.stop()
         motivation_timer = None
@@ -400,18 +457,6 @@ def handle_key_press(action):
         anim.stop()
 
     sound_manager.stop_bgm()
-
-    # Highlight the chosen card in the game widget
-    selected_option = key_mapping[action]
-    task_data = state_manager.get_current_task()
-    eval_data = task_data.get("evaluate", {}) if task_data else {}
-    correct_option = eval_data.get("correct_option")
-
-    is_correct = (selected_option == correct_option)
-    game_widget.highlight_answer(selected_option, correct=is_correct)
-
-    if evaluate_timer:
-        evaluate_timer.stop()
 
     if is_correct:
         print(f"[Evaluate Screen] Answer VALIDATION: CORRECT! 🎉")

@@ -39,20 +39,21 @@ class KeyboardManager:
         for i in range(10):
             self.key_mapping[Qt.Key_0 + i] = str(i)
 
+        # ── Override: 1 = YES, 2 = NO (for voice-driven evaluation) ──
+        self.key_mapping[Qt.Key_1] = "YES"
+        self.key_mapping[Qt.Key_2] = "NO"
+
         # ── Voice Command Hex Mappings (VC-02 → Action) ──
         self.voice_hex_mapping = {
             0x01: "WAKE",       # "Hey Akshi" / "Wake up"
-            0x02: "1",          # "Option one"
-            0x03: "2",          # "Option two"
-            0x04: "3",          # "Option three"
-            0x05: "4",          # "Option four"
-            0x06: "ENTER",      # "Next" / "Continue"
-            0x07: "CONTINUE",   # "Teacher continue"
-            0x08: "SKIP",       # "Skip"
-            0x09: "BREAK",      # "Take a break"
-            0x0A: "P",          # "Pass"
-            0x0B: "F",          # "Fail"
-            0x0C: "CONTINUE",   # "Select teacher"
+            0x02: "YES",        # "Yes"
+            0x03: "NO",         # "No"
+            0x04: "ENTER",      # "Okay" / "Next"
+            0x05: "CONTINUE",   # "Teacher continue"
+            0x06: "SKIP",       # "Skip"
+            0x07: "BREAK",      # "Take a break"
+            0x08: "P",          # "Pass"
+            0x09: "F",          # "Fail"
         }
 
         # ── Voice Input Thread (Raspberry Pi only) ──
