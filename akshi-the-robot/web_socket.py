@@ -38,14 +38,18 @@ class WebSocketServer:
             try:
                 while True:
                     if self.latest_frame is None:
-                        await asyncio.sleep(0.01)
+                        await asyncio.sleep(0.05)
                         continue
 
                     frame = self.latest_frame.copy()
-                    frame = cv2.flip(frame, 1)
-
-                    frame = cv2.GaussianBlur(frame, (0, 0), 1)
-                    frame = cv2.addWeighted(frame, 1.5, frame, -0.5, 0)
+                    
+                    if not self.tracking_active:
+                        # Send pitch-black frames to keep connection alive but prevent face detection
+                        frame[:] = 0
+                    else:
+                        frame = cv2.flip(frame, 1)
+                        frame = cv2.GaussianBlur(frame, (0, 0), 1)
+                        frame = cv2.addWeighted(frame, 1.5, frame, -0.5, 0)
 
                     ret, buffer = cv2.imencode(
                         ".jpg",
@@ -100,12 +104,13 @@ class WebSocketServer:
                             json.dump(self.last_client_data, f)
                         
                         # Toggle tracking based on student session commands
-                        if cmd.get("type") == "start_session":
+                        cmd_type = cmd.get("type")
+                        if cmd_type in ["start_session", "resume_frames"]:
                             self.tracking_active = True
-                            print("[WebSocket] Student session STARTED - tracking ON")
-                        elif cmd.get("type") == "end_session":
+                            print(f"[WebSocket] Tracking ON ({cmd_type})")
+                        elif cmd_type in ["end_session", "pause_frames"]:
                             self.tracking_active = False
-                            print("[WebSocket] Student session ENDED - tracking OFF")
+                            print(f"[WebSocket] Tracking OFF ({cmd_type})")
                         
                         print("Sent IPC command to server:", cmd)
                 except Exception as e:

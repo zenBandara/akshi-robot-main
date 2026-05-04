@@ -66,22 +66,39 @@ class CalibrationScreenUI(QWidget):
             f"Can you look right at my camera?"
         )
         voice_manager.stop()
-        voice_manager.speak(intro_msg, "calib_magic_intro")
+        delay_ms = voice_manager.speak(intro_msg, "calib_magic_intro")
 
-        # 2. Tell the server to start tracking (same IPC as before)
+        # Clear any existing state
         try:
-            with open(COMMAND_FILE, "w") as f:
-                json.dump({
-                    "type": "start_session",
-                    "student_name": student_name,
-                    "task_id": "face_calibration"
-                }, f)
             with open(STATE_FILE, "w") as f:
                 json.dump({"calibration_status": "Not started yet"}, f)
+        except: pass
+
+        # Start Open Eyes Phase strictly AFTER the intro finishes + buffer
+        QTimer.singleShot(delay_ms + 1000, self.prompt_open_eyes)
+
+    def prompt_open_eyes(self):
+        if self.prompt_state == "done": return # Aborted
+        
+        self.game.set_phase("open")
+        self.prompt_state = "open"
+        delay_ms = voice_manager.speak(
+            "Wow! Can you make your eyes BIG like a magical owl? Look! Stars are appearing in the sky!",
+            "owl_eyes"
+        )
+        
+        # Start backend tracking ONLY AFTER the instructions are fully spoken
+        QTimer.singleShot(delay_ms + 500, self.begin_backend_tracking)
+
+    def begin_backend_tracking(self):
+        student_name = state_manager.get_current_student() or "friend"
+        try:
+            with open(COMMAND_FILE, "w") as f:
+                json.dump({"type": "start_session", "student_name": student_name, "task_id": "face_calibration"}, f)
         except Exception as e:
             print("[Calibration Error] Failed to write command file:", e)
 
-        # 3. Start polling for server signals
+        # Start polling for authentic server signals
         global state_timer
         if state_timer is None:
             state_timer = QTimer(self)
@@ -106,64 +123,66 @@ class CalibrationScreenUI(QWidget):
             current_frame = int(match.group(1)) if match else 0
             total_frames = int(match.group(2)) if match else 200
 
-            # ─── ACT 1: OWL EYES (Eyes Open) ───
-            if status.startswith("Keep eyes OPEN"):
-                self.game.set_phase("open")
+            # Update visuals from authentic backend data
+            if status.startswith("Keep eyes OPEN") or status.startswith("Keep eyes CLOSED"):
                 self.game.update_progress(current_frame, total_frames)
-
-                if self.prompt_state != "open":
-                    self.prompt_state = "open"
-                    voice_manager.stop()
-                    voice_manager.speak(
-                        "Wow! Can you make your eyes BIG like a magical owl? "
-                        "Look! Stars are appearing in the sky!",
-                        "owl_eyes"
-                    )
 
             # ─── ACT 2: SLEEPING BUNNY (Eyes Closed) ───
-            elif status.startswith("Keep eyes CLOSED"):
-                self.game.set_phase("closed")
-                self.game.update_progress(current_frame, total_frames)
-
+            if status.startswith("Keep eyes CLOSED"):
                 if self.prompt_state != "closed":
                     self.prompt_state = "closed"
+                    
+                    # 🛑 CRITICAL: Immediately pause the backend from counting frames while we speak!
+                    try:
+                        with open(COMMAND_FILE, "w") as f:
+                            json.dump({"type": "pause_frames"}, f)
+                    except: pass
+
+                    self.game.set_phase("closed")
                     voice_manager.stop()
-                    voice_manager.speak(
-                        "Amazing! Now the owl is sleepy! "
-                        "Can you close your eyes like a cozy sleeping bunny? "
-                        "Shhh... the moon is rising!",
+                    delay_ms = voice_manager.speak(
+                        "Amazing! Now the owl is sleepy! Can you close your eyes like a cozy sleeping bunny? Shhh... the moon is rising!",
                         "sleeping_bunny"
                     )
+                    
+                    # Resume frames only after the student knows what to do
+                    QTimer.singleShot(delay_ms + 500, self.resume_backend_tracking)
 
             # ─── ACT 3: CELEBRATION (Done) ───
             elif status.startswith("DONE"):
-                self.game.set_phase("done")
-
                 if self.prompt_state != "done":
                     self.prompt_state = "done"
+                    self.game.set_phase("done")
+                    
+                    if state_timer:
+                        state_timer.stop()
+                        
                     voice_manager.stop()
-                    voice_manager.speak(
-                        "WOW! You did it! Your magical eyes are fully charged! "
-                        "You're AMAZING! Let's go learn something super cool!",
+                    delay_ms = voice_manager.speak(
+                        "WOW! You did it! Your magical eyes are fully charged! You're AMAZING! Let's go learn something super cool!",
                         "super_power"
                     )
 
-                    state_timer.stop()
                     keyboard_manager.unregister_handler()
+                    QTimer.singleShot(delay_ms + 1000, self.proceed_to_task)
 
-                    # Delay to let the celebration play + voice finish
-                    QTimer.singleShot(5000, self.proceed_to_task)
-
-            print("[Calibration Game]", status)
+            print("[Calibration Backend Status]", status)
 
         except Exception:
             pass
+
+    def resume_backend_tracking(self):
+        try:
+            with open(COMMAND_FILE, "w") as f:
+                json.dump({"type": "resume_frames"}, f)
+        except: pass
 
     def handle_key_press(self, mapped_action):
         if mapped_action == "SKIP":
             print("[Calibration Override] Manual skip via SKIP key.")
             if state_timer:
                 state_timer.stop()
+            self.prompt_state = "done"
             keyboard_manager.unregister_handler()
             voice_manager.stop()
             try:
