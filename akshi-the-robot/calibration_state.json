@@ -1,1 +1,1 @@
-{"type": "end_session"}
+{"type": "metrics", "calibration_status": "DONE", "overall": 86.88, "eye": 85.43, "face": 88.33, "emotion": "neutral", "timestamp": 1777880905.8500621}

@@ -32,9 +32,19 @@ def start():
         )
         print(f"[Backend Manager] Dummy backend started (PID: {_process.pid})")
     else:
-        print("[Backend Manager] Starting REAL backend subprocess...")
+        cores = os.cpu_count() or 1
+        command = []
+        
+        if sys.platform.startswith("linux") and cores >= 4:
+            print("[Backend Manager] Quad-core detected. Starting REAL backend on CPU Cores 2 & 3...")
+            command.extend(["taskset", "-c", "2,3"])
+        else:
+            print(f"[Backend Manager] {cores} cores detected. Starting REAL backend without core binding...")
+            
+        command.extend([sys.executable, os.path.join(_project_root, "akshi-the-robot", "maincopy.py")])
+        
         _process = subprocess.Popen(
-            [sys.executable, os.path.join(_project_root, "akshi-the-robot", "maincopy.py")],
+            command,
             cwd=os.path.join(_project_root, "akshi-the-robot"),
         )
         print(f"[Backend Manager] Real backend started (PID: {_process.pid})")
