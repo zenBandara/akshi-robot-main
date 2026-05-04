@@ -1,10 +1,8 @@
 import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer, QUrl
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PySide6.QtMultimediaWidgets import QVideoWidget
-from PySide6.QtGui import QPainterPath, QRegion
+from PySide6.QtWidgets import QVBoxLayout, QLabel
+from PySide6.QtGui import QPainterPath, QRegion, QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
@@ -17,9 +15,10 @@ ui_path = os.path.join(project_root, "ui", "engageUI.ui")
 window = None
 input_enabled = False
 voice_manager = VoiceManager()
-media_player = None
-audio_output = None
-video_widget = None
+video_label = None
+frame_timer = None
+current_frames = []
+current_frame_idx = 0
 
 def get_ui():
     global window
@@ -44,33 +43,46 @@ def apply_rounded_clip(widget, radius=20):
     widget.setMask(region)
 
 def swap_video(stage, engage_data):
-    """Dynamically hot-swaps the underlying QMediaPlayer layer matching the precise engagement vocal queue."""
-    global media_player
-    if not media_player:
-        return
-        
+    """Dynamically hot-swaps the underlying image sequence layer matching the precise engagement vocal queue."""
+    global current_frames, current_frame_idx, frame_timer
+    
     urls_dict = engage_data.get("video_urls", {})
     media_url = urls_dict.get(stage, "")
-    abs_media_path = os.path.join(project_root, media_url) if media_url else ""
     
-    if os.path.exists(abs_media_path):
-        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
-        media_player.setLoops(QMediaPlayer.Infinite)
-        media_player.play()
-        print(f"[Engage Screen] Video playing stage '{stage}': {abs_media_path}")
+    if not media_url:
+        return
+        
+    base_dir = media_url.rsplit('.', 1)[0]
+    abs_dir_path = os.path.join(project_root, base_dir)
+    
+    if os.path.isdir(abs_dir_path):
+        frames = [os.path.join(abs_dir_path, f) for f in os.listdir(abs_dir_path) if f.endswith('.jpg')]
+        frames.sort()
+        current_frames = frames
+        current_frame_idx = 0
+        if current_frames and frame_timer:
+            frame_timer.start(66) # 15 FPS (~66ms)
+            print(f"[Engage Screen] Image sequence playing stage '{stage}': {abs_dir_path}")
     else:
-        print(f"[Engage Screen] Video file not found for stage '{stage}': {abs_media_path}")
+        print(f"[Engage Screen] Image sequence dir not found for stage '{stage}': {abs_dir_path}")
+
+def update_frame():
+    global current_frames, current_frame_idx, video_label
+    if current_frames and video_label:
+        pixmap = QPixmap(current_frames[current_frame_idx])
+        video_label.setPixmap(pixmap)
+        current_frame_idx = (current_frame_idx + 1) % len(current_frames)
 
 def setup_video_container():
-    global media_player, audio_output, video_widget
+    global video_label, frame_timer
     
-    if media_player:
-        media_player.stop()
-        media_player.deleteLater()
-        media_player = None
+    if frame_timer:
+        frame_timer.stop()
         
-    video_widget = QVideoWidget()
-    video_widget.setAspectRatioMode(Qt.KeepAspectRatioByExpanding)
+    if video_label is None:
+        video_label = QLabel()
+        video_label.setAlignment(Qt.AlignCenter)
+        video_label.setScaledContents(True)
     
     container = window.video_container
     if container.layout() is None:
@@ -79,21 +91,19 @@ def setup_video_container():
     else:
         while container.layout().count():
             item = container.layout().takeAt(0)
-            if item.widget():
+            if item.widget() and item.widget() != video_label:
                 item.widget().deleteLater()
     
-    container.layout().addWidget(video_widget)
+    if container.layout().indexOf(video_label) == -1:
+        container.layout().addWidget(video_label)
     
     # Yellow engage styling matching the XML template
     container.setStyleSheet("background-color: #FFECB3; border-radius: 20px; border: 4px solid #FFCA28;") 
     QTimer.singleShot(100, lambda: apply_rounded_clip(container, 20))
     
-    audio_output = QAudioOutput()
-    audio_output.setVolume(0)
-    
-    media_player = QMediaPlayer()
-    media_player.setAudioOutput(audio_output)
-    media_player.setVideoOutput(video_widget)
+    if frame_timer is None:
+        frame_timer = QTimer()
+        frame_timer.timeout.connect(update_frame)
 
 
 def on_show():
@@ -174,8 +184,8 @@ def handle_key_press(action):
     if action == "ENTER":
         input_enabled = False
         voice_manager.stop()
-        if media_player:
-            media_player.stop()
+        if frame_timer:
+            frame_timer.stop()
             
         print("[Engage Screen] Student pressed ENTER. Flowing smoothly toward Evaluate L2 natively.")
         try:

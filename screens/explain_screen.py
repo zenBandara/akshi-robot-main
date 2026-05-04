@@ -2,9 +2,7 @@ import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer, QUrl
 from PySide6.QtGui import QPixmap, QImage, QPainterPath, QRegion
-from PySide6.QtWidgets import QVBoxLayout, QFrame
-from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtWidgets import QVBoxLayout, QFrame, QLabel
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
@@ -17,9 +15,10 @@ window = None
 input_enabled = False
 explain_data = {}
 voice_manager = VoiceManager()
-media_player = None
-audio_output = None
-video_widget = None
+video_label = None
+frame_timer = None
+current_frames = []
+current_frame_idx = 0
 
 def get_ui():
     global window
@@ -74,29 +73,27 @@ def apply_rounded_clip(widget, radius=20):
     widget.setMask(region)
 
 def setup_video(explain_data):
-    """Setup video player following the proven idle_screen.py architecture."""
-    global media_player, audio_output, video_widget
+    """Setup image sequence player following the proven idle_screen.py architecture."""
+    global video_label, frame_timer, current_frames, current_frame_idx
     
     # Resolve video path
     media_url = explain_data.get("video_url", "")
     if not media_url:
         media_url = "assets/video/t_1-explain.mp4"
     
-    abs_media_path = os.path.join(project_root, media_url)
-    if not os.path.exists(abs_media_path):
-        abs_media_path = os.path.join(project_root, "assets", "video", "t_1-explain.mp4")
+    base_dir = media_url.rsplit('.', 1)[0]
+    abs_dir_path = os.path.join(project_root, base_dir)
+    if not os.path.exists(abs_dir_path):
+        abs_dir_path = os.path.join(project_root, "assets", "video", "t_1-explain")
     
-    # Cleanup old player
-    if media_player:
-        media_player.stop()
-        media_player.deleteLater()
-        media_player = None
+    # Cleanup old timer
+    if frame_timer:
+        frame_timer.stop()
     
-    # Create QVideoWidget exactly like idle_screen.py
-    video_widget = QVideoWidget()
-    
-    # Expand to fill, eliminating black letterbox bars
-    video_widget.setAspectRatioMode(Qt.KeepAspectRatioByExpanding)
+    if video_label is None:
+        video_label = QLabel()
+        video_label.setAlignment(Qt.AlignCenter)
+        video_label.setScaledContents(True)
     
     # Mount into the container layout (same pattern as idle_screen.py web_container)
     container = window.video_container
@@ -109,32 +106,37 @@ def setup_video(explain_data):
         # Clear existing widgets
         while container.layout().count():
             item = container.layout().takeAt(0)
-            if item.widget():
+            if item.widget() and item.widget() != video_label:
                 item.widget().deleteLater()
         container.layout().setContentsMargins(0, 0, 0, 0)
     
-    container.layout().addWidget(video_widget)
+    if container.layout().indexOf(video_label) == -1:
+        container.layout().addWidget(video_label)
     
-    # Apply rounded corner clip mask to the container (clips the QVideoWidget inside)
+    # Apply rounded corner clip mask to the container
     container.setStyleSheet("background-color: #FFF3E0; border: 4px solid #FFCC80; border-radius: 20px;")
     QTimer.singleShot(100, lambda: apply_rounded_clip(container, 20))
     
-    # Audio output (muted — robot voice handles narration)
-    audio_output = QAudioOutput()
-    audio_output.setVolume(0)
-    
-    # Media player
-    media_player = QMediaPlayer()
-    media_player.setAudioOutput(audio_output)
-    media_player.setVideoOutput(video_widget)
-    
-    if os.path.exists(abs_media_path):
-        media_player.setSource(QUrl.fromLocalFile(abs_media_path))
-        media_player.setLoops(QMediaPlayer.Infinite)
-        media_player.play()
-        print(f"[Explain Screen] Video playing: {abs_media_path}")
+    if os.path.isdir(abs_dir_path):
+        frames = [os.path.join(abs_dir_path, f) for f in os.listdir(abs_dir_path) if f.endswith('.jpg')]
+        frames.sort()
+        current_frames = frames
+        current_frame_idx = 0
+        if current_frames:
+            if frame_timer is None:
+                frame_timer = QTimer()
+                frame_timer.timeout.connect(update_frame)
+            frame_timer.start(66) # 15 FPS
+            print(f"[Explain Screen] Image sequence playing: {abs_dir_path}")
     else:
-        print(f"[Explain Screen] Video file not found: {abs_media_path}")
+        print(f"[Explain Screen] Image sequence dir not found: {abs_dir_path}")
+
+def update_frame():
+    global current_frames, current_frame_idx, video_label
+    if current_frames and video_label:
+        pixmap = QPixmap(current_frames[current_frame_idx])
+        video_label.setPixmap(pixmap)
+        current_frame_idx = (current_frame_idx + 1) % len(current_frames)
 
 def play_second_speech():
     pass # Deprecated by combined fluent speech
@@ -154,8 +156,8 @@ def handle_key_press(action):
     if action == "ENTER": # Hardware mapping for Return/Enter
         input_enabled = False
         voice_manager.stop()
-        if media_player:
-            media_player.stop()
+        if frame_timer:
+            frame_timer.stop()
         print("[Explain Screen] Student pressed ENTER. Logging failure and advancing...")
         
         # 1. Log the Failure Interaction natively
