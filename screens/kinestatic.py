@@ -196,12 +196,12 @@ def handle_key_press(action):
         voice_manager.stop()
         if frame_timer:
             frame_timer.stop()
-        print("[Kinesthetic Screen] Teacher approved! Moving on to next student...")
+        print("[Kinesthetic Screen] Teacher approved! Returning to evaluation...")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.on_correct_answer(parent_stack) # Passed fallback, skip next student
+                flow_controller.return_to_evaluation(parent_stack)
         except ImportError: pass
             
     elif action in ("F", "NO"): # Teacher Overrides - FAIL (F key or "No" voice command)
@@ -209,10 +209,10 @@ def handle_key_press(action):
         voice_manager.stop()
         if frame_timer:
             frame_timer.stop()
-        print("[Kinesthetic Screen] Teacher failed student. Proceeding down cascade.")
+        print("[Kinesthetic Screen] Teacher failed student. Returning to evaluation anyway to try again.")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.on_incorrect_answer(parent_stack)
+                flow_controller.return_to_evaluation(parent_stack)
         except ImportError: pass

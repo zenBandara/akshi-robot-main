@@ -126,12 +126,22 @@ class FlowController:
         # Reset cascade pointer safely for the next student
         self.reset_cascade()
         
-        # Trigger the Celebration path (which implicitly calls next_student() after the animations)
         try:
             from core.navigator import navigator
             navigator.navigate_to("celebration")
         except Exception as e:
             print(f"[FlowController] CRITICAL: Could not transit to Celebration Screen. {e}")
+
+    def return_to_evaluation(self, parent_widget):
+        """Route the student back to the Evaluation screen to prove mastery after a scaffolding activity."""
+        print("[FlowController] Returning to Evaluation screen from scaffolding...")
+        self.cascade_index = 0  # Reset to evaluate_L1
+        state_manager.current_stage = "evaluate_L1"
+        try:
+            from core.navigator import navigator
+            navigator.navigate_to("evaluate")
+        except Exception as e:
+            print(f"[FlowController] CRITICAL: Could not return to Evaluation Screen. {e}")
 
     def on_incorrect_answer(self, parent_widget, is_timeout=False):
         """Handle an incorrect answer by deeply escalating the cognitive cascade."""
