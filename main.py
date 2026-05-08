@@ -27,6 +27,7 @@ from screens import break_screen
 from screens import kinestatic
 from screens import task_intro_screen
 from screens import calibration_screen
+from screens import water_break_screen
 main_window = QMainWindow()
 main_window.setWindowTitle("Ginglu Robot Interface")
 # Enforce a strict 16:9 aspect ratio natively
@@ -68,6 +69,7 @@ screens = {
     "explore": explore_screen.get_ui(),
     "teacher_intervention": teacher_intervention.get_ui(),
     "break": break_screen.get_ui(),
+    "water_break": water_break_screen.get_ui(),
     "kinestatic": kinestatic.get_ui(),
     "task_intro": task_intro_screen.get_ui(),
     "calibration": calibration_screen.get_ui(),

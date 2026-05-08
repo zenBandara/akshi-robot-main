@@ -333,11 +333,11 @@ def on_timer_expire():
 
         QTimer.singleShot(delay_ms, go_to_break)
     else:
-        # ── L1: Normal cascade timeout (kinesthetic test) ──
+        # ── L1: Route to Water Break Screen ──
         if motivation_given:
-            timeout_speech = f"That's okay {student_name}! Let's try something different. We're going to do a fun activity instead!"
+            timeout_speech = f"That's okay {student_name}! I think you might need a little rest!"
         else:
-            timeout_speech = f"Oops {student_name}, looks like you need a little more help! Let's try a fun activity together!"
+            timeout_speech = f"Hey {student_name}, it looks like you could use a small break!"
         delay_ms = voice_manager.speak(timeout_speech, f"timeout_3min_{student_name}")
 
         def transition_after_speech():

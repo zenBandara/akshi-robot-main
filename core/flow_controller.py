@@ -231,7 +231,7 @@ class FlowController:
             get_robot_eyes().set_expression("encouraging")
 
         if self.progression_state == "IDENTIFYING":
-            self._cascade_incorrect(parent_widget)
+            self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
         elif self.progression_state == "CONFIRMING":
             self.baseline_confirms = 0
             print(f"[FlowController] Failed baseline. Resetting confirms. Moving to next student.")
@@ -248,9 +248,19 @@ class FlowController:
             import core.session_logic as session_logic
             session_logic.next_student()
 
-    def _cascade_incorrect(self, parent_widget):
+    def _cascade_incorrect(self, parent_widget, is_timeout=False):
         """During IDENTIFYING: run the full cascade."""
         current_node = self.get_current_node()
+
+        # Water break side-loop for L1 timeouts
+        if is_timeout and current_node == "evaluate_L1":
+            print(f"[FlowController] Timeout at {current_node} → Routing to Water Break")
+            try:
+                from core.navigator import navigator
+                navigator.navigate_to("water_break")
+            except Exception as e:
+                print(f"[FlowController] Routing error: {e}")
+            return
 
         # Kinesthetic side-loop for all evaluate levels
         if current_node.startswith("evaluate_L"):

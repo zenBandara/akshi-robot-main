@@ -1,6 +1,6 @@
 import os
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, QTimer
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
@@ -36,11 +36,15 @@ def get_ui():
         except Exception as e:
             print("IPC Error notifying end_session:", e)
 
+        # Automatically go back to idle after 10 seconds
+        print("[Session Complete Screen] Waiting 10 seconds before returning to idle...")
+        QTimer.singleShot(10000, lambda: navigator.navigate_to("idle"))
+
     window.on_show = on_show
     return window
 
 def handle_key_press(mapped_action):
-    # W to return to idle
-    if mapped_action == "WAKE":
-        print("Returning to idle...")
+    # Allow manual override to idle if needed, but the timer handles it
+    if mapped_action in ["WAKE", "SKIP"]:
+        print("Manual override: Returning to idle...")
         navigator.navigate_to("idle")
