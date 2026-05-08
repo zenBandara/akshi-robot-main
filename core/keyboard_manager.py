@@ -30,6 +30,7 @@ class KeyboardManager:
             Qt.Key_Enter: "ENTER",
             Qt.Key_Escape: "ESCAPE",
             Qt.Key_Z: "STOP",
+            Qt.Key_Q: "STOP",
         }
         
         # Add A-Z mappings ONLY if they aren't already mapped
@@ -138,26 +139,33 @@ class KeyboardManager:
             self.active_handler(mapped_action)
 
     def global_emergency_stop(self):
-        print("🚨 [GLOBAL STOP] Emergency STOP Triggered! Terminating active flow...")
+        print("🚨 [GLOBAL STOP] Emergency HARD RESET Triggered! Restarting entire application...")
         from core.voice_manager import VoiceManager
         try:
             VoiceManager().stop()
         except Exception:
             pass
 
+        # 1. Stop the backend subprocess so it doesn't leak or hold the camera hostage
+        try:
+            import core.backend_manager as backend_manager
+            backend_manager.stop()
+        except Exception as e:
+            print(f"[GLOBAL STOP] Warning: Could not stop backend manager: {e}")
+
+        # 2. Reset the IPC JSON file
         import json
         try:
             with open("ginglu-the-robot/calibration_command.json", "w") as f:
                 json.dump({"type": "end_session"}, f)
-        except Exception as e:
+        except Exception:
             pass
 
-        from core.state_manager import state_manager
-        state_manager.current_path = []
-        state_manager.set_current_student(None)
-
-        from core.navigator import navigator
-        navigator.navigate_to("idle")
+        # 3. Hard Restart! Kill the current process and spawn a perfectly fresh one.
+        import os
+        import sys
+        print("♻️ [GLOBAL STOP] Executing process reboot...")
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 # Global singleton instance
 keyboard_manager = KeyboardManager()
