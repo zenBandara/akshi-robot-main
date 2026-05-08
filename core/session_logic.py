@@ -6,7 +6,7 @@ def next_student():
     # End the current student's WebSocket session
     import json
     try:
-        with open("akshi-the-robot/calibration_command.json", "w") as f:
+        with open("ginglu-the-robot/calibration_command.json", "w") as f:
             json.dump({"type": "end_session"}, f)
         print("[Session Logic] Student session ended via IPC.")
     except Exception as e:

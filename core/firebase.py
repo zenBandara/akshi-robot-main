@@ -6,7 +6,7 @@ from firebase_admin import db
 cred = credentials.Certificate("serviceAccountKey.json")
 
 firebase_admin.initialize_app(cred,{
-    "databaseURL":"https://akshi-robot-default-rtdb.firebaseio.com"
+    "databaseURL":"https://ginglu-robot-default-rtdb.firebaseio.com"
 })
 
 # Initialize Firestore for logging

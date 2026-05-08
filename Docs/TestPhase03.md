@@ -1,4 +1,4 @@
-# Akshi Robot: Phase 3 Integration Testing Plan
+# Ginglu Robot: Phase 3 Integration Testing Plan
 
 This document outlines the standard physical validation procedures required to certify Phase 3 (The 5E Cognitive Flow Engine).
 

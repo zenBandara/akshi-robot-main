@@ -36,7 +36,7 @@ else:
 
         cred = credentials.Certificate(_KEY_PATH)
         firebase_admin.initialize_app(cred, {
-            "databaseURL": "https://akshi-robot-default-rtdb.firebaseio.com"
+            "databaseURL": "https://ginglu-robot-default-rtdb.firebaseio.com"
         })
         _firebase_ok = True
         print(f"[DummyFirebase] ✅ Firebase initialized (key: {_KEY_PATH})")

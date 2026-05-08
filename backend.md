@@ -1,12 +1,12 @@
-# Akshi Robot: Architecture & Communication Breakdown
+# Ginglu Robot: Architecture & Communication Breakdown
 
-This document provides a comprehensive explanation of how the Akshi Robot's software is structured, focusing on how the robot's local UI communicates with the local hardware script, and how that script communicates with your remote dedicated server.
+This document provides a comprehensive explanation of how the Ginglu Robot's software is structured, focusing on how the robot's local UI communicates with the local hardware script, and how that script communicates with your remote dedicated server.
 
 ## 1. High-Level Architecture
 The system is divided into three distinct layers to ensure that heavy video processing and network streaming do not freeze the child-friendly UI.
 
 1. **The Frontend Robot UI (`main.py`)**: A PySide6 graphical application that runs the interactive screens, plays robot audio, and tracks the student's progress through the lesson.
-2. **The Local Background Daemon (`akshi-the-robot/maincopy.py`)**: A headless script running concurrently on the Robot's Raspberry Pi. It captures the camera feed, moves the physical neck servos using MediaPipe face tracking, and hosts a WebSocket server.
+2. **The Local Background Daemon (`ginglu-the-robot/maincopy.py`)**: A headless script running concurrently on the Robot's Raspberry Pi. It captures the camera feed, moves the physical neck servos using MediaPipe face tracking, and hosts a WebSocket server.
 3. **The Remote Dedicated Server**: An external computer/server that connects to the Robot over WebSockets, receives the live camera feed, performs heavy remote computations (like evaluating eyes open/closed or attention metrics), and sends commands back to the Robot.
 
 ---
@@ -15,7 +15,7 @@ The system is divided into three distinct layers to ensure that heavy video proc
 
 When you run `python main.py` from the root folder, here is exactly what happens:
 
-1. **Subprocess Booting**: Inside `main.py`, Python uses the `subprocess` module to physically spawn a completely separate background Terminal process running `/akshi-the-robot/maincopy.py`. 
+1. **Subprocess Booting**: Inside `main.py`, Python uses the `subprocess` module to physically spawn a completely separate background Terminal process running `/ginglu-the-robot/maincopy.py`. 
 2. **Camera Initialization**: `maincopy.py` boots up the camera (`Picamera2`) and begins calculating face centroids using MediaPipe so the physical robot neck (`pigpio`) can track the face independently.
 3. **WebSocket Server**: `maincopy.py` spins up a local server on port `8765` using `web_socket.py`.
 4. **Firebase IP Registration**: `firebase_request.py` automatically figures out what local Wi-Fi IP address the robot is using and posts it to the Firebase Realtime Database. This allows your Remote Dedicated Server to know exactly what IP to connect to!
@@ -23,7 +23,7 @@ When you run `python main.py` from the root folder, here is exactly what happens
 ---
 
 ## 3. The Inter-Process Communication (IPC) Bridge
-Because the Frontend UI and the Background Daemon are two separate processes, they cannot easily share variables in memory. We use local JSON files inside `akshi-the-robot/` to pass messages back and forth instantly.
+Because the Frontend UI and the Background Daemon are two separate processes, they cannot easily share variables in memory. We use local JSON files inside `ginglu-the-robot/` to pass messages back and forth instantly.
 
 * **`calibration_command.json`**: Written to by the Frontend UI. Read by the Background Daemon. This is used to issue commands like `"start_session"` or `"end_session"`.
 * **`calibration_state.json`**: Written to by the Background Daemon. Read continuously by the Frontend UI. This provides live updates from the Remote Server (like `"Keep eyes OPEN"`).
@@ -51,7 +51,7 @@ Here is the exact timeline of events when you invite a student:
    At the exact same time, it writes `{"calibration_status": "Not started yet"}` into `calibration_state.json` to ensure a clean slate.
 
 4. **Background Daemon Forwards to Server**:
-   Inside `akshi-the-robot/web_socket.py`, a function named `ipc_controller()` polls that JSON file every 500ms. When it sees the `"start_session"` command, it intercepts it and **sends it completely unchanged over the WebSocket connection to your Remote Dedicated Server**.
+   Inside `ginglu-the-robot/web_socket.py`, a function named `ipc_controller()` polls that JSON file every 500ms. When it sees the `"start_session"` command, it intercepts it and **sends it completely unchanged over the WebSocket connection to your Remote Dedicated Server**.
 
 ---
 

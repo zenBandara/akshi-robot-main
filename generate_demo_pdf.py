@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate the Akshi Robot Demo Guide PDF."""
+"""Generate the Ginglu Robot Demo Guide PDF."""
 
 from fpdf import FPDF
 import os
 
 OUTPUT_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "Akshi_Robot_Demo_Guide.pdf"
+    "Ginglu_Robot_Demo_Guide.pdf"
 )
 
 
@@ -14,7 +14,7 @@ class DemoGuidePDF(FPDF):
     def header(self):
         self.set_font("Helvetica", "B", 11)
         self.set_text_color(100, 100, 100)
-        self.cell(0, 8, "Akshi Robot - Demo Guide", align="R", new_x="LMARGIN", new_y="NEXT")
+        self.cell(0, 8, "Ginglu Robot - Demo Guide", align="R", new_x="LMARGIN", new_y="NEXT")
         self.set_draw_color(66, 133, 244)
         self.set_line_width(0.5)
         self.line(10, self.get_y(), 200, self.get_y())
@@ -131,7 +131,7 @@ def generate():
     pdf.ln(40)
     pdf.set_font("Helvetica", "B", 36)
     pdf.set_text_color(33, 37, 41)
-    pdf.cell(0, 20, "Akshi Robot", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 20, "Ginglu Robot", align="C", new_x="LMARGIN", new_y="NEXT")
 
     pdf.set_font("Helvetica", "", 18)
     pdf.set_text_color(100, 100, 100)
@@ -364,7 +364,7 @@ def generate():
 
     pdf.sub_title("Run Full Application")
     pdf.code_block("python main.py")
-    pdf.body_text("Launches the complete Akshi Robot interface with all screens, backend, and real timers.")
+    pdf.body_text("Launches the complete Ginglu Robot interface with all screens, backend, and real timers.")
 
     pdf.sub_title("Run Individual Demo")
     pdf.code_block("python demo.py <1-12>")

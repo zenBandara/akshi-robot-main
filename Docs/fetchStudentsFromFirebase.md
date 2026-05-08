@@ -1,4 +1,4 @@
-# Firebase & Local Task Architecture in Akshi Robot
+# Firebase & Local Task Architecture in Ginglu Robot
 
 This document explains the data pipeline between the remote Firebase Realtime Database and the local PySide6 Python application. It details how the robot dynamically fetches students, handles sessions, and matches them with local curriculum data (the 5E JSON tasks).
 
@@ -8,7 +8,7 @@ This document explains the data pipeline between the remote Firebase Realtime Da
 The connection is managed in `core/firebase.py`. 
 - The application uses the `firebase_admin` SDK.
 - It authenticates securely using a local `serviceAccountKey.json` credential file.
-- It connects to the Firebase Realtime Database (`https://akshi-robot-default-rtdb.firebaseio.com`) for active session synchronization and student data, and sets up a stub for Firestore to log metrics (handled in Phase 6).
+- It connects to the Firebase Realtime Database (`https://ginglu-robot-default-rtdb.firebaseio.com`) for active session synchronization and student data, and sets up a stub for Firestore to log metrics (handled in Phase 6).
 
 ---
 

@@ -22,7 +22,7 @@
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <item>
       <widget class="QLabel" name="title_label">
-       <property name="text"><string>Hello there! 🌟 I am Akshi!</string></property>
+       <property name="text"><string>Hello there! 🌟 I am Ginglu!</string></property>
        <property name="alignment"><set>Qt::AlignCenter</set></property>
        <property name="wordWrap"><bool>true</bool></property>
        <property name="styleSheet"><string>font-size: 56px; font-weight: bold; color: #1A237E; letter-spacing: 2px;</string></property>

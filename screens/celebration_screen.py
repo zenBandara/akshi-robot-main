@@ -36,7 +36,7 @@ def on_show():
     # Pause frames during celebration
     try:
         import json
-        with open("akshi-the-robot/calibration_command.json", "w") as f:
+        with open("ginglu-the-robot/calibration_command.json", "w") as f:
             json.dump({"type": "pause_frames"}, f)
     except Exception as e:
         print("[Celebration Screen] Error pausing frames:", e)

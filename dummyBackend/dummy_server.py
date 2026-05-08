@@ -238,7 +238,7 @@ async def main():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("  📊 AKSHI DUMMY ANALYSIS SERVER")
+    print("  📊 GINGLU DUMMY ANALYSIS SERVER")
     print("  Replaces: server/server.py")
     print("  Connects to: ws://127.0.0.1:8765")
     print("=" * 50)

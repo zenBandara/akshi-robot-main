@@ -1,5 +1,5 @@
 """
-Evaluate Screen — "Akshi's Enchanted Forest" Edition
+Evaluate Screen — "Ginglu's Enchanted Forest" Edition
 =====================================================
 Replaces the plain white QUiLoader-based evaluation with a QPainter
 game world (sky, sun, clouds, hills, flowers, owl + speech bubble,
@@ -72,7 +72,7 @@ def on_show():
     # Resume sending real frames to backend as the task is starting
     try:
         import json
-        with open("akshi-the-robot/calibration_command.json", "w") as f:
+        with open("ginglu-the-robot/calibration_command.json", "w") as f:
             json.dump({"type": "resume_frames"}, f)
     except Exception as e:
         print("[Evaluate Screen] Error resuming frames:", e)

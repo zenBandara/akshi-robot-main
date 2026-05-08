@@ -1,17 +1,17 @@
-# WebSocket Architecture — Akshi Robot
+# WebSocket Architecture — Ginglu Robot
 
-This document explains how the WebSocket communication system works in the Akshi Robot project. It covers the connection setup, data flow, session lifecycle, and the IPC bridge between the frontend UI and the backend hardware tracker.
+This document explains how the WebSocket communication system works in the Ginglu Robot project. It covers the connection setup, data flow, session lifecycle, and the IPC bridge between the frontend UI and the backend hardware tracker.
 
 ---
 
 ## 1. The Big Picture
 
-The Akshi Robot runs **two completely separate Python processes** on the same Raspberry Pi:
+The Ginglu Robot runs **two completely separate Python processes** on the same Raspberry Pi:
 
 | Process | Entry File | Responsibility |
 |---------|-----------|----------------|
 | **Frontend** | `main.py` | PySide6 GUI — screens, navigation, voice, keyboard |
-| **Backend** | `akshi-the-robot/maincopy.py` | Camera, face tracking, servo motors, WebSocket server |
+| **Backend** | `ginglu-the-robot/maincopy.py` | Camera, face tracking, servo motors, WebSocket server |
 
 These two processes **cannot share variables** directly because they run in isolated memory spaces. They communicate using two mechanisms:
 
@@ -34,14 +34,14 @@ These two processes **cannot share variables** directly because they run in isol
 When `maincopy.py` starts, it imports `web_socket.py`, which immediately calls:
 
 ```python
-# File: akshi-the-robot/web_socket.py (line 11)
+# File: ginglu-the-robot/web_socket.py (line 11)
 fr.update_connected_ip()
 ```
 
-This function (defined in `akshi-the-robot/firebase_request.py`) detects the Raspberry Pi's local network IP address and writes it to Firebase Realtime Database:
+This function (defined in `ginglu-the-robot/firebase_request.py`) detects the Raspberry Pi's local network IP address and writes it to Firebase Realtime Database:
 
 ```python
-# File: akshi-the-robot/firebase_request.py
+# File: ginglu-the-robot/firebase_request.py
 def update_connected_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
@@ -57,7 +57,7 @@ After this runs, Firebase stores: `connected_ip: "10.10.6.152"`
 In `maincopy.py`, the WebSocket server is created and started on port **8765**:
 
 ```python
-# File: akshi-the-robot/maincopy.py (lines 172-173)
+# File: ginglu-the-robot/maincopy.py (lines 172-173)
 ws = WebSocketServer()
 ws.start()
 ```
@@ -65,7 +65,7 @@ ws.start()
 The `start()` method spins up a background thread that listens for incoming WebSocket connections on `0.0.0.0:8765` (accepts connections from any device on the network):
 
 ```python
-# File: akshi-the-robot/web_socket.py (lines 123-126)
+# File: ginglu-the-robot/web_socket.py (lines 123-126)
 async with websockets.serve(self.stream, "0.0.0.0", 8765, max_size=5_000_000):
     print("Server started")
     await asyncio.Future()  # Run forever
@@ -92,7 +92,7 @@ When a dashboard client connects, three concurrent tasks run simultaneously insi
 Sends live camera frames to the dashboard at ~20 FPS.
 
 ```python
-# File: akshi-the-robot/web_socket.py (lines 36-66)
+# File: ginglu-the-robot/web_socket.py (lines 36-66)
 async def sender():
     frame = self.latest_frame.copy()
     # Process: flip, blur, sharpen
@@ -112,7 +112,7 @@ async def sender():
 The `latest_frame` is continuously updated by `maincopy.py`'s main tracking loop:
 
 ```python
-# File: akshi-the-robot/maincopy.py (line 202)
+# File: ginglu-the-robot/maincopy.py (line 202)
 ws.update_frame(frame)
 ```
 
@@ -121,7 +121,7 @@ ws.update_frame(frame)
 Receives JSON messages sent back from the dashboard (e.g., calibration metrics, attention scores):
 
 ```python
-# File: akshi-the-robot/web_socket.py (lines 68-83)
+# File: ginglu-the-robot/web_socket.py (lines 68-83)
 async def listener():
     msg = await websocket.recv()
     data = json.loads(msg)
@@ -145,7 +145,7 @@ The dashboard can send any JSON object. Common examples:
 This is the bridge between the PySide6 frontend and the WebSocket. It polls a JSON file on disk every 50ms:
 
 ```python
-# File: akshi-the-robot/web_socket.py (lines 87-103)
+# File: ginglu-the-robot/web_socket.py (lines 87-103)
 async def ipc_controller():
     last_command = None
     while True:
@@ -175,7 +175,7 @@ Frontend Screen                    Disk File                     IPC Controller 
 
 ## 4. The IPC File System (Frontend ↔ Backend)
 
-Since the Frontend (`main.py`) and Backend (`maincopy.py`) are separate processes, they use two JSON files inside `akshi-the-robot/` as a shared mailbox:
+Since the Frontend (`main.py`) and Backend (`maincopy.py`) are separate processes, they use two JSON files inside `ginglu-the-robot/` as a shared mailbox:
 
 | File | Direction | Purpose |
 |------|-----------|---------|
@@ -221,7 +221,7 @@ Each student has their own session. The session tells the dashboard "I am now tr
 3. The calibration screen writes a `start_session` command to the IPC file
 
 ```python
-# Written to: akshi-the-robot/calibration_command.json
+# Written to: ginglu-the-robot/calibration_command.json
 {
     "type": "start_session",
     "student_name": "Kamal",
@@ -250,7 +250,7 @@ While the student is active (Evaluate → Engage → Explore → etc.):
 1. An `end_session` command is written to the IPC file
 
 ```python
-# Written to: akshi-the-robot/calibration_command.json
+# Written to: ginglu-the-robot/calibration_command.json
 { "type": "end_session" }
 ```
 
@@ -315,11 +315,11 @@ Student 1                          Student 2                          End
 
 | File | Location | Role |
 |------|----------|------|
-| `web_socket.py` | `akshi-the-robot/` | WebSocket server with sender, listener, and IPC controller |
-| `firebase_request.py` | `akshi-the-robot/` | Publishes the Pi's IP address to Firebase |
-| `maincopy.py` | `akshi-the-robot/` | Main backend loop — camera, face detection, servos, starts WebSocket |
-| `calibration_command.json` | `akshi-the-robot/` | IPC mailbox: Frontend writes commands here |
-| `calibration_state.json` | `akshi-the-robot/` | IPC mailbox: Dashboard status written here |
+| `web_socket.py` | `ginglu-the-robot/` | WebSocket server with sender, listener, and IPC controller |
+| `firebase_request.py` | `ginglu-the-robot/` | Publishes the Pi's IP address to Firebase |
+| `maincopy.py` | `ginglu-the-robot/` | Main backend loop — camera, face detection, servos, starts WebSocket |
+| `calibration_command.json` | `ginglu-the-robot/` | IPC mailbox: Frontend writes commands here |
+| `calibration_state.json` | `ginglu-the-robot/` | IPC mailbox: Dashboard status written here |
 | `calibration_screen.py` | `screens/` | Writes `start_session`, reads calibration state |
 | `session_logic.py` | `core/` | Writes `end_session`, stops backend subprocess |
 | `backend_manager.py` | `core/` | Starts/stops the `maincopy.py` subprocess on demand |
@@ -332,4 +332,4 @@ Student 1                          Student 2                          End
 - The IP is auto-detected and pushed to Firebase every time the backend starts. The dashboard reads it from Firebase path `connected_ip`.
 - The IPC polling interval is **50ms** — fast enough to feel instant during calibration transitions.
 - Each student gets a **completely fresh** backend process. This ensures the camera is cleanly released and recalibrated for each child.
-- The `serviceAccountKey.json` file must be present in `akshi-the-robot/` for the Firebase IP upload to work.
+- The `serviceAccountKey.json` file must be present in `ginglu-the-robot/` for the Firebase IP upload to work.

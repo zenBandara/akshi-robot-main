@@ -37,7 +37,7 @@ def setup_state():
 def build_app():
     """Create the main window and stack."""
     main_window = QMainWindow()
-    main_window.setWindowTitle("🖥️ Akshi Screen Viewer")
+    main_window.setWindowTitle("🖥️ Ginglu Screen Viewer")
     main_window.setFixedSize(1280, 720)
     main_window.setFocusPolicy(Qt.StrongFocus)
 
@@ -79,7 +79,7 @@ SCREENS_MAP = {
 
 def print_cheat_sheet():
     print("\n" + "="*50)
-    print("🎬 AKSHI SCREEN VIEWER CHEAT SHEET")
+    print("🎬 GINGLU SCREEN VIEWER CHEAT SHEET")
     print("="*50)
     print("Usage: python screen_viewer.py <screen_number>\n")
     for key, (screen_id, desc) in sorted(SCREENS_MAP.items()):

@@ -374,7 +374,7 @@ def build_html():
         f"<script>var animData={anim_json};"
         "lottie.loadAnimation({container:document.getElementById('lottie'),renderer:'svg',loop:true,autoplay:true,animationData:animData});"
         # typing subtitle JS: reveal words across 4 seconds
-        "var subtitleText=\"Hello I'm Akshi! I'm Starting to analyze your learning behaviors now!\";"
+        "var subtitleText=\"Hello I'm Ginglu! I'm Starting to analyze your learning behaviors now!\";"
         "function typeSubtitle(){"
         " var s=document.getElementById('subtitle');"
         " if(!s) return;"

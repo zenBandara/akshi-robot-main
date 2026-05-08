@@ -1,6 +1,6 @@
-# Akshi Robot — 5E Task JSON Schema
+# Ginglu Robot — 5E Task JSON Schema
 
-This document defines the official strictly-enforced JSON structure for all tasks loaded by the Akshi Robot system. Every task must be placed in the `Tasks/task_jsons/` directory and must exactly follow this format.
+This document defines the official strictly-enforced JSON structure for all tasks loaded by the Ginglu Robot system. Every task must be placed in the `Tasks/task_jsons/` directory and must exactly follow this format.
 
 ## Root Object
 Every task file represents a single learning objective (e.g., "Left and Right", "Colors").

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🤖 Akshi Robot — Dummy Backend Launcher
+🤖 Ginglu Robot — Dummy Backend Launcher
 ========================================
 Launches BOTH the dummy robot and dummy analysis server together.
 
@@ -11,7 +11,7 @@ Usage:
     python dummyBackend/run.py
 
 This replaces BOTH:
-    akshi-the-robot/maincopy.py   (spawned by core/backend_manager.py)
+    ginglu-the-robot/maincopy.py   (spawned by core/backend_manager.py)
     server/server.py              (the remote analysis server)
 """
 
@@ -34,7 +34,7 @@ sys.path.insert(0, DUMMY_DIR)
 
 def main():
     print("=" * 60)
-    print("  🤖 AKSHI ROBOT — DUMMY BACKEND")
+    print("  🤖 GINGLU ROBOT — DUMMY BACKEND")
     print("  ─────────────────────────────────")
     print(f"  Robot:  dummy_robot.py  → ws://localhost:8765")
     print(f"  Server: dummy_server.py → connects to robot")

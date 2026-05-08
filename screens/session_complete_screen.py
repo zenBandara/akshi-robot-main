@@ -30,7 +30,7 @@ def get_ui():
         # Notify backend that the student's session has historically concluded so it saves to DB
         import json
         try:
-            with open("akshi-the-robot/calibration_command.json", "w") as f:
+            with open("ginglu-the-robot/calibration_command.json", "w") as f:
                 json.dump({"type": "end_session"}, f)
             print("Session End dispatched to backend.")
         except Exception as e:

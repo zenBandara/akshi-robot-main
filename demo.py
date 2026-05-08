@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎬 Akshi Robot — Client Demo Launcher
+🎬 Ginglu Robot — Client Demo Launcher
 =======================================
 Launch any showcase scenario instantly with shortened timers.
 
@@ -62,7 +62,7 @@ def setup_state(student="Nadun", level=1):
 def build_app():
     """Create the main window + stack + key listener."""
     main_window = QMainWindow()
-    main_window.setWindowTitle("🎬 Akshi Demo")
+    main_window.setWindowTitle("🎬 Ginglu Demo")
     # Enforce a strict 16:9 aspect ratio natively
     main_window.setFixedSize(1280, 720)
     main_window.setFocusPolicy(Qt.StrongFocus)
@@ -442,7 +442,7 @@ def scenario_12():
 def print_help():
     """Print all scenarios."""
     print("""
-🎬 Akshi Robot — Client Demo Launcher
+🎬 Ginglu Robot — Client Demo Launcher
 =======================================
 
 Usage: python demo.py <number>

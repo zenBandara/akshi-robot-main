@@ -1,6 +1,6 @@
-# Akshi Robot Project Phases
+# Ginglu Robot Project Phases
 
-This document outlines the step-by-step development phases for the Akshi humanoid robot software. The system is built using Python and PySide6, incorporates a Firebase backend, and strictly follows a 5E educational model with adaptive Affordance Levels tailored for preschool students.
+This document outlines the step-by-step development phases for the Ginglu humanoid robot software. The system is built using Python and PySide6, incorporates a Firebase backend, and strictly follows a 5E educational model with adaptive Affordance Levels tailored for preschool students.
 
 ---
 

@@ -33,7 +33,7 @@ from components.calibration_game import CalibrationGameWidget
 class PreviewWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("🎮 Akshi Calibration Game — Preview")
+        self.setWindowTitle("🎮 Ginglu Calibration Game — Preview")
         self.setMinimumSize(900, 700)
 
         central = QWidget()

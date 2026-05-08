@@ -28,7 +28,7 @@ from screens import kinestatic
 from screens import task_intro_screen
 from screens import calibration_screen
 main_window = QMainWindow()
-main_window.setWindowTitle("Akshi Robot Interface")
+main_window.setWindowTitle("Ginglu Robot Interface")
 # Enforce a strict 16:9 aspect ratio natively
 main_window.setFixedSize(1280, 720)
 main_window.setFocusPolicy(Qt.StrongFocus) # Crucial for key events on empty windows!
@@ -96,7 +96,7 @@ def cleanup_and_exit(signum, frame):
 signal.signal(signal.SIGINT, cleanup_and_exit)
 signal.signal(signal.SIGTERM, cleanup_and_exit)
 
-print("Akshi app launched successfully!")
+print("Ginglu app launched successfully!")
 try:
     sys.exit(app.exec())
 finally:

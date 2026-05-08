@@ -41,11 +41,11 @@ def start():
         else:
             print(f"[Backend Manager] {cores} cores detected. Starting REAL backend without core binding...")
             
-        command.extend([sys.executable, os.path.join(_project_root, "akshi-the-robot", "maincopy.py")])
+        command.extend([sys.executable, os.path.join(_project_root, "ginglu-the-robot", "maincopy.py")])
         
         _process = subprocess.Popen(
             command,
-            cwd=os.path.join(_project_root, "akshi-the-robot"),
+            cwd=os.path.join(_project_root, "ginglu-the-robot"),
         )
         print(f"[Backend Manager] Real backend started (PID: {_process.pid})")
 

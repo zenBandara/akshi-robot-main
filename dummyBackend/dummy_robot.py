@@ -1,5 +1,5 @@
 """
-Dummy Robot Daemon — replaces akshi-the-robot/maincopy.py
+Dummy Robot Daemon — replaces ginglu-the-robot/maincopy.py
 
 What it does:
   1. Generates synthetic camera frames (animated gradient + fake face marker)
@@ -24,9 +24,9 @@ import math
 import numpy as np
 import cv2
 
-# ── IPC file paths (relative to akshi-the-robot/, same as real code) ──
+# ── IPC file paths (relative to ginglu-the-robot/, same as real code) ──
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROBOT_DIR = os.path.join(PROJECT_ROOT, "akshi-the-robot")
+ROBOT_DIR = os.path.join(PROJECT_ROOT, "ginglu-the-robot")
 COMMAND_FILE = os.path.join(ROBOT_DIR, "calibration_command.json")
 STATE_FILE = os.path.join(ROBOT_DIR, "calibration_state.json")
 
@@ -85,7 +85,7 @@ def generate_frame(frame_num: int) -> bytes:
 
 class DummyWebSocketServer:
     """
-    Drop-in replacement for akshi-the-robot/web_socket.py WebSocketServer.
+    Drop-in replacement for ginglu-the-robot/web_socket.py WebSocketServer.
     Same wire protocol, same IPC JSON bridge.
     """
 
@@ -195,8 +195,8 @@ class DummyWebSocketServer:
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("  🤖 AKSHI DUMMY ROBOT DAEMON")
-    print("  Replaces: akshi-the-robot/maincopy.py")
+    print("  🤖 GINGLU DUMMY ROBOT DAEMON")
+    print("  Replaces: ginglu-the-robot/maincopy.py")
     print("  WebSocket: ws://localhost:8765")
     print("=" * 50)
 

@@ -55,7 +55,7 @@ def get_ui():
 def on_ready():
     global anim_1, anim_2
     
-    greeting_message = "Hello there! I am Akshi! Ready to learn something fun today?"
+    greeting_message = "Hello there! I am Ginglu! Ready to learn something fun today?"
     print(f"[Robot Speaks]: {greeting_message}")
     
     # 1. Animate massive Deep Blue Title

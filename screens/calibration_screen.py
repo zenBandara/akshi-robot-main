@@ -1,5 +1,5 @@
 """
-Calibration Screen — "Akshi's Magical Eyes" Edition
+Calibration Screen — "Ginglu's Magical Eyes" Edition
 ====================================================
 Replaces the plain colored-screen calibration with an animated 3-act mini-game.
 
@@ -20,8 +20,8 @@ from components.calibration_game import CalibrationGameWidget
 
 window = None
 state_timer = None
-STATE_FILE = "akshi-the-robot/calibration_state.json"
-COMMAND_FILE = "akshi-the-robot/calibration_command.json"
+STATE_FILE = "ginglu-the-robot/calibration_state.json"
+COMMAND_FILE = "ginglu-the-robot/calibration_command.json"
 voice_manager = VoiceManager()
 
 # Regex to extract frame counts from status like "Keep eyes OPEN (47/200)"
