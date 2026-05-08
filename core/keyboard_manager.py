@@ -29,7 +29,7 @@ class KeyboardManager:
             Qt.Key_Return: "ENTER",
             Qt.Key_Enter: "ENTER",
             Qt.Key_Escape: "ESCAPE",
-            Qt.Key_Backspace: "STOP",
+            Qt.Key_Z: "STOP",
         }
         
         # Add A-Z mappings ONLY if they aren't already mapped
