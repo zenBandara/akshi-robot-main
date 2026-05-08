@@ -40,7 +40,7 @@
    </item>
    <item>
     <widget class="QLabel" name="hint_label">
-     <property name="text"><string>Press W to return to Idle 🌟</string></property>
+     <property name="text"><string>Say 'Finish' to return to Idle 🌟</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <property name="styleSheet"><string>font-size: 24px; color: #C9ADA7; margin-top: 50px;</string></property>
     </widget>

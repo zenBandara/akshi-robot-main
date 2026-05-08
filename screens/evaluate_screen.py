@@ -104,9 +104,9 @@ def on_show():
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
 
     if level >= 3:
-        question_display = f"{desc_text}\n(Press S to Skip)"
+        question_display = f"{desc_text}\n(Say 'Skip' to Skip)"
     elif level == 2:
-        question_display = f"{desc_text}\n(Press B to take a Break 🌿)"
+        question_display = f"{desc_text}\n(Say 'Break' to take a Break 🌿)"
     else:
         question_display = desc_text
 

@@ -32,7 +32,7 @@
      </item>
      <item>
       <widget class="QLabel" name="hint_label">
-       <property name="text"><string>Press W to wake me up!</string></property>
+       <property name="text"><string>Say 'Wake up' to start!</string></property>
        <property name="alignment"><set>Qt::AlignCenter</set></property>
        <property name="styleSheet"><string>font-size: 28px; font-weight: bold; color: #1976D2; margin-top: 20px;</string></property>
       </widget>

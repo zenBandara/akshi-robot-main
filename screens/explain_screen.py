@@ -55,7 +55,7 @@ def on_show():
     
     # 3. Speech
     speech_start = explain_data.get("speech_start", "Let's review this concept together.")
-    speech_end = explain_data.get("speech_end", "Press Enter when you are done.")
+    speech_end = explain_data.get("speech_end", "Say 'Done' when you are done.")
     full_speech = f"{speech_start} {speech_end}"
     
     window.robot_text_label.setText(f'🤖 "{full_speech}"')
@@ -145,7 +145,7 @@ def enable_input():
     global input_enabled
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
-    window.robot_text_label.setText("🤖 Press Enter when you are done.")
+    window.robot_text_label.setText("🤖 Say 'Done' when you are done.")
     print("[Explain Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
 
 def handle_key_press(action):

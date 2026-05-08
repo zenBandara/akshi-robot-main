@@ -24,7 +24,7 @@
     },
     "speech_start": "Let's grab our magic binoculars and carefully explore the dinosaur jungle! Put your hands up to your eyes like binoculars! Are you ready?",
     "speech_middle": "Look all the way to the Left side! Shh! Behind those giant leaves on your Left, there is a tall, gentle dinosaur eating lunch! That is the Left side!",
-    "speech_end": "Now, quickly, safely swing your binoculars all the way to the Right side! Wow, do you see him? A fast little dinosaur is happily running across the field on your Right! Left for the tall dinosaur, Right for the fast dinosaur! Press Enter when you are all done exploring!"
+    "speech_end": "Now, quickly, safely swing your binoculars all the way to the Right side! Wow, do you see him? A fast little dinosaur is happily running across the field on your Right! Left for the tall dinosaur, Right for the fast dinosaur! Say 'Done' when you are all done exploring!"
   },
   "explain": {
     "task_title": "Understanding Left and Right",
@@ -58,7 +58,7 @@
       "op4": "This picture shows a foot! That isn't a hand at all!"
     },
     "correct_option": "op1",
-    "correct_option_speech": "So, the first picture is the absolutely correct answer because we are looking specifically for the left hand! Press Enter when you are ready to try the real test again!"
+    "correct_option_speech": "So, the first picture is the absolutely correct answer because we are looking specifically for the left hand! Say 'Ready' when you are ready to try the real test again!"
   },
   "evaluate": {
     "task_type": "mcq_image",

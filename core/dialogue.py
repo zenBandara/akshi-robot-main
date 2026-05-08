@@ -73,15 +73,15 @@ class DialoguePool:
     ]
 
     BREAK_RETURN = [
-        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and press the green Enter button when you're ready to try again!",
-        "Great job hopping, {name}! You're such a fast bunny! Now come back to your seat and press Enter. Let's try the question again!",
-        "Awesome, {name}! What fantastic hopping! Come back, sit down, and press Enter when you're ready. I know you can do it this time!"
+        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and say 'Ready' when you're ready to try again!",
+        "Great job hopping, {name}! You're such a fast bunny! Now come back to your seat and say 'Ready'. Let's try the question again!",
+        "Awesome, {name}! What fantastic hopping! Come back, sit down, and say 'Ready' when you're ready. I know you can do it this time!"
     ]
 
     BREAK_HURRY = [
-        "Come on {name}, I'm waiting for you! Hop back to your seat and press Enter! We've got more fun things to do!",
-        "{name}, the break is almost over! Come back quick and press Enter! I miss you!",
-        "Hey {name}, hurry back! Press Enter when you're in your seat! Let's keep going!"
+        "Come on {name}, I'm waiting for you! Hop back to your seat and say 'Ready'! We've got more fun things to do!",
+        "{name}, the break is almost over! Come back quick and say 'Ready'! I miss you!",
+        "Hey {name}, hurry back! Say 'Ready' when you're in your seat! Let's keep going!"
     ]
 
     WAITING_THINKING = [

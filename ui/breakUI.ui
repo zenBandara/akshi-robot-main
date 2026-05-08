@@ -31,7 +31,7 @@
    </item>
    <item>
     <widget class="QLabel" name="info_label">
-     <property name="text"><string>Take your time! Press Enter when you're ready to come back.</string></property>
+     <property name="text"><string>Take your time! Say 'Ready' when you're ready to come back.</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <property name="styleSheet"><string>font-size: 24px; color: #388E3C; background: transparent;</string></property>
     </widget>

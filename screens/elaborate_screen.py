@@ -130,7 +130,7 @@ def on_show():
         correct_key = reverse_mapping.get(correct_option, "1")
         highlight_card(correct_key, is_correct=True)
         
-        final_speech = elab_data.get("correct_option_speech", "This is the correct answer! Press Enter to try the real quiz again!")
+        final_speech = elab_data.get("correct_option_speech", "This is the correct answer! Say 'Ready' to try the real quiz again!")
         print(f"🤖 ROBOT SPEAKS CONCLUSION: \"{final_speech}\"")
         delay_ms = voice_manager.speak(final_speech, f"elaborate_{student_name}_conclusion")
 

@@ -40,7 +40,7 @@
    </item>
    <item>
     <widget class="QLabel" name="hint_label">
-     <property name="text"><string>Press Enter when you're ready! 🌟</string></property>
+     <property name="text"><string>Say 'Okay' when you're ready! 🌟</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <property name="styleSheet"><string>font-size: 24px; color: #64748B; margin-top: 50px;</string></property>
     </widget>

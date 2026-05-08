@@ -57,7 +57,7 @@
    <!-- Action Prompt -->
    <item>
     <widget class="QLabel" name="prompt_label">
-     <property name="text"><string>Teacher Approval: Press P to Pass, F to Fail</string></property>
+     <property name="text"><string>Teacher Approval: Say 'Pass' or 'Fail'</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
      <property name="styleSheet"><string>font-size: 26px; font-weight: bold; color: white; background-color: #4CAF50; border-radius: 20px; padding: 15px; margin: 0px 50px;</string></property>
     </widget>

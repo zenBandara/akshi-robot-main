@@ -468,7 +468,7 @@ class RabbitBreakWidget(QWidget):
         btn_font = QFont("Georgia", 26, QFont.Bold)
         p.setFont(btn_font)
         p.setPen(QColor(255, 255, 255))
-        p.drawText(QRectF(btn_x, btn_y, btn_w, btn_h), Qt.AlignCenter, "⏎  Press ENTER")
+        p.drawText(QRectF(btn_x, btn_y, btn_w, btn_h), Qt.AlignCenter, "🎤 Say 'READY'")
 
         # Countdown (subtle)
         if self.return_remaining <= 15:

@@ -32,14 +32,14 @@ def main():
         "Awesome! Now, what about your other hand? That is your left hand! Can you wiggle your left hand high in the air?",
         "Wow! Now, go over to your teacher and show them your beautiful left and right hands!",
         "Let's review this concept together.",
-        "Press Enter when you are done.",
-        "Let's review this concept together. Press Enter when you are done.",
+        "Say 'Done' when you are done.",
+        "Let's review this concept together. Say 'Done' when you are done.",
         "Let's try something super fun safely together.",
         "Watch our character carefully on the screen!",
-        "Press the Enter key when you are all done!",
+        "Say 'Done' when you are all done!",
         "Let's begin our adventure!",
         "Look closely!",
-        "Press the Enter key when you are done!"
+        "Say 'Done' when you are done!"
     ])
 
     for json_file in glob.glob(os.path.join(tasks_dir, "*.json")):
@@ -52,7 +52,7 @@ def main():
                 if "explain" in data:
                     e = data["explain"]
                     s_start = e.get("speech_start", "Let's review this concept together.")
-                    s_end = e.get("speech_end", "Press Enter when you are done.")
+                    s_end = e.get("speech_end", "Say 'Done' when you are done.")
                     all_speech.append(f"{s_start} {s_end}")
             except Exception as e:
                 print(f"Error reading {json_file}: {e}")
