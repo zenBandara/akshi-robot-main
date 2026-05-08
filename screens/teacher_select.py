@@ -163,8 +163,8 @@ def handle_key_press(mapped_action):
         lesson_data = next((t for t in all_tasks if t.get("task_id") == lesson_id), None)
         
         if not lesson_data:
-            print(f"Warning: Lesson {lesson_id} not physically found on disk. Falling back to random structure.")
-            lesson_data = task_loader.pick_random_task()
+            print(f"Warning: Lesson {lesson_id} not physically found on disk. Falling back to t_2.")
+            lesson_data = next((t for t in all_tasks if t.get("task_id") == "t_2"), None)
             
         state_manager.set_student_list(students)
         state_manager.set_current_task(lesson_data)

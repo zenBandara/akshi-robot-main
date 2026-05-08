@@ -102,7 +102,35 @@ def update_frame():
 def handle_key_press(mapped_action):
     global frame_timer
     if mapped_action == "WAKE":
-        print("[Idle Screen] WAKE command triggered! Transitioning natively to Greeting...")
+        print("[Idle Screen] WAKE command triggered! Starting new session & fetching data...")
+        selected_teacher = state_manager.get_selected_teacher()
+        if selected_teacher:
+            from core import firebase
+            import random
+            import core.task_loader as task_loader
+            import core.database as database
+            
+            # Start new telemetry session
+            current_session = database.start_session(selected_teacher)
+            state_manager.set_current_session(current_session)
+            print(f"[Idle Screen] New session started: {current_session}")
+            
+            # Fetch latest students
+            students = firebase.get_students(selected_teacher)
+            state_manager.set_student_list(students)
+            student_queue = students.copy()
+            random.shuffle(student_queue)
+            state_manager.set_student_queue(student_queue)
+            
+            # Fetch single task
+            lesson_id = firebase.get_current_lesson(selected_teacher)
+            all_tasks = task_loader.get_loaded_tasks()
+            lesson_data = next((t for t in all_tasks if t.get("task_id") == lesson_id), None)
+            if not lesson_data:
+                lesson_data = next((t for t in all_tasks if t.get("task_id") == "t_2"), None)
+            state_manager.set_current_task(lesson_data)
+            print(f"[Idle Screen] Fetched task: {lesson_data.get('task_id') if lesson_data else 'None'}")
+            
         if frame_timer is not None:
             frame_timer.stop()
         navigator.navigate_to("greeting")

@@ -100,15 +100,7 @@ class FlowController:
         """Called when a student is ready. ONE question per student per round."""
         self.reset_for_new_student()
 
-        # Initialize task queue on very first call of the session
-        if not state_manager.get_task_queue() and not state_manager.get_current_task():
-            import core.task_loader as task_loader
-            task_queue = task_loader.build_task_queue()
-            if task_queue:
-                first_task = task_queue.pop(0)
-                state_manager.set_task_queue(task_queue)
-                state_manager.set_current_task(first_task)
-                print(f"[FlowController] Session initialized with task: {first_task.get('task_id')}")
+
 
         # Try to restore saved state from a previous round
         if self._load_student_state(student_name):

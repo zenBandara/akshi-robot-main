@@ -15,35 +15,9 @@ def next_student():
     queue = state_manager.get_student_queue()
     
     if not queue:
-        # All students finished this round — try advancing to next task
-        task_queue = state_manager.get_task_queue()
-        
-        if task_queue:
-            # More tasks available! Start a new round
-            next_task = task_queue.pop(0)
-            state_manager.set_task_queue(task_queue)
-            state_manager.set_current_task(next_task)
-            print(f"[Session Logic] ── NEW ROUND ── Task: {next_task.get('task_id')} | Remaining: {len(task_queue)}")
-            
-            # Reload the full student list for this new round
-            all_students = state_manager.get_student_list()
-            if all_students:
-                new_queue = all_students.copy()
-                student = new_queue.pop(0)
-                state_manager.set_student_queue(new_queue)
-                state_manager.set_current_student(student)
-                
-                state_manager.set_five_e_stage("evaluate")
-                state_manager.set_affordance_level(1)
-                
-                print(f"[Session Logic] Round starting with student: {student}")
-                navigator.navigate_to("student_call")
-            else:
-                navigator.navigate_to("session_complete")
-        else:
-            # No more tasks — session is truly complete
-            print("[Session Logic] All tasks and students complete!")
-            navigator.navigate_to("session_complete")
+        # No more students — session is truly complete for this single task
+        print("[Session Logic] All students complete for this task!")
+        navigator.navigate_to("session_complete")
         return
         
     student = queue.pop(0)
