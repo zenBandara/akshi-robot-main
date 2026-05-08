@@ -118,7 +118,13 @@ def on_show():
     voice_manager.stop()
     
     task_data = state_manager.get_current_task()
-    kinesthetic_data = task_data.get("kinesthetic", {}) if task_data else {}
+    affordance_level = state_manager.get_affordance_level()
+    kinesthetic_key = f"kinesthetic_L{affordance_level}"
+    kinesthetic_data = task_data.get(kinesthetic_key, {}) if task_data else {}
+    
+    # Fallback for older JSONs
+    if not kinesthetic_data and task_data:
+        kinesthetic_data = task_data.get("kinesthetic", {})
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     
     window.title_label.setText(kinesthetic_data.get("task_title", "Kinesthetic Learning"))
@@ -191,15 +197,28 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    if action in ("P", "ENTER"): # Teacher says "OK" — activity is complete
+    if action in ("P", "ENTER", "YES"): # Teacher says "Pass"
         input_enabled = False
         voice_manager.stop()
         if frame_timer:
             frame_timer.stop()
-        print("[Kinesthetic Screen] Activity complete! Returning to evaluation...")
+        print("[Kinesthetic Screen] Passed! Returning to evaluation...")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.advance_after_kinesthetic(parent_stack)
+                flow_controller.kinesthetic_passed(parent_stack)
+        except ImportError: pass
+        
+    elif action in ("F", "NO"): # Teacher says "Fail"
+        input_enabled = False
+        voice_manager.stop()
+        if frame_timer:
+            frame_timer.stop()
+        print("[Kinesthetic Screen] Failed! Dropping to scaffolding phase...")
+        try:
+            from core.flow_controller import flow_controller
+            parent_stack = window.parentWidget()
+            if parent_stack:
+                flow_controller.kinesthetic_failed(parent_stack)
         except ImportError: pass

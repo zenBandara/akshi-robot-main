@@ -36,7 +36,7 @@ SCREEN_MAP = {
 class FlowController:
     def __init__(self):
         self.cascade_index = 0
-        self.kinesthetic_done = False
+        self.kinesthetic_attempts = {1: False, 2: False, 3: False}
         self.progression_state = "IDENTIFYING"
         self.identified_phase = None
         self.baseline_confirms = 0
@@ -71,7 +71,7 @@ class FlowController:
 
     def reset_for_new_student(self):
         self.cascade_index = 0
-        self.kinesthetic_done = False
+        self.kinesthetic_attempts = {1: False, 2: False, 3: False}
         state_manager.set_affordance_level(1)
         if not hasattr(state_manager, 'current_path'):
             state_manager.current_path = []
@@ -79,7 +79,7 @@ class FlowController:
 
     def reset_cascade(self):
         self.cascade_index = 0
-        self.kinesthetic_done = False
+        self.kinesthetic_attempts = {1: False, 2: False, 3: False}
         state_manager.set_affordance_level(1)
 
     def _get_phase_above(self, phase):
@@ -252,17 +252,19 @@ class FlowController:
         """During IDENTIFYING: run the full cascade."""
         current_node = self.get_current_node()
 
-        # Kinesthetic side-loop
-        if current_node == "evaluate_L1" and not self.kinesthetic_done:
-            self.kinesthetic_done = True
-            print(f"[FlowController] First L1 failure → Kinesthetic side-loop")
-            state_manager.current_stage = "kinesthetic"
-            try:
-                from core.navigator import navigator
-                navigator.navigate_to("kinestatic")
-            except Exception as e:
-                print(f"[FlowController] Routing error: {e}")
-            return
+        # Kinesthetic side-loop for all evaluate levels
+        if current_node.startswith("evaluate_L"):
+            level = int(current_node[-1])
+            if not self.kinesthetic_attempts[level]:
+                self.kinesthetic_attempts[level] = True
+                print(f"[FlowController] First L{level} failure → Kinesthetic side-loop")
+                state_manager.current_stage = "kinesthetic"
+                try:
+                    from core.navigator import navigator
+                    navigator.navigate_to("kinestatic")
+                except Exception as e:
+                    print(f"[FlowController] Routing error: {e}")
+                return
 
         self.cascade_index += 1
         next_node = self.get_current_node()
@@ -318,14 +320,22 @@ class FlowController:
             except Exception:
                 pass
 
-    def advance_after_kinesthetic(self, parent_widget):
-        print("[FlowController] Kinesthetic done → evaluate_L1 retry")
-        state_manager.current_stage = "evaluate_L1"
+    def kinesthetic_passed(self, parent_widget):
+        current_node = self.get_current_node()
+        level = int(current_node[-1]) if current_node.startswith("evaluate_L") else state_manager.get_affordance_level()
+        print(f"[FlowController] Kinesthetic L{level} passed → retrying {current_node}")
+        state_manager.current_stage = current_node
         try:
             from core.navigator import navigator
             navigator.navigate_to("evaluate")
         except Exception as e:
             print(f"[FlowController] Error: {e}")
+
+    def kinesthetic_failed(self, parent_widget):
+        current_node = self.get_current_node()
+        level = int(current_node[-1]) if current_node.startswith("evaluate_L") else state_manager.get_affordance_level()
+        print(f"[FlowController] Kinesthetic L{level} failed → dropping to next scaffolding phase")
+        self._cascade_incorrect(parent_widget)
 
     # ── Timeout / Skip / Break ──
 
