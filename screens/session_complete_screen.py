@@ -4,6 +4,7 @@ from PySide6.QtCore import QFile, QTimer
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
+from components.robot_eyes import get_robot_eyes
 
 window = None
 
@@ -25,6 +26,7 @@ def get_ui():
     def on_show():
         print("[Session Complete Screen] Becoming active...")
         state_manager.set_current_screen("session_complete")
+        get_robot_eyes().set_expression("encouraging")
         keyboard_manager.register_handler(handle_key_press)
         
         # Notify backend that the student's session has historically concluded so it saves to DB
@@ -38,7 +40,7 @@ def get_ui():
 
         # Automatically go back to idle after 10 seconds
         print("[Session Complete Screen] Waiting 10 seconds before returning to idle...")
-        QTimer.singleShot(10000, lambda: navigator.navigate_to("idle"))
+        QTimer.singleShot(10000, lambda: [get_robot_eyes().set_expression("default"), navigator.navigate_to("idle")])
 
     window.on_show = on_show
     return window

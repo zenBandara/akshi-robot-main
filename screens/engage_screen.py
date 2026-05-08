@@ -184,6 +184,7 @@ def handle_key_press(action):
     if action == "ENTER":
         input_enabled = False
         voice_manager.stop()
+        get_robot_eyes().set_expression("default")
         if frame_timer:
             frame_timer.stop()
             

@@ -5,6 +5,7 @@ from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QEasingCurve
 from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -32,6 +33,7 @@ def get_ui():
 def on_show():
     print("[Celebration Screen] Becoming active...")
     state_manager.set_current_screen("celebration")
+    get_robot_eyes().set_expression("surprised")
     
     # Pause frames during celebration
     try:
@@ -73,6 +75,7 @@ def end_celebration():
         reward_anim.stop()
         
     print("[Celebration Screen] Celebration timeout reached.")
+    get_robot_eyes().set_expression("encouraging")
     
     # 7. Log the Result (Step 21)
     task_data = state_manager.get_current_task()

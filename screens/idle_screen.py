@@ -6,6 +6,7 @@ from PySide6.QtGui import QPixmap
 from core.keyboard_manager import keyboard_manager
 from core.state_manager import state_manager
 from core.navigator import navigator
+from components.robot_eyes import get_robot_eyes
 
 window = None
 pulse_anim = None
@@ -37,6 +38,7 @@ def get_ui():
         print("[Idle Screen] Becoming active with native Video Engine...")
         keyboard_manager.register_handler(handle_key_press)
         state_manager.set_current_screen("idle")
+        get_robot_eyes().set_expression("default")
         
         # Deploy image sequence pipeline gracefully
         if frame_timer is None:
@@ -103,6 +105,7 @@ def handle_key_press(mapped_action):
     global frame_timer
     if mapped_action == "WAKE":
         print("[Idle Screen] WAKE command triggered! Starting new session & fetching data...")
+        get_robot_eyes().set_expression("surprised")
         selected_teacher = state_manager.get_selected_teacher()
         if selected_teacher:
             from core import firebase

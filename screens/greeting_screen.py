@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 from core.voice_manager import VoiceManager
 from core.navigator import navigator
+from components.robot_eyes import get_robot_eyes
 
 window = None
 voice_manager = VoiceManager()
@@ -55,6 +56,7 @@ def get_ui():
 def on_ready():
     global anim_1, anim_2
     
+    get_robot_eyes().set_expression("encouraging")
     greeting_message = "Hello there! I am Ginglu! Ready to learn something fun today?"
     print(f"[Robot Speaks]: {greeting_message}")
     
@@ -85,6 +87,7 @@ def on_ready():
     QTimer.singleShot(duration_ms, transition_to_first_student)
 
 def transition_to_first_student():
+    get_robot_eyes().set_expression("default")
     print("Transitioning to first student...")
     import core.session_logic as session_logic
     session_logic.next_student()

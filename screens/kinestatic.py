@@ -203,6 +203,7 @@ def handle_key_press(action):
         if frame_timer:
             frame_timer.stop()
         print("[Kinesthetic Screen] Passed! Returning to evaluation...")
+        get_robot_eyes().set_expression("encouraging")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
@@ -216,6 +217,7 @@ def handle_key_press(action):
         if frame_timer:
             frame_timer.stop()
         print("[Kinesthetic Screen] Failed! Dropping to scaffolding phase...")
+        get_robot_eyes().set_expression("sad")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()

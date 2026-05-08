@@ -19,6 +19,7 @@ from core.keyboard_manager import keyboard_manager
 from core.sound_manager import sound_manager
 from core.timer_widget import EmojiTimerWidget
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 from components.evaluate_game import EvaluateGameWidget
 
 current_dir = os.path.dirname(__file__)
@@ -68,6 +69,7 @@ def on_show():
 
     print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
     state_manager.set_current_screen("evaluate")
+    get_robot_eyes().set_expression("thinking")
 
     # Resume sending real frames to backend as the task is starting
     try:
@@ -213,6 +215,7 @@ def present_option(idx):
 
     # Highlight this option in BLUE to indicate it's the current one being asked
     game_widget.highlight_answer(op_code, correct="present")
+    get_robot_eyes().set_expression("encouraging")
 
     # Speak the option explanation + ask YES/NO
     op_speech = options_speech.get(op_code, f"Option {int(current_key)}.")
@@ -260,6 +263,7 @@ def on_motivation_nudge():
         return  # Student already answered
 
     motivation_given = True
+    get_robot_eyes().set_expression("encouraging")
     student_name = state_manager.get_current_student() or "friend"
     level = state_manager.get_affordance_level()
 
@@ -285,6 +289,7 @@ def on_timer_expire():
     input_enabled = False
     level = state_manager.get_affordance_level()
     print(f"[Evaluate Screen] ⏰ 3-MINUTE TIMER EXPIRED at Level {level}!")
+    get_robot_eyes().set_expression("sad")
 
     # Stop motivation timer if it's still active
     if motivation_timer:

@@ -17,6 +17,7 @@ from PySide6.QtGui import (
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -198,6 +199,7 @@ def on_show():
     global input_enabled
     print("[Teacher Intervention Screen] Becoming active...")
     state_manager.set_current_screen("teacher_intervention")
+    get_robot_eyes().set_expression("sad")
 
     input_enabled = False
 
@@ -231,6 +233,7 @@ def handle_key_press(action):
     if action == "ENTER":
         input_enabled = False
         voice_manager.stop()
+        get_robot_eyes().set_expression("encouraging")
         print("[Teacher Intervention] Teacher pressed ENTER/CONTINUE. Logging complete cascade and resetting.")
 
         # Log Result (Complete Cascade Failure -> Teacher Assisted)
@@ -284,6 +287,7 @@ def handle_key_press(action):
         state_manager.current_path = []
         state_manager.set_affordance_level(1)
         
+        get_robot_eyes().set_expression("default")
         print("[Teacher Intervention] Phase set to 'elaborate'. Moving to next student...")
         import core.session_logic as session_logic
         session_logic.next_student()

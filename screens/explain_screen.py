@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QVBoxLayout, QFrame, QLabel
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -38,6 +39,7 @@ def get_ui():
 def on_show():
     print("[Explain Screen] Becoming active...")
     state_manager.set_current_screen("explain")
+    get_robot_eyes().set_expression("thinking")
     
     task_data = state_manager.get_current_task()
     if not task_data or "explain" not in task_data:
@@ -156,6 +158,7 @@ def handle_key_press(action):
     if action == "ENTER": # Hardware mapping for Return/Enter
         input_enabled = False
         voice_manager.stop()
+        get_robot_eyes().set_expression("encouraging")
         if frame_timer:
             frame_timer.stop()
         print("[Explain Screen] Student pressed ENTER. Logging failure and advancing...")

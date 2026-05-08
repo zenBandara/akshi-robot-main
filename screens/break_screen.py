@@ -17,6 +17,7 @@ from core.sound_manager import sound_manager
 from core.voice_manager import VoiceManager
 from core.dialogue import DialoguePool
 from components.rabbit_break_game import RabbitBreakWidget
+from components.robot_eyes import get_robot_eyes
 
 voice_manager = VoiceManager()
 
@@ -56,6 +57,7 @@ def on_show():
     global input_enabled
     print("[Break Screen] 🐰 Rabbit Jump Break starting!")
     state_manager.set_current_screen("break")
+    get_robot_eyes().set_expression("sleeping")
 
     input_enabled = False
     voice_manager.stop()
@@ -86,6 +88,7 @@ def _start_activity():
     """Transition to Act 2 — start the 45-second activity timer."""
     global input_enabled
     print("[Break Screen] Act 2: Activity timer starting (45 seconds)!")
+    get_robot_eyes().set_expression("encouraging")
 
     game_widget.set_phase("activity")
     input_enabled = True
@@ -96,6 +99,7 @@ def _on_halfway():
     """Called at ~22 seconds — halfway encouragement."""
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     speech = f"Great hopping, {student_name}! You're halfway there! Keep going!"
+    get_robot_eyes().set_expression("surprised")
     print(f"🤖 ROBOT SPEAKS (Halfway): \"{speech}\"")
     voice_manager.speak(speech, f"break_halfway_{student_name}")
 
@@ -112,6 +116,7 @@ def _on_activity_complete():
     """Activity timer finished — transition to Act 3 (Return)."""
     print("[Break Screen] Act 3: Activity complete! Waiting for student to press ENTER...")
     game_widget.set_phase("return")
+    get_robot_eyes().set_expression("thinking")
 
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     return_speech = DialoguePool.get_phrase("break_return", student_name)
@@ -140,6 +145,7 @@ def _on_return_timeout():
 
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     print(f"[Break Screen] ⏰ Return timeout! {student_name} did not come back. Skipping student.")
+    get_robot_eyes().set_expression("sad")
 
     skip_speech = f"Oh no, {student_name} didn't come back. Let's move on to the next friend!"
     delay_ms = voice_manager.speak(skip_speech, f"break_skip_{student_name}")
@@ -166,6 +172,7 @@ def handle_key_press(action):
         game_widget.stop_all()
         sound_manager.stop_bgm()
         voice_manager.stop()
+        get_robot_eyes().set_expression("surprised")
 
         student_name = str(state_manager.get_current_student() or "friend").capitalize()
         welcome_speech = f"Yay {student_name}, welcome back! You're full of energy now! Let's try again!"

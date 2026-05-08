@@ -359,6 +359,7 @@ class FlowController:
         if current_node not in state_manager.current_path:
             state_manager.current_path.append(current_node)
         print(f"[FlowController] Skip at: {current_node}")
+        get_robot_eyes().set_expression("sad")
 
         log_data = {
             "student_id": state_manager.get_current_student() or "unknown",

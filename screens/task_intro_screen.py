@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -34,6 +35,7 @@ def on_show():
     global name_opacity, name_anim
     print("[Task Intro Screen] Becoming active...")
     state_manager.set_current_screen("task_intro")
+    get_robot_eyes().set_expression("surprised")
     
     # Pause frames during task introduction
     try:
@@ -79,5 +81,6 @@ def on_show():
     QTimer.singleShot(duration_ms, transition_to_student_call)
 
 def transition_to_student_call():
+    get_robot_eyes().set_expression("default")
     print("[Task Intro Screen] Transitioning to Student Call...")
     navigator.navigate_to("student_call")

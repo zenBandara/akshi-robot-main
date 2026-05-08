@@ -7,6 +7,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 
 voice_manager = VoiceManager()
 window = None
@@ -37,6 +38,7 @@ def on_show():
     global frame_timer, current_frames, current_frame_idx
     print("[Water Break Screen] Becoming active...")
     state_manager.set_current_screen("water_break")
+    get_robot_eyes().set_expression("sleeping")
     keyboard_manager.register_handler(handle_key_press)
     
     project_root = os.path.dirname(os.path.dirname(__file__))
@@ -76,6 +78,7 @@ def handle_key_press(action):
         if frame_timer:
             frame_timer.stop()
         voice_manager.stop()
+        get_robot_eyes().set_expression("surprised")
         
         student_name = str(state_manager.get_current_student() or "friend").capitalize()
         speech = f"Yay {student_name}! Welcome back! You look refreshed! Let's try again!"

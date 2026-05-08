@@ -6,6 +6,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
+from components.robot_eyes import get_robot_eyes
 
 window = None
 fade_anim = None
@@ -50,6 +51,8 @@ def get_ui():
         window.student_name_label.setText(f"{display_name}! 🎉")
         window.hint_label.setText("Say 'Okay' to start, or 'No' to skip! 🌟")
         
+        get_robot_eyes().set_expression("encouraging")
+        
         # Simple call — the task introduction is handled by the dedicated task_intro_screen
         intro_msg = f"{display_name}, can you please come on up? It is your turn to shine!"
         
@@ -79,12 +82,14 @@ def handle_key_press(mapped_action):
     if mapped_action in ["ENTER", "YES"]:
         keyboard_manager.unregister_handler()
         voice_manager.stop()
+        get_robot_eyes().set_expression("surprised")
         print("Student present! Transitioning to Calibration Screen...")
         # Route to calibration for face tracking BEFORE starting the learning flow
         navigator.navigate_to("calibration")
     elif mapped_action in ["ESCAPE", "NO"]:
         keyboard_manager.unregister_handler()
         voice_manager.stop()
+        get_robot_eyes().set_expression("sad")
         print("Student absent! Skipping to next student...")
         import core.session_logic as session_logic
         session_logic.next_student()
