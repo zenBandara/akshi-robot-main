@@ -69,6 +69,14 @@ def on_show():
     print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
     state_manager.set_current_screen("evaluate")
 
+    # Resume sending real frames to backend as the task is starting
+    try:
+        import json
+        with open("akshi-the-robot/calibration_command.json", "w") as f:
+            json.dump({"type": "resume_frames"}, f)
+    except Exception as e:
+        print("[Evaluate Screen] Error resuming frames:", e)
+
     # 0. Clean Resets
     if evaluate_timer:
         evaluate_timer.stop()

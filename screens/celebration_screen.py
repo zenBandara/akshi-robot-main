@@ -33,6 +33,14 @@ def on_show():
     print("[Celebration Screen] Becoming active...")
     state_manager.set_current_screen("celebration")
     
+    # Pause frames during celebration
+    try:
+        import json
+        with open("akshi-the-robot/calibration_command.json", "w") as f:
+            json.dump({"type": "pause_frames"}, f)
+    except Exception as e:
+        print("[Celebration Screen] Error pausing frames:", e)
+    
     # 1. Fetch exact Student Name
     student_name = state_manager.get_current_student()
     display_name = str(student_name).capitalize() if student_name else "Superstar"

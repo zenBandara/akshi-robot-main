@@ -32,6 +32,15 @@ def get_ui():
     def on_show():
         print("[Student Call Screen] Becoming active...")
         state_manager.set_current_screen("student_call")
+        
+        # Pause frames during student selection
+        try:
+            import json
+            with open("akshi-the-robot/calibration_command.json", "w") as f:
+                json.dump({"type": "pause_frames"}, f)
+        except Exception as e:
+            print("[Student Call Screen] Error pausing frames:", e)
+            
         voice_manager.stop()  # Kill any lingering audio from task_intro or previous screens
         keyboard_manager.register_handler(handle_key_press)
         

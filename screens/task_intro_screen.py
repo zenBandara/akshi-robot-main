@@ -35,6 +35,14 @@ def on_show():
     print("[Task Intro Screen] Becoming active...")
     state_manager.set_current_screen("task_intro")
     
+    # Pause frames during task introduction
+    try:
+        import json
+        with open("akshi-the-robot/calibration_command.json", "w") as f:
+            json.dump({"type": "pause_frames"}, f)
+    except Exception as e:
+        print("[Task Intro Screen] Error pausing frames:", e)
+    
     # Stop any lingering audio from the previous screen
     voice_manager.stop()
     

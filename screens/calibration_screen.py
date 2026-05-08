@@ -152,6 +152,12 @@ class CalibrationScreenUI(QWidget):
             elif status.startswith("DONE"):
                 if self.prompt_state != "done":
                     self.prompt_state = "done"
+                    
+                    try:
+                        with open(COMMAND_FILE, "w") as f:
+                            json.dump({"type": "pause_frames"}, f)
+                    except: pass
+                    
                     self.game.set_phase("done")
                     
                     if state_timer:
