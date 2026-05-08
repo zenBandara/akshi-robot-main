@@ -28,6 +28,8 @@ class KeyboardManager:
             Qt.Key_B: "BREAK",
             Qt.Key_Return: "ENTER",
             Qt.Key_Enter: "ENTER",
+            Qt.Key_Escape: "ESCAPE",
+            Qt.Key_Backspace: "STOP",
         }
         
         # Add A-Z mappings ONLY if they aren't already mapped
@@ -53,6 +55,7 @@ class KeyboardManager:
             0x04: "SKIP",       # "Go Forward" (Reusing for Skip)
             0x08: "BREAK",      # "I'm tired" (Reusing for Take a break)
             0x09: "ENTER",      # "Said Ok" (Used for pass/continue)
+            0x11: "STOP",       # "Stop" command
         }
 
         # ── Voice Input Thread (Raspberry Pi only) ──
@@ -102,6 +105,10 @@ class KeyboardManager:
 
     def _on_voice_command(self, action: str):
         """Called on the MAIN UI thread when a voice command arrives via Signal."""
+        if action == "STOP":
+            self.global_emergency_stop()
+            return
+            
         if self.active_handler:
             self.active_handler(action)
 
@@ -123,8 +130,34 @@ class KeyboardManager:
         if not mapped_action and event.text().upper():
             mapped_action = event.text().upper()
             
+        if mapped_action == "STOP":
+            self.global_emergency_stop()
+            return
+            
         if self.active_handler and mapped_action:
             self.active_handler(mapped_action)
+
+    def global_emergency_stop(self):
+        print("🚨 [GLOBAL STOP] Emergency STOP Triggered! Terminating active flow...")
+        from core.voice_manager import VoiceManager
+        try:
+            VoiceManager().stop()
+        except Exception:
+            pass
+
+        import json
+        try:
+            with open("akshi-the-robot/calibration_command.json", "w") as f:
+                json.dump({"type": "end_session"}, f)
+        except Exception as e:
+            pass
+
+        from core.state_manager import state_manager
+        state_manager.current_path = []
+        state_manager.set_current_student(None)
+
+        from core.navigator import navigator
+        navigator.navigate_to("idle")
 
 # Global singleton instance
 keyboard_manager = KeyboardManager()

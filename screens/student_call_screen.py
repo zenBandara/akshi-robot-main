@@ -48,7 +48,7 @@ def get_ui():
         display_name = student_name if student_name else "Buddy"
         
         window.student_name_label.setText(f"{display_name}! 🎉")
-        window.hint_label.setText("Say 'Okay' when you're ready! 🌟")
+        window.hint_label.setText("Say 'Okay' to start, or 'No' to skip! 🌟")
         
         # Simple call — the task introduction is handled by the dedicated task_intro_screen
         intro_msg = f"{display_name}, can you please come on up? It is your turn to shine!"
@@ -76,10 +76,16 @@ def setup_animations():
     fade_anim.setEasingCurve(QEasingCurve.OutCubic)
 
 def handle_key_press(mapped_action):
-    if mapped_action == "ENTER":
+    if mapped_action in ["ENTER", "YES"]:
         keyboard_manager.unregister_handler()
         voice_manager.stop()
-        print("Student cleanly interrupted intro! Transitioning to Calibration Screen...")
+        print("Student present! Transitioning to Calibration Screen...")
         # Route to calibration for face tracking BEFORE starting the learning flow
         navigator.navigate_to("calibration")
+    elif mapped_action in ["ESCAPE", "NO"]:
+        keyboard_manager.unregister_handler()
+        voice_manager.stop()
+        print("Student absent! Skipping to next student...")
+        import core.session_logic as session_logic
+        session_logic.next_student()
 
