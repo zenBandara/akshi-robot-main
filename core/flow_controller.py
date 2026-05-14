@@ -218,18 +218,35 @@ class FlowController:
 
     def on_incorrect_answer(self, parent_widget, is_timeout=False):
         current_node = self.get_current_node()
+        # If we are in CONFIRMING/ADVANCING, get_current_node() might not be accurate 
+        # for what's actually on screen. Let's determine the level.
+        level = state_manager.get_affordance_level()
         log_node = f"{current_node}_timeout" if is_timeout else current_node
+        
         if not hasattr(state_manager, 'current_path'):
             state_manager.current_path = []
         if log_node not in state_manager.current_path:
             state_manager.current_path.append(log_node)
 
-        print(f"[FlowController] ❌ {'Timeout' if is_timeout else 'Incorrect'} at: {log_node} | State: {self.progression_state}")
+        print(f"[FlowController] ❌ {'Timeout' if is_timeout else 'Incorrect'} at level {level} | State: {self.progression_state}")
         if is_timeout:
             get_robot_eyes().set_expression("thinking")
         else:
             get_robot_eyes().set_expression("encouraging")
 
+        # ── KINESTHETIC LOOP (Applies to all states on first level failure) ──
+        if not self.kinesthetic_attempts.get(level, False):
+            self.kinesthetic_attempts[level] = True
+            print(f"[FlowController] First L{level} failure → Kinesthetic side-loop")
+            state_manager.current_stage = "kinesthetic"
+            try:
+                from core.navigator import navigator
+                navigator.navigate_to("kinestatic")
+                return
+            except Exception as e:
+                print(f"[FlowController] Routing error: {e}")
+
+        # If kinesthetic was already tried, proceed with state-specific logic
         if self.progression_state == "IDENTIFYING":
             self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
         elif self.progression_state == "CONFIRMING":
@@ -262,19 +279,7 @@ class FlowController:
                 print(f"[FlowController] Routing error: {e}")
             return
 
-        # Kinesthetic side-loop for all evaluate levels
-        if current_node.startswith("evaluate_L"):
-            level = int(current_node[-1])
-            if not self.kinesthetic_attempts[level]:
-                self.kinesthetic_attempts[level] = True
-                print(f"[FlowController] First L{level} failure → Kinesthetic side-loop")
-                state_manager.current_stage = "kinesthetic"
-                try:
-                    from core.navigator import navigator
-                    navigator.navigate_to("kinestatic")
-                except Exception as e:
-                    print(f"[FlowController] Routing error: {e}")
-                return
+        # (Kinesthetic logic was moved to on_incorrect_answer)
 
         self.cascade_index += 1
         next_node = self.get_current_node()
@@ -344,8 +349,19 @@ class FlowController:
     def kinesthetic_failed(self, parent_widget):
         current_node = self.get_current_node()
         level = int(current_node[-1]) if current_node.startswith("evaluate_L") else state_manager.get_affordance_level()
-        print(f"[FlowController] Kinesthetic L{level} failed → dropping to next scaffolding phase")
-        self._cascade_incorrect(parent_widget)
+        print(f"[FlowController] Kinesthetic L{level} failed | State: {self.progression_state}")
+
+        if self.progression_state == "IDENTIFYING":
+            print("[FlowController] Dropping to next scaffolding phase")
+            self._cascade_incorrect(parent_widget)
+        else:
+            # CONFIRMING or ADVANCING: Kinesthetic failed -> treat as baseline failure and skip
+            print("[FlowController] Failed baseline after kinesthetic. Moving to next student.")
+            self.baseline_confirms = 0
+            student_name = state_manager.get_current_student() or "unknown"
+            self._save_student_state(student_name)
+            import core.session_logic as session_logic
+            session_logic.next_student()
 
     # ── Timeout / Skip / Break ──
 
