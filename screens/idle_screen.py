@@ -1,7 +1,7 @@
 import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, Qt, QUrl
-from PySide6.QtWidgets import QGraphicsOpacityEffect, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QApplication, QGraphicsOpacityEffect, QVBoxLayout, QLabel, QPushButton
 from PySide6.QtGui import QPixmap
 from core.keyboard_manager import keyboard_manager
 from core.state_manager import state_manager
@@ -30,6 +30,26 @@ def get_ui():
 
     window = loader.load(file)
     file.close()
+
+    # ── TOUCHSCREEN QUIT BUTTON ──
+    # Create a large, translucent button in the bottom-left for system exit
+    quit_btn = QPushButton("✖ Quit", window)
+    quit_btn.setFixedSize(120, 60)
+    quit_btn.move(20, 640) # Bottom-left on 1280x720 canvas
+    quit_btn.setStyleSheet("""
+        QPushButton {
+            background-color: rgba(255, 0, 0, 50);
+            color: white;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 80);
+        }
+        QPushButton:pressed {
+            background-color: rgba(255, 0, 0, 150);
+        }
+    """)
+    quit_btn.clicked.connect(lambda: QApplication.instance().quit())
 
     setup_animations()
     

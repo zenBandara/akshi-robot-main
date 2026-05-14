@@ -1,9 +1,24 @@
 import sys
 import os
+import signal
 import datetime
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PySide6.QtCore import QObject, QEvent, Qt
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QStackedWidget, 
+    QGraphicsView, QGraphicsScene, QGraphicsProxyWidget
+)
+from PySide6.QtCore import QObject, QEvent, Qt, QRectF
+from PySide6.QtGui import QPainter
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# DISPLAY SETTINGS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TARGET_WIDTH = 1280
+TARGET_HEIGHT = 720
+# Physical screen resolution (Raspberry Pi display)
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 480
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # CRITICAL BUGFIX: Core graphic resource engine MUST boot BEFORE Chromium memory allocations!
 app = QApplication(sys.argv)
@@ -15,41 +30,88 @@ update_connected_ip()
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 
-from screens import idle_screen
-from screens import greeting_screen
-from screens import teacher_select
-from screens import student_call_screen
-from screens import session_complete_screen
-from screens import evaluate_screen
-from screens import elaborate_screen
-from screens import celebration_screen
-from screens import engage_screen
-from screens import explain_screen
-from screens import explore_screen
-from screens import teacher_intervention
-from screens import break_screen
-from screens import kinestatic
-from screens import task_intro_screen
-from screens import calibration_screen
-from screens import water_break_screen
-main_window = QMainWindow()
-main_window.setWindowTitle("Ginglu Robot Interface")
-# Enforce a strict 16:9 aspect ratio natively
-main_window.setFixedSize(1280, 720)
-main_window.setFocusPolicy(Qt.StrongFocus) # Crucial for key events on empty windows!
+from screens import (
+    idle_screen, greeting_screen, teacher_select, student_call_screen,
+    session_complete_screen, evaluate_screen, elaborate_screen, 
+    celebration_screen, engage_screen, explain_screen, explore_screen,
+    teacher_intervention, break_screen, kinestatic, task_intro_screen,
+    calibration_screen, water_break_screen
+)
 
-stack = QStackedWidget()
-stack.setFocusPolicy(Qt.StrongFocus)
-main_window.setCentralWidget(stack)
+class ScalableWindow(QMainWindow):
+    """
+    A specialized QMainWindow that hosts a 1280x720 UI and scales it 
+    down to fit the physical screen resolution (e.g., 800x480).
+    """
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Ginglu Robot Interface")
+        
+        # 1. Create the high-res Stacked Widget (The "Brain")
+        self.stack = QStackedWidget()
+        self.stack.setFixedSize(TARGET_WIDTH, TARGET_HEIGHT)
+        self.stack.setFocusPolicy(Qt.StrongFocus)
+        
+        # 2. Create the Graphics Scene to host the Stack
+        self.scene = QGraphicsScene(0, 0, TARGET_WIDTH, TARGET_HEIGHT)
+        self.proxy = self.scene.addWidget(self.stack)
+        
+        # 3. Create the View (The "Lens" that scales)
+        self.view = QGraphicsView(self.scene, self)
+        self.view.setRenderHints(
+            QPainter.Antialiasing | 
+            QPainter.SmoothPixmapTransform | 
+            QPainter.TextAntialiasing
+        )
+        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view.setFrameShape(QGraphicsView.NoFrame)
+        self.view.setStyleSheet("background: black;") # Letterboxing color
+        
+        self.setCentralWidget(self.view)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def resizeEvent(self, event):
+        """Automatically scale the UI whenever the window size changes."""
+        self.apply_scaling()
+        super().resizeEvent(event)
+
+    def apply_scaling(self):
+        # Calculate scaling ratios
+        view_w = self.view.width()
+        view_h = self.view.height()
+        
+        if view_w <= 0 or view_h <= 0:
+            return
+
+        scale_x = view_w / TARGET_WIDTH
+        scale_y = view_h / TARGET_HEIGHT
+        
+        # Use the smaller scale to maintain aspect ratio (Letterboxing)
+        # Or use scale_x/scale_y directly for "stretch to fit"
+        scale = min(scale_x, scale_y)
+        
+        self.view.resetTransform()
+        self.view.scale(scale, scale)
+        
+        # Center the scene in the view
+        self.view.setSceneRect(QRectF(0, 0, TARGET_WIDTH, TARGET_HEIGHT))
+
+main_window = ScalableWindow()
+
+# Setup Fullscreen Mode
+main_window.setWindowFlags(Qt.FramelessWindowHint)
+main_window.showFullScreen()
+# Also hide the cursor for a true "Robot" feel
+app.setOverrideCursor(Qt.BlankCursor)
 
 # Bind the stack to the navigator
-navigator.set_stack(stack)
+navigator.set_stack(main_window.stack)
 
 # Setup Global Keyboard Manager using EventFilter
 class GlobalKeyListener(QObject):
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.KeyPress or event.type() == QEvent.KeyPress:
-            # print(f"Key intercepted by app filter! Key: {event.key()}") # uncomment to debug all keys
+        if event.type() in [QEvent.KeyPress, QEvent.Type.KeyPress]:
             keyboard_manager.handle_key_press(event)
             return False
         return super().eventFilter(obj, event)
@@ -89,7 +151,6 @@ for name, widget in screens.items():
 # Set startup screen
 navigator.navigate_to("teacher_select")
 
-main_window.show()
 import signal
 from core import backend_manager
 
