@@ -34,17 +34,24 @@ def init_db():
         evaluation_passed TEXT,
         method_used TEXT,
         used_kinesthetic INTEGER DEFAULT 0,
+        teacher_intervention INTEGER DEFAULT 0,
         timestamp TEXT,
         FOREIGN KEY(session_id) REFERENCES sessions(session_id)
     )
     ''')
     
-    # ── Auto-Migration: Add used_kinesthetic column if missing ──
+    # ── Auto-Migration: Add missing columns ──
     try:
         cursor.execute("SELECT used_kinesthetic FROM student_metrics LIMIT 1")
     except sqlite3.OperationalError:
         print("[Database] Migrating student_metrics: Adding used_kinesthetic column...")
         cursor.execute("ALTER TABLE student_metrics ADD COLUMN used_kinesthetic INTEGER DEFAULT 0")
+
+    try:
+        cursor.execute("SELECT teacher_intervention FROM student_metrics LIMIT 1")
+    except sqlite3.OperationalError:
+        print("[Database] Migrating student_metrics: Adding teacher_intervention column...")
+        cursor.execute("ALTER TABLE student_metrics ADD COLUMN teacher_intervention INTEGER DEFAULT 0")
     
     conn.commit()
     conn.close()
@@ -67,7 +74,7 @@ def start_session(teacher_id):
     print(f"[Database] Started new RL loop session ID {session_id} for teacher {teacher_id}")
     return session_id
 
-def log_student_metric(session_id, student_name, evaluation_passed, method_used, used_kinesthetic=0):
+def log_student_metric(session_id, student_name, evaluation_passed, method_used, used_kinesthetic=0, teacher_intervention=0):
     """
     Called intimately by flow_controller whenever the Cascade completes or fails fully.
     """
@@ -75,12 +82,12 @@ def log_student_metric(session_id, student_name, evaluation_passed, method_used,
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''
-    INSERT INTO student_metrics (session_id, student_name, evaluation_passed, method_used, used_kinesthetic, timestamp)
-    VALUES (?, ?, ?, ?, ?, ?)
-    ''', (str(session_id), str(student_name), str(evaluation_passed), str(method_used), int(used_kinesthetic), now_str))
+    INSERT INTO student_metrics (session_id, student_name, evaluation_passed, method_used, used_kinesthetic, teacher_intervention, timestamp)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (str(session_id), str(student_name), str(evaluation_passed), str(method_used), int(used_kinesthetic), int(teacher_intervention), now_str))
     conn.commit()
     conn.close()
-    print(f"[RL Telemetry Logged] Student:{student_name} | Passed:{evaluation_passed} | Method:{method_used} | Kinesthetic:{used_kinesthetic}")
+    print(f"[RL Telemetry Logged] Student:{student_name} | Passed:{evaluation_passed} | Method:{method_used} | Kinesthetic:{used_kinesthetic} | TeacherIntervention:{teacher_intervention}")
 
 def get_student_optimal_starting_method(student_name):
     """
@@ -105,7 +112,7 @@ def get_student_optimal_starting_method(student_name):
         return row[0], row[1], row[2]
     return None, None, 0
 
-def update_student_phase(session_id, student_name, new_phase, used_kinesthetic=0):
+def update_student_phase(session_id, student_name, new_phase, used_kinesthetic=0, teacher_intervention=0):
     """
     Called when a student is promoted to a new phase during the advancement staircase.
     Logs a new metric entry with the promoted phase as the method_used.
@@ -114,12 +121,12 @@ def update_student_phase(session_id, student_name, new_phase, used_kinesthetic=0
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''
-    INSERT INTO student_metrics (session_id, student_name, evaluation_passed, method_used, used_kinesthetic, timestamp)
-    VALUES (?, ?, ?, ?, ?, ?)
-    ''', (str(session_id), str(student_name), "promoted", str(new_phase), int(used_kinesthetic), now_str))
+    INSERT INTO student_metrics (session_id, student_name, evaluation_passed, method_used, used_kinesthetic, teacher_intervention, timestamp)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (str(session_id), str(student_name), "promoted", str(new_phase), int(used_kinesthetic), int(teacher_intervention), now_str))
     conn.commit()
     conn.close()
-    print(f"[RL Telemetry] PHASE PROMOTION: Student:{student_name} promoted to phase: {new_phase} | Kinesthetic:{used_kinesthetic}")
+    print(f"[RL Telemetry] PHASE PROMOTION: Student:{student_name} promoted to phase: {new_phase} | Kinesthetic:{used_kinesthetic} | TeacherIntervention:{teacher_intervention}")
 
 # Immediately initialize the DB upon module import securely
 init_db()

@@ -272,7 +272,9 @@ def handle_key_press(action):
             import core.database as database
             session_id = state_manager.get_current_session()
             student_name = state_manager.get_current_student() or "unknown"
-            database.log_student_metric(session_id, student_name, "null", "teacher_intervention")
+            # We log 'elaborate' so the student can resume from the most scaffolded phase,
+            # but we set teacher_intervention=1 for accurate tracking.
+            database.log_student_metric(session_id, student_name, "null", "elaborate", teacher_intervention=1)
         except Exception as db_err:
             print(f"[Teacher Intervention] RL SQLite Telemetry Logging error: {db_err}")
 
@@ -285,7 +287,6 @@ def handle_key_press(action):
         flow_controller._save_student_state(student_name)
         
         state_manager.current_path = []
-        state_manager.set_affordance_level(1)
         
         get_robot_eyes().set_expression("default")
         print("[Teacher Intervention] Phase set to 'elaborate'. Moving to next student...")

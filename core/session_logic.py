@@ -60,10 +60,6 @@ def next_student():
     state_manager.set_student_queue(queue)
     state_manager.set_current_student(student)
     
-    # Reset tracking state for new student
-    state_manager.set_five_e_stage("evaluate")
-    state_manager.set_affordance_level(1)
-    
     print(f"Next student selected: {student}")
     
     # First student gets the task introduction screen

@@ -180,10 +180,13 @@ class FlowController:
             try:
                 import core.database as database
                 session_id = state_manager.get_current_session()
+                # Check if we just came from teacher intervention (though identifying usually doesn't)
+                ti = 1 if self.get_current_node() == "teacher_intervention" else 0
                 database.log_student_metric(session_id, student_name,
                     f"evaluate_L{self._get_eval_level(self.identified_phase)}", 
                     self.identified_phase,
-                    used_kinesthetic=self.used_kinesthetic_this_round)
+                    used_kinesthetic=self.used_kinesthetic_this_round,
+                    teacher_intervention=ti)
             except Exception as e:
                 print(f"[FlowController] DB error: {e}")
 
@@ -208,7 +211,8 @@ class FlowController:
                     import core.database as database
                     session_id = state_manager.get_current_session()
                     database.update_student_phase(session_id, student_name, new, 
-                                                 used_kinesthetic=self.used_kinesthetic_this_round)
+                                                 used_kinesthetic=self.used_kinesthetic_this_round,
+                                                 teacher_intervention=0) # Advancement implies they passed without TI
                 except Exception as e:
                     print(f"[FlowController] DB error: {e}")
             self.progression_state = "CONFIRMING"
