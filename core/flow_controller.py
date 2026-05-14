@@ -40,6 +40,7 @@ class FlowController:
         self.progression_state = "IDENTIFYING"
         self.identified_phase = None
         self.baseline_confirms = 0
+        self.used_kinesthetic_this_round = False
         # Per-student state persistence across rounds
         self.student_states = {}
 
@@ -72,6 +73,7 @@ class FlowController:
     def reset_for_new_student(self):
         self.cascade_index = 0
         self.kinesthetic_attempts = {1: False, 2: False, 3: False}
+        self.used_kinesthetic_this_round = False
         state_manager.set_affordance_level(1)
         if not hasattr(state_manager, 'current_path'):
             state_manager.current_path = []
@@ -80,6 +82,7 @@ class FlowController:
     def reset_cascade(self):
         self.cascade_index = 0
         self.kinesthetic_attempts = {1: False, 2: False, 3: False}
+        self.used_kinesthetic_this_round = False
         state_manager.set_affordance_level(1)
 
     def _get_phase_above(self, phase):
@@ -178,7 +181,9 @@ class FlowController:
                 import core.database as database
                 session_id = state_manager.get_current_session()
                 database.log_student_metric(session_id, student_name,
-                    f"evaluate_L{self._get_eval_level(self.identified_phase)}", self.identified_phase)
+                    f"evaluate_L{self._get_eval_level(self.identified_phase)}", 
+                    self.identified_phase,
+                    used_kinesthetic=self.used_kinesthetic_this_round)
             except Exception as e:
                 print(f"[FlowController] DB error: {e}")
 
@@ -202,7 +207,8 @@ class FlowController:
                 try:
                     import core.database as database
                     session_id = state_manager.get_current_session()
-                    database.update_student_phase(session_id, student_name, new)
+                    database.update_student_phase(session_id, student_name, new, 
+                                                 used_kinesthetic=self.used_kinesthetic_this_round)
                 except Exception as e:
                     print(f"[FlowController] DB error: {e}")
             self.progression_state = "CONFIRMING"
@@ -237,6 +243,7 @@ class FlowController:
         # ── KINESTHETIC LOOP (Applies to all states on first level failure) ──
         if not self.kinesthetic_attempts.get(level, False):
             self.kinesthetic_attempts[level] = True
+            self.used_kinesthetic_this_round = True
             print(f"[FlowController] First L{level} failure → Kinesthetic side-loop")
             state_manager.current_stage = "kinesthetic"
             try:

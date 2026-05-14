@@ -15,7 +15,43 @@ def next_student():
     queue = state_manager.get_student_queue()
     
     if not queue:
-        # No more students — session is truly complete for this single task
+        # ── DEVELOPMENT STAGE LOGIC ──
+        # Check Firebase again to see if we should start another round.
+        # In Production: We should only repeat if (new_lesson != old_lesson).
+        # In Development: We repeat as long as Firebase has ANY lesson information.
+        print("[Session Logic] All students complete. Re-checking Firebase for next round...")
+        
+        try:
+            from core import firebase
+            import random
+            import core.task_loader as task_loader
+            
+            selected_teacher = state_manager.get_selected_teacher()
+            lesson_id = firebase.get_current_lesson(selected_teacher) if selected_teacher else None
+            
+            if lesson_id:
+                print(f"[Session Logic] Round Complete. Firebase has task '{lesson_id}'. Starting another round.")
+                
+                # 1. Refetch students
+                students = firebase.get_students(selected_teacher)
+                state_manager.set_student_list(students)
+                new_queue = students.copy()
+                random.shuffle(new_queue)
+                state_manager.set_student_queue(new_queue)
+                
+                # 2. Load the task
+                all_tasks = task_loader.get_loaded_tasks()
+                lesson_data = next((t for t in all_tasks if t.get("task_id") == lesson_id), None)
+                state_manager.set_current_task(lesson_data)
+                
+                # 3. Recursively call next_student to pick the first person from the new queue
+                return next_student()
+            else:
+                print("[Session Logic] Firebase returned no lesson. Ending session.")
+        except Exception as e:
+            print(f"[Session Logic] Error during Firebase re-poll: {e}")
+
+        # If no lesson or error, truly complete the session
         print("[Session Logic] All students complete for this task!")
         navigator.navigate_to("session_complete")
         return
