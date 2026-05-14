@@ -8,6 +8,10 @@ from PySide6.QtCore import QObject, QEvent, Qt
 # CRITICAL BUGFIX: Core graphic resource engine MUST boot BEFORE Chromium memory allocations!
 app = QApplication(sys.argv)
 
+from core.firebase import update_connected_ip
+# Upload IP address immediately on startup
+update_connected_ip()
+
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 

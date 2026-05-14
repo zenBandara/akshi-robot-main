@@ -1,7 +1,9 @@
 import datetime
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_admin import db
+import socket
 
 cred = credentials.Certificate("serviceAccountKey.json")
 
@@ -15,6 +17,40 @@ try:
 except ValueError:
     firestore_client = None
     print("Warning: Firestore client could not be initialized.")
+
+def update_connected_ip():
+    """Retrieves the local IPv4 address, uploads it to Firebase RTDB, and updates sshdata.txt."""
+    try:
+        # Create a socket and connect to Google's DNS to find the local interface IP
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+
+        # 1. Update Firebase
+        db.reference("connected_ip").set(ip)
+        print(f"[Firebase] Connected IP updated to: {ip}")
+
+        # 2. Update local sshdata.txt for convenience
+        ssh_file = "sshdata.txt"
+        if os.path.exists(ssh_file):
+            with open(ssh_file, "r") as f:
+                lines = f.readlines()
+            
+            if lines:
+                # Assuming format is user@old_ip
+                parts = lines[0].strip().split("@")
+                if len(parts) == 2:
+                    user = parts[0]
+                    lines[0] = f"{user}@{ip}\n"
+                    with open(ssh_file, "w") as f:
+                        f.writelines(lines)
+                    print(f"[Local] Updated {ssh_file} with new IP: {ip}")
+
+        return ip
+    except Exception as e:
+        print(f"[Firebase/Local] Error updating IP: {e}")
+        return None
 
 def get_teachers():
 
