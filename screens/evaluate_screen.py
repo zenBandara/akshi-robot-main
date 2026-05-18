@@ -210,6 +210,7 @@ def present_option(idx):
     awaiting_yes_no = False  # Not yet — wait for speech to finish
 
     game_widget.clear_highlight()
+    game_widget.set_focus_mode(False)
     current_key = presentation_keys[idx]
     op_code = key_mapping[current_key]
 
@@ -230,6 +231,10 @@ def present_option(idx):
         if input_enabled and current_presenting_idx == idx:
             awaiting_yes_no = True
             print(f"[Evaluate Screen] Waiting for YES/NO on option {current_key}...")
+            
+            # ── LEVEL 3 FOCUS DIMMING ──
+            if state_manager.get_affordance_level() >= 3:
+                game_widget.set_focus_mode(True)
 
     QTimer.singleShot(op_delay_ms + 200, unlock_input)
 
@@ -472,6 +477,7 @@ def _process_answer(is_correct):
     for anim in active_animations:
         anim.stop()
 
+    game_widget.set_focus_mode(False)
     sound_manager.stop_bgm()
 
     if is_correct:

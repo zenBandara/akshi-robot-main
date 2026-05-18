@@ -50,22 +50,35 @@ def on_show():
     
     # Get task data
     task_data = state_manager.get_current_task()
-    task_name = task_data.get("task_name", "A Fun Activity") if task_data else "A Fun Activity"
+    if task_data:
+        task_name = task_data.get("task_name", "A Fun Activity")
+    else:
+        print("[Task Intro Screen] WARNING: No task data found in state_manager!")
+        task_name = "A Fun Activity"
+        
+    print(f"[Task Intro Screen] Setting lesson name to: '{task_name}'")
     
     # Populate UI
-    window.task_name_label.setText(task_name)
+    if hasattr(window, "task_name_label"):
+        window.task_name_label.setText(task_name)
+    else:
+        print("[Task Intro Screen] ERROR: task_name_label not found in UI!")
+    
+    # Force a UI update to ensure the text is rendered immediately
+    window.update()
     
     # Fade-in animation for the task name
-    name_opacity = QGraphicsOpacityEffect(window.task_name_label)
-    window.task_name_label.setGraphicsEffect(name_opacity)
-    name_opacity.setOpacity(0.0)
-    
-    name_anim = QPropertyAnimation(name_opacity, b"opacity")
-    name_anim.setDuration(1200)
-    name_anim.setStartValue(0.0)
-    name_anim.setEndValue(1.0)
-    name_anim.setEasingCurve(QEasingCurve.OutCubic)
-    name_anim.start()
+    if hasattr(window, "task_name_label"):
+        name_opacity = QGraphicsOpacityEffect(window.task_name_label)
+        window.task_name_label.setGraphicsEffect(name_opacity)
+        name_opacity.setOpacity(0.0)
+        
+        name_anim = QPropertyAnimation(name_opacity, b"opacity")
+        name_anim.setDuration(1200)
+        name_anim.setStartValue(0.0)
+        name_anim.setEndValue(1.0)
+        name_anim.setEasingCurve(QEasingCurve.OutCubic)
+        name_anim.start()
     
     # Robot introduces the task
     intro_speech = f"Hello my wonderful friends! Today, we are going to learn all about {task_name}! It is going to be so much fun. Let's get started!"
