@@ -210,9 +210,9 @@ def on_show():
 
     game_widget.load_data(student_name, task_data, level, path)
 
-    speech_text = f"Let's ask teacher for some help! Don't worry {student_name}, you did great trying!"
-    print(f"🤖 ROBOT SPEAKS [CHEERFUL ENCOURAGING TONE]: \"{speech_text}\"")
-    delay_ms = voice_manager.speak(speech_text, f"teacher_intervention_{student_name}")
+    speech_template = "Let's ask teacher for some help! Don't worry {name}, you did great trying!"
+    print(f"🤖 ROBOT SPEAKS [CHEERFUL ENCOURAGING TONE]: \"{speech_template.replace('{name}', student_name)}\"")
+    delay_ms = voice_manager.speak_with_name(speech_template, student_name, f"teacher_intervention_{student_name}")
 
     print(f"Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()

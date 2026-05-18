@@ -169,9 +169,9 @@ def on_show():
     desc_text = eval_data.get("task_description", "")
 
     # ── All levels now use the sequential YES/NO presentation ──
-    speech_text = f"{student_name}, {speech_start} {desc_text}".strip()
-    print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_text}\"")
-    delay_ms = voice_manager.speak(speech_text, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}")
+    speech_template = "{name}, " + f"{speech_start} {desc_text}".strip()
+    print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_template.replace('{name}', student_name)}\"")
+    delay_ms = voice_manager.speak_with_name(speech_template, student_name, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}")
 
     enable_input()
 
@@ -275,15 +275,15 @@ def on_motivation_nudge():
     from core.dialogue import DialoguePool
     # Use level-specific motivation
     if level >= 3:
-        nudge = DialoguePool.get_phrase("motivation_nudge_l3", student_name)
-        print(f"⏰ [1 MIN NUDGE L3] 🤖 ROBOT MOTIVATES (GENTLE): \"{nudge}\"")
+        nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge_l3", student_name)
+        print(f"⏰ [1 MIN NUDGE L3] 🤖 ROBOT MOTIVATES (GENTLE): \"{nudge_template.format(name=nudge_name)}\"")
     elif level == 2:
-        nudge = DialoguePool.get_phrase("motivation_nudge_l2", student_name)
-        print(f"⏰ [1 MIN NUDGE L2] 🤖 ROBOT MOTIVATES (STRONG): \"{nudge}\"")
+        nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge_l2", student_name)
+        print(f"⏰ [1 MIN NUDGE L2] 🤖 ROBOT MOTIVATES (STRONG): \"{nudge_template.format(name=nudge_name)}\"")
     else:
-        nudge = DialoguePool.get_phrase("motivation_nudge", student_name)
-        print(f"⏰ [1 MIN NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge}\"")
-    voice_manager.speak(nudge, f"motivation_{student_name}")
+        nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge", student_name)
+        print(f"⏰ [1 MIN NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge_template.format(name=nudge_name)}\"")
+    voice_manager.speak_with_name(nudge_template, nudge_name, f"motivation_{student_name}")
 
 def on_timer_expire():
     """Called at 3 minutes — L1: escalate to kinesthetic, L2: rabbit jump break."""
@@ -315,8 +315,8 @@ def on_timer_expire():
         # ── L3: Student is too unresponsive, skip entirely to next student ──
         from core.dialogue import DialoguePool
         print(f"[Evaluate Screen] ⏭️ L3 timeout → Skipping student {student_name}!")
-        skip_speech = DialoguePool.get_phrase("skip_l3", student_name)
-        delay_ms = voice_manager.speak(skip_speech, f"timeout_skip_{student_name}")
+        skip_template, skip_name = DialoguePool.get_template("skip_l3", student_name)
+        delay_ms = voice_manager.speak_with_name(skip_template, skip_name, f"timeout_skip_{student_name}")
 
         def skip_student():
             try:
@@ -331,8 +331,8 @@ def on_timer_expire():
     elif level == 2:
         # ── L2: Route to Rabbit Jump Break screen ──
         print(f"[Evaluate Screen] 🐰 L2 timeout → Rabbit Jump Break for {student_name}!")
-        timeout_speech = f"Hey {student_name}! I think you need some energy! Let's do something super fun!"
-        delay_ms = voice_manager.speak(timeout_speech, f"timeout_break_{student_name}")
+        timeout_template = "Hey {name}! I think you need some energy! Let's do something super fun!"
+        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_break_{student_name}")
 
         def go_to_break():
             try:
@@ -345,10 +345,10 @@ def on_timer_expire():
     else:
         # ── L1: Route to Water Break Screen ──
         if motivation_given:
-            timeout_speech = f"That's okay {student_name}! I think you might need a little rest!"
+            timeout_template = "That's okay {name}! I think you might need a little rest!"
         else:
-            timeout_speech = f"Hey {student_name}, it looks like you could use a small break!"
-        delay_ms = voice_manager.speak(timeout_speech, f"timeout_3min_{student_name}")
+            timeout_template = "Hey {name}, it looks like you could use a small break!"
+        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_3min_{student_name}")
 
         def transition_after_speech():
             try:
@@ -496,10 +496,10 @@ def _process_answer(is_correct):
         student_name = state_manager.get_current_student() or "friend"
         current_level = state_manager.get_affordance_level()
         dialogue_category = f"incorrect_L{current_level}"
-        encouragement_speech = DialoguePool.get_phrase(dialogue_category, student_name)
+        encourage_template, encourage_name = DialoguePool.get_template(dialogue_category, student_name)
 
-        print(f"🤖 ROBOT ENCOURAGES: \"{encouragement_speech}\"")
-        delay_ms = voice_manager.speak(encouragement_speech, f"eval_encourage_{student_name}")
+        print(f"🤖 ROBOT ENCOURAGES: \"{encourage_template.format(name=encourage_name)}\"")
+        delay_ms = voice_manager.speak_with_name(encourage_template, encourage_name, f"eval_encourage_{student_name}")
 
         def proceed_to_incorrect_cascade():
             try:

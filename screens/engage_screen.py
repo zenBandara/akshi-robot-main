@@ -1,7 +1,7 @@
 import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer, QUrl
-from PySide6.QtWidgets import QVBoxLayout, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QLabel, QApplication
 from PySide6.QtGui import QPainterPath, QRegion, QPixmap
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
@@ -159,6 +159,9 @@ def on_show():
     if speech_start:
         swap_video("start", engage_data)
         window.robot_text_label.setText(f"🤖 \"{speech_start}\"")
+        window.update()
+        QApplication.processEvents()
+        
         print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
         start_delay = voice_manager.speak(speech_start, f"engage_{student_name}_start")
         QTimer.singleShot(start_delay + 600, play_middle)

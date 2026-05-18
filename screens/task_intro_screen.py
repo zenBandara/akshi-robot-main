@@ -1,7 +1,7 @@
 import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, QEasingCurve
-from PySide6.QtWidgets import QGraphicsOpacityEffect
+from PySide6.QtWidgets import QGraphicsOpacityEffect, QApplication
 from core.state_manager import state_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
@@ -66,24 +66,15 @@ def on_show():
     
     # Force a UI update to ensure the text is rendered immediately
     window.update()
+    QApplication.processEvents()
     
-    # Fade-in animation for the task name
+    # Ensure the task name is visible immediately
     if hasattr(window, "task_name_label"):
-        name_opacity = QGraphicsOpacityEffect(window.task_name_label)
-        window.task_name_label.setGraphicsEffect(name_opacity)
-        name_opacity.setOpacity(0.0)
-        
-        name_anim = QPropertyAnimation(name_opacity, b"opacity")
-        name_anim.setDuration(1200)
-        name_anim.setStartValue(0.0)
-        name_anim.setEndValue(1.0)
-        name_anim.setEasingCurve(QEasingCurve.OutCubic)
-        name_anim.start()
-    
+        window.task_name_label.setGraphicsEffect(None)
+
     # Robot introduces the task
     intro_speech = f"Hello my wonderful friends! Today, we are going to learn all about {task_name}! It is going to be so much fun. Let's get started!"
-    print(f"[Robot Speaks]: {intro_speech}")
-    
+    print(f"[Robot Speaks]: {intro_speech}")    
     duration_ms = 5000
     try:
         duration_ms = voice_manager.speak(intro_speech, f"task_intro_{task_name.replace(' ', '_').lower()}")

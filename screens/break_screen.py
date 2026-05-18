@@ -76,9 +76,9 @@ def on_show():
         pass
 
     # Act 1: Robot tells the story
-    story_speech = DialoguePool.get_phrase("break_story", student_name)
-    print(f"🤖 ROBOT SPEAKS (Break Story): \"{story_speech}\"")
-    delay_ms = voice_manager.speak(story_speech, f"break_story_{student_name}")
+    story_template, story_name = DialoguePool.get_template("break_story", student_name)
+    print(f"🤖 ROBOT SPEAKS (Break Story): \"{story_template.format(name=story_name)}\"")
+    delay_ms = voice_manager.speak_with_name(story_template, story_name, f"break_story_{student_name}")
 
     # After story speech finishes → start activity timer
     QTimer.singleShot(delay_ms + 500, _start_activity)
@@ -98,18 +98,18 @@ def _start_activity():
 def _on_halfway():
     """Called at ~22 seconds — halfway encouragement."""
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
-    speech = f"Great hopping, {student_name}! You're halfway there! Keep going!"
+    speech_template = "Great hopping, {name}! You're halfway there! Keep going!"
     get_robot_eyes().set_expression("surprised")
-    print(f"🤖 ROBOT SPEAKS (Halfway): \"{speech}\"")
-    voice_manager.speak(speech, f"break_halfway_{student_name}")
+    print(f"🤖 ROBOT SPEAKS (Halfway): \"{speech_template.replace('{name}', student_name)}\"")
+    voice_manager.speak_with_name(speech_template, student_name, f"break_halfway_{student_name}")
 
 
 def _on_almost_done():
     """Called at ~5 seconds remaining — hurry back!"""
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
-    speech = f"Almost done, {student_name}! Hop back to your seat!"
-    print(f"🤖 ROBOT SPEAKS (Almost Done): \"{speech}\"")
-    voice_manager.speak(speech, f"break_almost_{student_name}")
+    speech_template = "Almost done, {name}! Hop back to your seat!"
+    print(f"🤖 ROBOT SPEAKS (Almost Done): \"{speech_template.replace('{name}', student_name)}\"")
+    voice_manager.speak_with_name(speech_template, student_name, f"break_almost_{student_name}")
 
 
 def _on_activity_complete():
@@ -119,17 +119,17 @@ def _on_activity_complete():
     get_robot_eyes().set_expression("thinking")
 
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
-    return_speech = DialoguePool.get_phrase("break_return", student_name)
-    print(f"🤖 ROBOT SPEAKS (Return): \"{return_speech}\"")
-    voice_manager.speak(return_speech, f"break_return_{student_name}")
+    return_template, return_name = DialoguePool.get_template("break_return", student_name)
+    print(f"🤖 ROBOT SPEAKS (Return): \"{return_template.format(name=return_name)}\"")
+    voice_manager.speak_with_name(return_template, return_name, f"break_return_{student_name}")
 
 
 def _on_return_warning():
     """Called at 15 seconds remaining in return phase — verbal hurry-up."""
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
-    hurry_speech = DialoguePool.get_phrase("break_hurry", student_name)
-    print(f"🤖 ROBOT SPEAKS (Hurry): \"{hurry_speech}\"")
-    voice_manager.speak(hurry_speech, f"break_hurry_{student_name}")
+    hurry_template, hurry_name = DialoguePool.get_template("break_hurry", student_name)
+    print(f"🤖 ROBOT SPEAKS (Hurry): \"{hurry_template.format(name=hurry_name)}\"")
+    voice_manager.speak_with_name(hurry_template, hurry_name, f"break_hurry_{student_name}")
 
 
 def _on_return_timeout():
@@ -147,8 +147,8 @@ def _on_return_timeout():
     print(f"[Break Screen] ⏰ Return timeout! {student_name} did not come back. Skipping student.")
     get_robot_eyes().set_expression("sad")
 
-    skip_speech = f"Oh no, {student_name} didn't come back. Let's move on to the next friend!"
-    delay_ms = voice_manager.speak(skip_speech, f"break_skip_{student_name}")
+    skip_template = "Oh no, {name} didn't come back. Let's move on to the next friend!"
+    delay_ms = voice_manager.speak_with_name(skip_template, student_name, f"break_skip_{student_name}")
 
     def skip_student():
         try:
@@ -175,9 +175,9 @@ def handle_key_press(action):
         get_robot_eyes().set_expression("surprised")
 
         student_name = str(state_manager.get_current_student() or "friend").capitalize()
-        welcome_speech = f"Yay {student_name}, welcome back! You're full of energy now! Let's try again!"
-        print(f"🤖 ROBOT SPEAKS (Welcome Back): \"{welcome_speech}\"")
-        delay_ms = voice_manager.speak(welcome_speech, f"break_welcome_{student_name}")
+        welcome_template = "Yay {name}, welcome back! You're full of energy now! Let's try again!"
+        print(f"🤖 ROBOT SPEAKS (Welcome Back): \"{welcome_template.replace('{name}', student_name)}\"")
+        delay_ms = voice_manager.speak_with_name(welcome_template, student_name, f"break_welcome_{student_name}")
 
         def resume():
             try:

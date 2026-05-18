@@ -92,8 +92,8 @@ class DialoguePool:
     ]
 
     @classmethod
-    def get_phrase(cls, category, student_name="Superstar"):
-        """Extract a mathematically pseudo-random natural language processing string securely formatting dynamic child names."""
+    def _get_pool(cls, category):
+        """Internal helper to look up the phrase pool for a given category."""
         pools = {
             "correct": cls.CORRECT,
             "incorrect_L1": cls.INCORRECT_L1,
@@ -109,6 +109,28 @@ class DialoguePool:
             "break_hurry": cls.BREAK_HURRY,
             "thinking": cls.WAITING_THINKING
         }
-        
-        target_pool = pools.get(category, ["Great job, {name}!"])
+        return pools.get(category, ["Great job, {name}!"])
+
+    @classmethod
+    def get_phrase(cls, category, student_name="Superstar"):
+        """Extract a mathematically pseudo-random natural language processing string securely formatting dynamic child names."""
+        target_pool = cls._get_pool(category)
         return random.choice(target_pool).format(name=student_name)
+
+    @classmethod
+    def get_template(cls, category, student_name="Superstar"):
+        """Returns (template_string, student_name) tuple for use with speak_with_name().
+        
+        The template contains the raw {name} placeholder instead of the formatted name,
+        enabling the VoiceManager to split the audio into reusable segments.
+        
+        Args:
+            category: The dialogue category (e.g. "correct", "break_story")
+            student_name: The student's name
+            
+        Returns:
+            Tuple of (template_string_with_{name}_placeholder, student_name)
+        """
+        target_pool = cls._get_pool(category)
+        template = random.choice(target_pool)
+        return template, student_name

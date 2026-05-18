@@ -1,7 +1,7 @@
 import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QPropertyAnimation, QTimer, QEasingCurve
-from PySide6.QtWidgets import QGraphicsOpacityEffect
+from PySide6.QtWidgets import QGraphicsOpacityEffect, QApplication
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
@@ -51,17 +51,21 @@ def get_ui():
         window.student_name_label.setText(f"{display_name}! 🎉")
         window.hint_label.setText("Say 'Okay' to start, or 'No' to skip! 🌟")
         
+        # Force UI update before blocking voice generation
+        window.update()
+        QApplication.processEvents()
+
         get_robot_eyes().set_expression("encouraging")
         
         # Simple call — the task introduction is handled by the dedicated task_intro_screen
-        intro_msg = f"{display_name}, can you please come on up? It is your turn to shine!"
+        intro_template = "{name}, can you please come on up? It is your turn to shine!"
         
-        print(f"[Robot Speaks]: {intro_msg}")
-        duration_ms = voice_manager.speak(intro_msg, f"call_{display_name}")
+        print(f"[Robot Speaks]: {intro_template.replace('{name}', display_name)}")
+        duration_ms = voice_manager.speak_with_name(intro_template, display_name, f"call_{display_name}")
             
-        if fade_anim:
-            fade_effect.setOpacity(0.0)
-            fade_anim.start()
+        # Ensure name is visible immediately
+        if hasattr(window, "student_name_label"):
+            window.student_name_label.setGraphicsEffect(None)
 
     window.on_show = on_show
     return window

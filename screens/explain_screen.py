@@ -2,7 +2,7 @@ import os
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt, QTimer, QUrl
 from PySide6.QtGui import QPixmap, QImage, QPainterPath, QRegion
-from PySide6.QtWidgets import QVBoxLayout, QFrame, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QFrame, QLabel, QApplication
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
@@ -61,6 +61,9 @@ def on_show():
     full_speech = f"{speech_start} {speech_end}"
     
     window.robot_text_label.setText(f'🤖 "{full_speech}"')
+    window.update()
+    QApplication.processEvents()
+    
     print(f'🤖 ROBOT SPEAKS: "{full_speech}"')
     voice_manager.speak(full_speech, f"explain_full_{task_data.get('task_id', 'id')}")
     

@@ -51,16 +51,17 @@ def on_show():
         
     # 2. Pick Random Encouragement Phrase
     from core.dialogue import DialoguePool
-    selected_phrase = DialoguePool.get_phrase("correct", display_name)
+    template, name = DialoguePool.get_template("correct", display_name)
+    selected_phrase = template.format(name=name)
     
     # 3. Update UI Text
     window.celebration_text.setText(selected_phrase)
     
     # 4. Robot Speech Stub (Filter out emojis for speech engine)
-    clean_speech = selected_phrase.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '')
-    clean_speech_str = clean_speech.strip()
-    print(f"🤖 ROBOT SPEAKS: \"{clean_speech_str}\"")
-    duration_ms = voice_manager.speak(clean_speech_str, f"celebrate_{student_name}")
+    clean_template = template.replace('🌟', '').replace('🎉', '').replace('💡', '').replace('✨', '').replace('🚀', '').replace('🏆', '')
+    clean_template = clean_template.strip()
+    print(f"🤖 ROBOT SPEAKS: \"{clean_template.format(name=name)}\"")
+    duration_ms = voice_manager.speak_with_name(clean_template, name, f"celebrate_{student_name}")
     
     # 5. Gamified Reward statically (Level 1 Affective Affordance)
     # The blinking animation has been removed based on user feedback.
