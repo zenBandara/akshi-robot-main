@@ -1,4 +1,4 @@
-# 🤖 Ginglu Robot — Dummy Backend
+# 🤖 Jinglu Robot — Dummy Backend
 
 Replaces **both** hardware-dependent components so you can develop the
 PySide6 frontend on your MacBook without the robot or the analysis server.

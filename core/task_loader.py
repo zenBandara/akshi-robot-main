@@ -6,7 +6,7 @@ from core.state_manager import state_manager
 
 def validate_task(data):
     """
-    Validate a task JSON dictionary against the official Ginglu Robot schema.
+    Validate a task JSON dictionary against the official Jinglu Robot schema.
     Returns True if valid, False if invalid. Prints detailed error messages.
     """
     if not isinstance(data, dict):

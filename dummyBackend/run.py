@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🤖 Ginglu Robot — Dummy Backend Launcher
+🤖 Jinglu Robot — Dummy Backend Launcher
 ========================================
 Launches BOTH the dummy robot and dummy analysis server together.
 

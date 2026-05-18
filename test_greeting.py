@@ -24,7 +24,7 @@ import core.navigator as nav
 class TestWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("👋 Ginglu Greeting Preview")
+        self.setWindowTitle("👋 Jinglu Greeting Preview")
         self.setFixedSize(1280, 720)
 
         # Create the Stacked Widget

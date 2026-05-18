@@ -44,7 +44,7 @@ def setup_mock_state():
 class TestWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("🚀 Ginglu Gamified L3 Preview")
+        self.setWindowTitle("🚀 Jinglu Gamified L3 Preview")
         self.setFixedSize(1280, 720)
 
         # Create the Stacked Widget (The "Brain")

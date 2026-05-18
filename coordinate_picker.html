@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jinglu UI Coordinate Picker</title>
+    <style>
+        :root {
+            --primary: #1976D2;
+            --bg: #f8f9fa;
+            --panel: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+            gap: 20px;
+        }
+        .canvas-area {
+            flex: 1;
+            background: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            position: relative;
+            border: 2px dashed #bbb;
+        }
+        canvas {
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: crosshair;
+        }
+        .sidebar {
+            width: 320px;
+            background: var(--panel);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        h2 { margin: 0 0 10px 0; font-size: 1.2rem; color: #333; }
+        .info { font-size: 0.9rem; color: #666; line-height: 1.4; }
+        .coord-box {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+        }
+        .coord-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        button.secondary { background: #5f6368; }
+        textarea {
+            width: 100%;
+            height: 80px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+        }
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 1.4rem; font-weight: bold;">Jinglu UI Coordinate Picker 🎯</div>
+    <div class="upload-btn-wrapper">
+        <button>Upload Background</button>
+        <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
+    </div>
+</header>
+
+<div class="container">
+    <div class="canvas-area" id="dropZone">
+        <canvas id="imageCanvas"></canvas>
+        <div id="placeholder" style="color: #888; font-size: 1.2rem;">Drop image here or click 'Upload'</div>
+    </div>
+
+    <div class="sidebar">
+        <h2>Coordinates</h2>
+        <p class="info">Click and drag on the image to draw a rectangle area.</p>
+        
+        <div class="coord-box">
+            <div class="coord-row"><span>X:</span> <span id="valX">0</span></div>
+            <div class="coord-row"><span>Y:</span> <span id="valY">0</span></div>
+            <div class="coord-row"><span>W:</span> <span id="valW">0</span></div>
+            <div class="coord-row"><span>H:</span> <span id="valH">0</span></div>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <label style="font-size: 0.8rem; font-weight: bold; color: #555;">NORMALIZED (Relative to 1280x720)</label>
+            <textarea id="outputCode" readonly placeholder="Resulting code will appear here..."></textarea>
+        </div>
+
+        <button onclick="copyToClipboard()">Copy JSON for AI</button>
+        <button class="secondary" onclick="clearCanvas()">Clear Rectangle</button>
+
+        <div style="margin-top: auto; font-size: 0.75rem; color: #999; border-top: 1px solid #eee; padding-top: 10px;">
+            Target Resolution: 1280 x 720 (Robot standard)
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageLoader = document.getElementById('imageLoader');
+    const outputCode = document.getElementById('outputCode');
+    const placeholder = document.getElementById('placeholder');
+
+    let img = new Image();
+    let startX, startY, isDrawing = false;
+    let rect = { x: 0, y: 0, w: 0, h: 0 };
+
+    imageLoader.addEventListener('change', handleImage, false);
+
+    function handleImage(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            img.onload = function() {
+                // Set canvas to robot standard resolution
+                canvas.width = 1280;
+                canvas.height = 720;
+                placeholder.style.display = 'none';
+                draw();
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw image scaled to 1280x720
+        if (img.src) {
+            ctx.drawImage(img, 0, 0, 1280, 720);
+        }
+
+        // Draw rectangle
+        if (isDrawing || rect.w !== 0) {
+            ctx.strokeStyle = '#FF0000';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6]);
+            ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+            
+            // Fill interior slightly
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        }
+        updateUI();
+    }
+
+    canvas.onmousedown = (e) => {
+        const rectCanvas = canvas.getBoundingClientRect();
+        startX = e.clientX - rectCanvas.left;
+        startY = e.clientY - rectCanvas.top;
+        isDrawing = true;
+    };
+
+    canvas.onmousemove = (e) => {
+        if (!isDrawing) return;
+        const rectCanvas = canvas.getBoundingClientRect();
+        const currentX = e.clientX - rectCanvas.left;
+        const currentY = e.clientY - rectCanvas.top;
+
+        rect.x = Math.min(startX, currentX);
+        rect.y = Math.min(startY, currentY);
+        rect.w = Math.abs(startX - currentX);
+        rect.h = Math.abs(startY - currentY);
+        draw();
+    };
+
+    canvas.onmouseup = () => {
+        isDrawing = false;
+    };
+
+    function updateUI() {
+        document.getElementById('valX').innerText = Math.round(rect.x);
+        document.getElementById('valY').innerText = Math.round(rect.y);
+        document.getElementById('valW').innerText = Math.round(rect.w);
+        document.getElementById('valH').innerText = Math.round(rect.h);
+
+        const data = {
+            x: Math.round(rect.x),
+            y: Math.round(rect.y),
+            w: Math.round(rect.w),
+            h: Math.round(rect.h),
+            ratio_x: (rect.x / 1280).toFixed(3),
+            ratio_y: (rect.y / 720).toFixed(3),
+            ratio_w: (rect.w / 1280).toFixed(3),
+            ratio_h: (rect.h / 720).toFixed(3)
+        };
+        outputCode.value = JSON.stringify(data, null, 2);
+    }
+
+    function clearCanvas() {
+        rect = { x: 0, y: 0, w: 0, h: 0 };
+        draw();
+    }
+
+    function copyToClipboard() {
+        outputCode.select();
+        document.execCommand('copy');
+        alert('Coordinates copied! Paste them to Gemini.');
+    }
+
+    // Drag and drop support
+    const dropZone = document.getElementById('dropZone');
+    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; };
+    dropZone.ondragleave = () => { dropZone.style.borderColor = '#bbb'; };
+    dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#bbb';
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                img.onload = () => {
+                    canvas.width = 1280;
+                    canvas.height = 720;
+                    placeholder.style.display = 'none';
+                    draw();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+</script>
+
+</body>
+</html>

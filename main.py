@@ -45,7 +45,7 @@ class ScalableWindow(QMainWindow):
     """
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Ginglu Robot Interface")
+        self.setWindowTitle("Jinglu Robot Interface")
         
         # 1. Create the high-res Stacked Widget (The "Brain")
         self.stack = QStackedWidget()
@@ -163,7 +163,7 @@ def cleanup_and_exit(signum, frame):
 signal.signal(signal.SIGINT, cleanup_and_exit)
 signal.signal(signal.SIGTERM, cleanup_and_exit)
 
-print("Ginglu app launched successfully!")
+print("Jinglu app launched successfully!")
 try:
     sys.exit(app.exec())
 finally:

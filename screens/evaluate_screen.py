@@ -1,5 +1,5 @@
 """
-Evaluate Screen — "Ginglu's Enchanted Forest" Edition
+Evaluate Screen — "Jinglu's Enchanted Forest" Edition
 =====================================================
 Replaces the plain white QUiLoader-based evaluation with a QPainter
 game world (sky, sun, clouds, hills, flowers, owl + speech bubble,

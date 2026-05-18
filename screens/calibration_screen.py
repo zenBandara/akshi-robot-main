@@ -1,5 +1,5 @@
 """
-Calibration Screen — "Ginglu's Magical Eyes" Edition
+Calibration Screen — "Jinglu's Magical Eyes" Edition
 ====================================================
 Replaces the plain colored-screen calibration with an animated 3-act mini-game.
 

@@ -1,5 +1,5 @@
 """
-🎮 Calibration Game Widget — "Ginglu's Magical Eyes"
+🎮 Calibration Game Widget — "Jinglu's Magical Eyes"
 =====================================================
 A 3-act animated mini-game that replaces the boring calibration screen.
 
@@ -258,7 +258,7 @@ class CalibrationGameWidget(QWidget):
 
         # Subtitle
         sub_font = QFont("Georgia", 26)
-        self._draw_fancy_text(p, "Look at Ginglu's camera...", sub_font,
+        self._draw_fancy_text(p, "Look at Jinglu's camera...", sub_font,
                               QColor(200, 190, 255), QColor(100, 80, 180, 80),
                               QRectF(0, title_y + 85, w, 50))
 

@@ -1,5 +1,5 @@
 """
-🌿 Evaluate Game Widget — "Ginglu's Enchanted Forest"
+🌿 Evaluate Game Widget — "Jinglu's Enchanted Forest"
 =====================================================
 A QPainter-based game world for evaluation screens.
 
