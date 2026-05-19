@@ -131,7 +131,7 @@ def on_show():
     # 3. Multi-Stage Warm Emotional Speech Loop mapped sequentially
     speech_start = engage_data.get("speech_start", "Let's try something super fun safely together.")
     speech_middle = engage_data.get("speech_middle", "Watch our character carefully on the screen!")
-    speech_end = engage_data.get("speech_end", "Press the Enter key when you are all done!")
+    speech_end = engage_data.get("speech_end", "Say 'Okay' when you are all done!")
     
     get_robot_eyes().set_expression("encouraging")
     
@@ -184,14 +184,14 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    if action == "ENTER":
+    if action in ["ENTER", "YES"]:
         input_enabled = False
         voice_manager.stop()
         get_robot_eyes().set_expression("default")
         if frame_timer:
             frame_timer.stop()
             
-        print("[Engage Screen] Student pressed ENTER. Flowing smoothly toward Evaluate L2 natively.")
+        print("[Engage Screen] Student said OKAY/YES. Flowing smoothly toward Evaluate L2 natively.")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()

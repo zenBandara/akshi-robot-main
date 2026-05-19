@@ -166,7 +166,7 @@ def handle_key_press(action):
     if not input_enabled:
         return
 
-    if action == "ENTER" and game_widget.phase == "return":
+    if action in ["ENTER", "YES"] and game_widget.phase == "return":
         # Student came back! Resume the cascade (retry L2 evaluation)
         input_enabled = False
         game_widget.stop_all()
@@ -186,4 +186,5 @@ def handle_key_press(action):
             except Exception as e:
                 print(f"[Break Screen] Error resuming cascade: {e}")
 
+        print("[Break Screen] Student said OKAY/YES. Resuming cascade.")
         QTimer.singleShot(delay_ms, resume)

@@ -1,0 +1,271 @@
+{
+  "connected_ip": "192.168.1.21",
+  "kid_name": "q",
+  "teachers": {
+    "chathura@ict_cmb_ac_lk": {
+      "attendance": {
+        "2026-03-02": "ans,nksd,kand,ndkf,nadn,nfsdf,nsdf,ndmsa",
+        "2026-03-15": "chathu,kusum,kalani",
+        "2026-05-07": "Shamal,Kanishka,Kalidu",
+        "2026-05-08": "Kalana,Kanishka Bandara,Kanishka Gihan,Kasun"
+      },
+      "current_lesson": "t_2",
+      "student_list": {
+        "-Os5EacJn6rNcXb7Lnn0": {
+          "firstName": "Kanishka",
+          "lastName": "Bandara"
+        },
+        "-Os5Edf-3KkNv8Bt1HHP": {
+          "firstName": "Kasun",
+          "lastName": "Silva"
+        },
+        "-Os5EjGt3-pE6Hg-9jEt": {
+          "firstName": "Kalana",
+          "lastName": "Jayasinghe"
+        },
+        "-Os5F07mu2zz2j6uyUff": {
+          "firstName": "Kanishka",
+          "lastName": "Gihan"
+        }
+      },
+      "teacher_dash_logs": {
+        "-Omhc_YhWeOyagDwNAu2": {
+          "action": "Attendance Submitted",
+          "details": "ans,nksd,kand,ndkf,nadn,nfsdf,nsdf,ndmsa",
+          "timestamp": 1772439623456
+        },
+        "-Omhcomsn8i22r4N1QGL": {
+          "action": "Lesson Selected",
+          "details": "lesson_02",
+          "timestamp": 1772439685867
+        },
+        "-OnmBccNNrJzHHMqtGZ7": {
+          "action": "Attendance Submitted",
+          "details": "chathu,kusum,kalani",
+          "timestamp": 1773589924474
+        },
+        "-OnmBd_5zGSg9kkiLyA-": {
+          "action": "Lesson Selected",
+          "details": "t_2",
+          "timestamp": 1773589928360
+        },
+        "-Os1MHtUTwIBSPTN3Oef": {
+          "action": "Attendance Submitted",
+          "details": "Shehan,Chathura,Kamal,Nimal",
+          "timestamp": 1778156120808
+        },
+        "-Os1ML91COPJI2yKwG8-": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778156134155
+        },
+        "-Os1MdWHAfGbeFJxdJLE": {
+          "action": "Attendance Submitted",
+          "details": "Hasitha,Nimal",
+          "timestamp": 1778156213487
+        },
+        "-Os1MhfW3M_64FAGrmsU": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778156230525
+        },
+        "-Os1pVzsTC6I-BR0s3ko": {
+          "action": "Attendance Submitted",
+          "details": "Shamal,Kanishka,Kalidu",
+          "timestamp": 1778164042831
+        },
+        "-Os1prA2GPRNH1zbP00h": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778164133658
+        },
+        "-Os5F9zGlmJCwkM0I-lJ": {
+          "action": "Attendance Submitted",
+          "details": "Kalana,Kanishka Bandara,Kanishka Gihan,Kasun",
+          "timestamp": 1778221362022
+        },
+        "-Os5FDRsEW0iSnJBBsoI": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778221376205
+        },
+        "-Os5FHRiU_Nt97lgG8vo": {
+          "action": "Lesson Selected",
+          "details": "t_2",
+          "timestamp": 1778221392579
+        },
+        "-Os5IOMAYbiO54q9yUCF": {
+          "action": "Lesson Selected",
+          "details": "t_2",
+          "timestamp": 1778222207327
+        }
+      }
+    },
+    "chathuramahasen@gmail_com": {
+      "attendance": {
+        "2026-03-15": "chathura,sadun",
+        "2026-03-16": "chathura,hansi,kasun",
+        "2026-03-17": "dinujaya,dinujaya2",
+        "2026-03-23": "Dinujaya,Dinujaya2,Dinujaya3",
+        "2026-03-24": "Dinujaya,Saman",
+        "2026-05-08": "Chathura,Kasun"
+      },
+      "current_lesson": "t_1",
+      "student_list": {
+        "-Os6AFgECMlmWmrpaus4": {
+          "firstName": "Chathura",
+          "lastName": "Kamal"
+        },
+        "-Os6AHpVpWX9lZd_cTG_": {
+          "firstName": "Kasun",
+          "lastName": "Udara"
+        }
+      },
+      "teacher_dash_logs": {
+        "-Onm3a7HYrgr6_9zuF4p": {
+          "action": "Attendance Submitted",
+          "details": "chathura,banuka,harsha,hasini,gave",
+          "timestamp": 1773587817075
+        },
+        "-Onm3bj0CkuBdhMhD5e2": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1773587823651
+        },
+        "-Onn1Z9gVp-qIF7o2yCp": {
+          "action": "Attendance Submitted",
+          "details": "chathura,sadun",
+          "timestamp": 1773604062264
+        },
+        "-Onn1_BguQqfhBH06hWM": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1773604066489
+        },
+        "-OnopHhUY-ChGeQ7e8HO": {
+          "action": "Attendance Submitted",
+          "details": "chathura,hansi,kasun",
+          "timestamp": 1773634137605
+        },
+        "-OnopKmgnqk6Qhp3Nq8g": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1773634150226
+        },
+        "-OnvyyziO5lorqXjHa64": {
+          "action": "Attendance Submitted",
+          "details": "dinujaya,dinujaya2",
+          "timestamp": 1773754118241
+        },
+        "-Onvz-YQvlK7EnCT5mj6": {
+          "action": "Lesson Selected",
+          "details": "t_3",
+          "timestamp": 1773754124622
+        },
+        "-OoNQtfGTMqAgj0nPQjO": {
+          "action": "Attendance Submitted",
+          "details": "Dinujaya,Dinujaya2,Dinujaya3",
+          "timestamp": 1774231460681
+        },
+        "-OoNQuZFxdvOxfuRtQH9": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1774231464328
+        },
+        "-OoU4XUBWP81jKKonrs8": {
+          "action": "Attendance Submitted",
+          "details": "Dinujaya,Sarith,Yasuru,Nadun,Dasindu,Malith,Vidhura,Methum,Nirmal",
+          "timestamp": 1774343039060
+        },
+        "-OoU4YMMN_O-wUFGkmm3": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1774343042656
+        },
+        "-Os6AJAI0RdgNXgwPzKL": {
+          "action": "Attendance Submitted",
+          "details": "Chathura,Kasun",
+          "timestamp": 1778236866153
+        },
+        "-Os6ALU_FrZQmZpondt3": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778236875643
+        },
+        "-Os6AP1GklJtJdwc3Q50": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778236890151
+        },
+        "-Os6IVClT39o3yaj9gGw": {
+          "action": "Lesson Selected",
+          "details": "t_2",
+          "timestamp": 1778239012614
+        },
+        "-Os6sqZxM78ojlYGhQIY": {
+          "action": "Lesson Selected",
+          "details": "t_3",
+          "timestamp": 1778248804173
+        },
+        "-Os6wIl_WZ6C7yY7NWvZ": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778249710323
+        }
+      }
+    },
+    "sehangamage708@gmail_com": {
+      "attendance": {
+        "2026-05-07": "Ashan,Dushan,Shehan_1 Gamage_1,Shehan_1 Gamage2,Shehan_1 Gamage3,Thihan"
+      },
+      "current_lesson": "t_3",
+      "student_list": {
+        "-Os1dvcXW08wlYLlcaWg": {
+          "firstName": "Shehan_1",
+          "lastName": "Gamage_1"
+        },
+        "-Os1e-5COQM4fusICUXk": {
+          "firstName": "Shehan_2",
+          "lastName": "Gamage_2"
+        },
+        "-Os1f9itIK8OXLxYA8Gl": {
+          "firstName": "Ashan",
+          "lastName": "Chamara"
+        },
+        "-Os1fJkmVJCHgZwNRwT_": {
+          "firstName": "Thihan",
+          "lastName": "Gamage"
+        },
+        "-Os1fMwvKK9TKl2IZTMa": {
+          "firstName": "Dushan",
+          "lastName": "Gamage"
+        },
+        "-Os28Yi04pidlR84OUqN": {
+          "firstName": "Shehan_1",
+          "lastName": "Gamage2"
+        },
+        "-Os2FmK5ma2gvUeHqFNn": {
+          "firstName": "Shehan_1",
+          "lastName": "Gamage3"
+        }
+      },
+      "teacher_dash_logs": {
+        "-Os2FrTjiJxb3Acmr3kc": {
+          "action": "Attendance Submitted",
+          "details": "Ashan,Dushan,Shehan_1 Gamage_1,Shehan_1 Gamage2,Shehan_1 Gamage3,Thihan",
+          "timestamp": 1778171214517
+        },
+        "-Os2FwJq61U2ODfTZ8I6": {
+          "action": "Lesson Selected",
+          "details": "t_1",
+          "timestamp": 1778171234364
+        },
+        "-Os2G5mQ-52QVw3nTy_n": {
+          "action": "Lesson Selected",
+          "details": "t_3",
+          "timestamp": 1778171277217
+        }
+      }
+    }
+  }
+}

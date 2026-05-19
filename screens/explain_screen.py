@@ -57,7 +57,7 @@ def on_show():
     
     # 3. Speech
     speech_start = explain_data.get("speech_start", "Let's review this concept together.")
-    speech_end = explain_data.get("speech_end", "Say 'Done' when you are done.")
+    speech_end = explain_data.get("speech_end", "Say 'Okay' when you are done.")
     full_speech = f"{speech_start} {speech_end}"
     
     window.robot_text_label.setText(f'🤖 "{full_speech}"')
@@ -150,7 +150,7 @@ def enable_input():
     global input_enabled
     input_enabled = True
     keyboard_manager.register_handler(handle_key_press)
-    window.robot_text_label.setText("🤖 Say 'Done' when you are done.")
+    window.robot_text_label.setText("🤖 Say 'Okay' when you are done.")
     print("[Explain Screen] Robot fully finished speaking. Keyboard hardware inputs physically enabled.")
 
 def handle_key_press(action):
@@ -158,13 +158,13 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    if action == "ENTER": # Hardware mapping for Return/Enter
+    if action in ["ENTER", "YES"]: # Hardware mapping for Return/Enter or Yes
         input_enabled = False
         voice_manager.stop()
         get_robot_eyes().set_expression("encouraging")
         if frame_timer:
             frame_timer.stop()
-        print("[Explain Screen] Student pressed ENTER. Logging failure and advancing...")
+        print("[Explain Screen] Student said OKAY/YES. Logging failure and advancing...")
         
         # 1. Log the Failure Interaction natively
         task_data = state_manager.get_current_task()

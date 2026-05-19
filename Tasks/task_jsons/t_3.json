@@ -12,7 +12,7 @@
     },
     "speech_start": "Oh no, that is totally okay! We are going to try something super fun safely together. Stand up! It is time for the Magic Mirror Dance!",
     "speech_middle": "Watch our character carefully on the screen! When they shake their arm with the red bracelet, that is the Left side! Let's shake our left arm right now!",
-    "speech_end": "Now they are shaking the blue bracelet arm, that is the Right side! Superb! Shake your right arm! Press the Enter key when you are all done dancing and ready to try again!"
+    "speech_end": "Now they are shaking the blue bracelet arm, that is the Right side! Superb! Shake your right arm! Say 'Okay' when you are all done dancing "
   },
   "explore": {
     "task_title": "Dinosaur Jungle Safari!",
@@ -24,7 +24,7 @@
     },
     "speech_start": "Let's grab our magic binoculars and carefully explore the dinosaur jungle! Put your hands up to your eyes like binoculars! Are you ready?",
     "speech_middle": "Look all the way to the Left side! Shh! Behind those giant leaves on your Left, there is a tall, gentle dinosaur eating lunch! That is the Left side!",
-    "speech_end": "Now, quickly, safely swing your binoculars all the way to the Right side! Wow, do you see him? A fast little dinosaur is happily running across the field on your Right! Left for the tall dinosaur, Right for the fast dinosaur! Say 'Done' when you are all done exploring!"
+    "speech_end": "Now, quickly, safely swing your binoculars all the way to the Right side! Wow, do you see him? A fast little dinosaur is happily running across the field on your Right! Left for the tall dinosaur, Right for the fast dinosaur! Say 'Okay' when you are all done exploring!"
   },
   "explain": {
     "task_title": "Understanding Left and Right",
@@ -58,7 +58,7 @@
       "op4": "This picture shows a foot! That isn't a hand at all!"
     },
     "correct_option": "op1",
-    "correct_option_speech": "So, the first picture is the absolutely correct answer because we are looking specifically for the left hand! Say 'Ready' when you are ready to try the real test again!"
+    "correct_option_speech": "So, the first picture is the absolutely correct answer because we are looking specifically for the left hand! Say 'Okay' "
   },
   "evaluate": {
     "task_type": "mcq_image",

@@ -37,27 +37,27 @@ class DialoguePool:
     ]
 
     MOTIVATION_NUDGE = [
-        "Hey {name}, you're doing great! Take a nice look at the pictures and pick the one you think is right!",
-        "Don't worry {name}! There's no wrong answer here. Just pick the one that feels right to you!",
-        "I believe in you, {name}! Look at each picture carefully. You can do this!",
-        "{name}, remember, you're a superstar! Just press the number of the picture you think is correct!",
-        "Hey {name}! It's okay to take your time. Look at the pictures one more time and give it a try!",
-        "You've got this, {name}! Which picture do you think is the answer? Go ahead and press the number!"
+        "Hey {name}, you're doing great! Take a nice look at the picture and say yes or no!",
+        "Don't worry {name}! There's no wrong answer here. Just say yes or no!",
+        "I believe in you, {name}! Look at the picture carefully. You can do this!",
+        "{name}, remember, you're a superstar! Just say yes if you think it's correct, or no if it's not!",
+        "Hey {name}! It's okay to take your time. Look at the picture one more time and say yes or no!",
+        "You've got this, {name}! Do you think this picture is the answer? Go ahead and say yes or no!"
     ]
 
     MOTIVATION_NUDGE_L2 = [
-        "Come on {name}, you can do it! Look at the two pictures really carefully. Which one feels right? Just press 1 or 2!",
-        "Hey {name}! I know you know this! Take a deep breath and pick the one that looks correct. You're so close!",
-        "{name}, you're a champion! Don't be shy, just pick one! There's only two choices, you've got a great chance!",
-        "I'm rooting for you, {name}! Just look one more time and press the number. You've totally got this!",
-        "{name}, you're one of the smartest kids I know! Just pick the picture that looks right. I believe in you!"
+        "Come on {name}, you can do it! Look at the picture really carefully. Do you think it's right? Just say yes or no!",
+        "Hey {name}! I know you know this! Take a deep breath and say yes if it looks correct. You're so close!",
+        "{name}, you're a champion! Don't be shy, just say yes or no! I believe in you!",
+        "I'm rooting for you, {name}! Just look one more time and say yes or no. You've totally got this!",
+        "{name}, you're one of the smartest kids I know! Just say yes if the picture looks right. I believe in you!"
     ]
 
     MOTIVATION_NUDGE_L3 = [
-        "{name}, take a deep breath. You are doing amazing! Pick the answer that feels right to you.",
-        "It's okay to feel stuck, {name}. Just give it your best guess! I'm proud of you no matter what.",
-        "Take all the time you need, {name}. Look at the choices and pick your favorite one.",
-        "You've worked so hard today, {name}! Just one more try. You're doing wonderful!"
+        "{name}, take a deep breath. You are doing amazing! Just say yes or no when you are ready.",
+        "It's okay to feel stuck, {name}. Just give it your best guess by saying yes or no! I'm proud of you no matter what.",
+        "Take all the time you need, {name}. Look at the choice on the screen and say yes or no.",
+        "You've worked so hard today, {name}! Just one more try. You're doing wonderful! Just say yes or no!"
     ]
 
     SKIP_L3 = [
@@ -73,15 +73,15 @@ class DialoguePool:
     ]
 
     BREAK_RETURN = [
-        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and say 'Ready' when you're ready to try again!",
-        "Great job hopping, {name}! You're such a fast bunny! Now come back to your seat and say 'Ready'. Let's try the question again!",
-        "Awesome, {name}! What fantastic hopping! Come back, sit down, and say 'Ready' when you're ready. I know you can do it this time!"
+        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and say 'Okay' when you're ready to try again!",
+        "Great job hopping, {name}! You're such a fast bunny! Now come back to your seat and say 'Okay'. Let's try the question again!",
+        "Awesome, {name}! What fantastic hopping! Come back, sit down, and say 'Okay' when you're ready. I know you can do it this time!"
     ]
 
     BREAK_HURRY = [
-        "Come on {name}, I'm waiting for you! Hop back to your seat and say 'Ready'! We've got more fun things to do!",
-        "{name}, the break is almost over! Come back quick and say 'Ready'! I miss you!",
-        "Hey {name}, hurry back! Say 'Ready' when you're in your seat! Let's keep going!"
+        "Come on {name}, I'm waiting for you! Hop back to your seat and say 'Okay'! We've got more fun things to do!",
+        "{name}, the break is almost over! Come back quick and say 'Okay'! I miss you!",
+        "Hey {name}, hurry back! Say 'Okay' when you're in your seat! Let's keep going!"
     ]
 
     WAITING_THINKING = [

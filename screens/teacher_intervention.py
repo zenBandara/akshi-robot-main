@@ -230,11 +230,11 @@ def handle_key_press(action):
     if not input_enabled:
         return
 
-    if action == "ENTER":
+    if action in ["ENTER", "YES"]:
         input_enabled = False
         voice_manager.stop()
         get_robot_eyes().set_expression("encouraging")
-        print("[Teacher Intervention] Teacher pressed ENTER/CONTINUE. Logging complete cascade and resetting.")
+        print("[Teacher Intervention] Teacher said OKAY/YES. Logging complete cascade and resetting.")
 
         # Log Result (Complete Cascade Failure -> Teacher Assisted)
         task_data = state_manager.get_current_task()

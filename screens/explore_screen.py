@@ -131,7 +131,7 @@ def on_show():
     # Safari Adventure Speech Implementation
     speech_start = explore_data.get("speech_start", "Let's begin our adventure!")
     speech_middle = explore_data.get("speech_middle", "Look closely!")
-    speech_end = explore_data.get("speech_end", "Press the Enter key when you are done!")
+    speech_end = explore_data.get("speech_end", "Say 'Okay' when you are done!")
     
     get_robot_eyes().set_expression("encouraging")
     
@@ -184,14 +184,14 @@ def handle_key_press(action):
     if not input_enabled:
         return
         
-    if action == "ENTER":
+    if action in ["ENTER", "YES"]:
         input_enabled = False
         voice_manager.stop()
         get_robot_eyes().set_expression("default")
         if frame_timer:
             frame_timer.stop()
             
-        print("[Explore Screen] Student pressed ENTER. End exploration phase and continuing cascade!")
+        print("[Explore Screen] Student said OKAY/YES. End exploration phase and continuing cascade!")
         
         try:
             from core.flow_controller import flow_controller

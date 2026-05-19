@@ -186,6 +186,9 @@ def present_option(idx):
     if not input_enabled:
         return
 
+    # Reset progress bar visual to 100% immediately
+    game_widget.set_timer_progress(1.0)
+
     # Stop current timers before presenting new option
     if evaluate_timer:
         evaluate_timer.stop()
