@@ -419,7 +419,7 @@ def handle_key_press(action):
             parent_stack = window.parentWidget()
             if parent_stack:
                 if level >= 3:
-                    # L3 Break Request -> Cheer and Skip Student
+                    # L3 Break Request -> Cheer and Skip Student (no data saved, re-queued)
                     print("[Evaluate Screen] L3 Break requested. Cheering and skipping student...")
                     student_name = state_manager.get_current_student() or "friend"
                     get_robot_eyes().set_expression("encouraging")
@@ -434,8 +434,12 @@ def handle_key_press(action):
                             print(f"[Evaluate Screen] Error skipping student: {e}")
                             
                     QTimer.singleShot(delay_ms, skip_student)
+                elif level == 2:
+                    # L2 Break Request -> Water Break
+                    print("[Evaluate Screen] L2 Break requested. Routing to Water Break...")
+                    flow_controller.on_water_break(parent_stack)
                 else:
-                    # L1/L2 Break Request -> Rabbit Jump Break
+                    # L1 Break Request -> Rabbit Jump Break
                     flow_controller.on_break(parent_stack)
         except ImportError: pass
         return

@@ -403,40 +403,41 @@ class FlowController:
         self.on_incorrect_answer(parent_widget, is_timeout=True)
 
     def on_skip(self, parent_widget):
+        """Skip the current student without saving any data. Re-add them to the end of the queue."""
         current_node = self.get_current_node()
-        if not hasattr(state_manager, 'current_path'):
-            state_manager.current_path = []
-        if current_node not in state_manager.current_path:
-            state_manager.current_path.append(current_node)
-        print(f"[FlowController] Skip at: {current_node}")
+        student_name = state_manager.get_current_student() or "unknown"
+        print(f"[FlowController] Skip at: {current_node} | Student: {student_name} — NO data saved, re-queuing.")
         get_robot_eyes().set_expression("sad")
 
-        log_data = {
-            "student_id": state_manager.get_current_student() or "unknown",
-            "task_id": (state_manager.get_current_task() or {}).get("task_id", "unknown"),
-            "result": "skipped",
-            "affordance_level_reached": getattr(state_manager, "affordance_level", 1),
-            "path_taken": state_manager.current_path
-        }
-        if not hasattr(state_manager, 'session_logs'):
-            state_manager.session_logs = []
-        state_manager.session_logs.append(log_data)
-        try:
-            from core import firebase
-            firebase.log_event(log_data)
-        except ImportError:
-            pass
-        print(f"[FlowController] LOGGED SKIP: {log_data}")
+        # Re-add the student to the END of the queue so they are called again
+        queue = state_manager.get_student_queue()
+        if student_name not in queue:
+            queue.append(student_name)
+            state_manager.set_student_queue(queue)
+            print(f"[FlowController] Re-queued '{student_name}' at end of queue. Queue: {queue}")
+
+        # Reset path for this student (no data saved)
+        if hasattr(state_manager, 'current_path'):
+            state_manager.current_path = []
 
         import core.session_logic as session_logic
         session_logic.next_student()
 
     def on_break(self, parent_widget):
-        print(f"[FlowController] Break at: {self.get_current_node()}")
+        print(f"[FlowController] Rabbit Break at: {self.get_current_node()}")
         get_robot_eyes().set_expression("sleeping")
         try:
             from core.navigator import navigator
             navigator.navigate_to("break")
+        except Exception:
+            pass
+
+    def on_water_break(self, parent_widget):
+        print(f"[FlowController] Water Break at: {self.get_current_node()}")
+        get_robot_eyes().set_expression("sleeping")
+        try:
+            from core.navigator import navigator
+            navigator.navigate_to("water_break")
         except Exception:
             pass
 
