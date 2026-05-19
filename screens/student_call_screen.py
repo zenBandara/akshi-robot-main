@@ -90,7 +90,7 @@ def handle_key_press(mapped_action):
         print("Student present! Transitioning to Calibration Screen...")
         # Route to calibration for face tracking BEFORE starting the learning flow
         navigator.navigate_to("calibration")
-    elif mapped_action in ["ESCAPE", "NO"]:
+    elif mapped_action in ["ESCAPE", "NO", "SKIP"]:
         keyboard_manager.unregister_handler()
         voice_manager.stop()
         get_robot_eyes().set_expression("sad")

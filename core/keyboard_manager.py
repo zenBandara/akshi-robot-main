@@ -53,7 +53,7 @@ class KeyboardManager:
             0x01: "WAKE",       # "Start Command 'Ging-lu'"
             0x02: "YES",        # "Said Yes"
             0x03: "NO",         # "Said No"
-            0x04: "SKIP",       # "Go Forward" (Reusing for Skip)
+            0x10: "SKIP",       # "Skip" command
             0x08: "BREAK",      # "I'm tired" (Reusing for Take a break)
             0x09: "ENTER",      # "Said Ok" (Used for pass/continue)
             0x11: "STOP",       # "Stop" command
