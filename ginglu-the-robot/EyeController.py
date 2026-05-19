@@ -1,5 +1,6 @@
 import serial
 import time
+import threading
 
 class EyeController:
     def __init__(self):
@@ -8,7 +9,8 @@ class EyeController:
         self.timeout = 1
         self.ser = None
 
-        self._connect()
+        # Connect in a background thread so the 2-second sleep doesn't block startup
+        threading.Thread(target=self._connect, daemon=True).start()
 
     def _connect(self):
         try:
@@ -19,11 +21,18 @@ class EyeController:
             print(f"Connection failed: {e}")
 
     def send(self, cmd):
-        if self.ser and self.ser.is_open:
-            self.ser.write((cmd + '\n').encode())
-            print(f"Sent: {cmd}")
-        else:
-            print("Serial not connected")
+        def _send_task():
+            if self.ser and self.ser.is_open:
+                try:
+                    self.ser.write((cmd + '\n').encode())
+                    print(f"Sent: {cmd}")
+                except Exception as e:
+                    print(f"Serial write error: {e}")
+            else:
+                print("Serial not connected")
+                
+        # Send in a background thread so serial lag doesn't block the camera loop
+        threading.Thread(target=_send_task, daemon=True).start()
 
     # Emotion methods
     def happy(self):

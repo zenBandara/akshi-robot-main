@@ -33,10 +33,14 @@ FACE_OK_MP3 = "ok_face.mp3"
 
 
 #audio play
+import subprocess
 
 def play_sound(file):
-    os.system(f"pkill -f mpg123")
-    os.system(f"mpg123 -q {file} > /dev/null 2>&1 &")
+    try:
+        subprocess.Popen(["pkill", "-f", "mpg123"])
+        subprocess.Popen(["mpg123", "-q", file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as e:
+        print("Audio play error:", e)
 
 # ===================== SETTINGS =====================
 PIN_YAW = 24
