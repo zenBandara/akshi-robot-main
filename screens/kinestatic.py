@@ -132,6 +132,10 @@ def on_show():
     # Boot UI Video Infrastructure
     setup_video_container()
     
+    # Update visual hint for teacher commands
+    if hasattr(window, "prompt_label"):
+        window.prompt_label.setText("Teacher Approval: Say 'Yes' or 'No' 🌟")
+    
     speech_start = kinesthetic_data.get("speech_start", "")
     speech_step_1 = kinesthetic_data.get("speech_step_1", "")
     speech_step_2 = kinesthetic_data.get("speech_step_2", "")
