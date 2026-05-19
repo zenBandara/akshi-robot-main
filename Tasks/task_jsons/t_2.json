@@ -97,7 +97,7 @@
     "speech_start": "Let's try moving our beautiful bodies to understand this! What is the hand that you use for eating?",
     "speech_step_1": "That is your right hand! Now, can you lift up the hand you use for eating nice and high?",
     "speech_step_2": "Awesome! Now, what about your other hand? That is your left hand! Can you wiggle your left hand high in the air?",
-    "speech_end": "Wow! Now, go over to your teacher and show them your beautiful left and right hands! Say 'Pass' or 'Fail' to continue!"
+    "speech_end": "Wow! Now, go over to your teacher and show them your beautiful left and right hands! Say 'Yes' if passed, or 'No' if you need more help!"
   },
   "kinesthetic_L2": {
     "task_title": "Kinesthetic Learning - Level 2",
@@ -110,7 +110,7 @@
     "speech_start": "I know we tried this a moment ago, but let's try it again! Let's think carefully about when you eat your yummy food. What hand do you use for eating?",
     "speech_step_1": "Yes, that is your right hand! Lift up that eating hand nice and high so everyone can see!",
     "speech_step_2": "Fantastic! Now let's think about the other hand you don't use for eating. That is your left hand! Can you wiggle your left hand high in the air?",
-    "speech_end": "You are doing so well! Go show your teacher how perfectly you know your eating hand and your other hand! Say 'Pass' or 'Fail' to continue!"
+    "speech_end": "You are doing so well! Go show your teacher how perfectly you know your eating hand and your other hand! Say 'Yes' if passed, or 'No' if you need more help!"
   },
   "kinesthetic_L3": {
     "task_title": "Kinesthetic Learning - Level 3",
@@ -123,6 +123,6 @@
     "speech_start": "Okay, let me tell you a little story! Imagine you are sitting at the table with a big, yummy plate of your favorite food. Let's do this one more time. Show me the exact hand you use to pick up your spoon and eat!",
     "speech_step_1": "That special hand is your right hand! Raise that right eating hand way up into the sky!",
     "speech_step_2": "Great job! Now, what about the hand that is resting on the table? That is your left hand! Can you shake your left hand high in the air?",
-    "speech_end": "What an amazing learner! Go over and give your teacher a gentle high-five with your left and right hands! Say 'Pass' or 'Fail' to continue!"
+    "speech_end": "What an amazing learner! Go over and give your teacher a gentle high-five with your left and right hands! Say 'Yes' if passed, or 'No' if you need more help!"
   }
 }
