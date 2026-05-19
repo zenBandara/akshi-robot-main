@@ -60,7 +60,7 @@ def on_show():
     
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
     
-    speech = f"Hey {student_name}, you've been sitting there for a little while! I think it's the perfect time for a quick water break. Go grab a nice drink, and when you are all ready, come back and say Okay!"
+    speech = f"Hey {student_name}, you've been sitting there for a little while! I think it's the perfect time for a quick water break. Go grab a nice drink, and when you are all okay, come back and say Okay!"
     print(f"🤖 ROBOT SPEAKS (Water Break): \"{speech}\"")
     voice_manager.speak(speech, f"water_break_{student_name}")
 

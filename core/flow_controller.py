@@ -36,7 +36,7 @@ SCREEN_MAP = {
 class FlowController:
     def __init__(self):
         self.cascade_index = 0
-        self.kinesthetic_attempts = {1: False, 2: False, 3: False}
+        self.kinesthetic_used_at = set()
         self.progression_state = "IDENTIFYING"
         self.identified_phase = None
         self.baseline_confirms = 0
@@ -72,7 +72,7 @@ class FlowController:
 
     def reset_for_new_student(self):
         self.cascade_index = 0
-        self.kinesthetic_attempts = {1: False, 2: False, 3: False}
+        self.kinesthetic_used_at = set()
         self.used_kinesthetic_this_round = False
         state_manager.set_affordance_level(1)
         if not hasattr(state_manager, 'current_path'):
@@ -81,7 +81,7 @@ class FlowController:
 
     def reset_cascade(self):
         self.cascade_index = 0
-        self.kinesthetic_attempts = {1: False, 2: False, 3: False}
+        self.kinesthetic_used_at = set()
         self.used_kinesthetic_this_round = False
         state_manager.set_affordance_level(1)
 
@@ -163,11 +163,15 @@ class FlowController:
         eval_level = self._get_eval_level(phase)
         state_manager.set_affordance_level(eval_level)
 
+        phase_to_eval_index = {"none": 0, "engage": 2, "explore": 4, "explain": 6, "elaborate": 8}
+
         if scaffolding:
+            self.cascade_index = max(0, phase_to_eval_index.get(phase, 0) - 1)
             print(f"[FlowController] Routing → {scaffolding} → then evaluate L{eval_level}")
             state_manager.current_stage = phase
             navigator.navigate_to(scaffolding)
         else:
+            self.cascade_index = phase_to_eval_index.get(phase, 0)
             print(f"[FlowController] Phase 'none' → directly to evaluate L{eval_level}")
             state_manager.current_stage = "evaluate_L1"
             navigator.navigate_to("evaluate")
@@ -260,11 +264,11 @@ class FlowController:
         else:
             get_robot_eyes().set_expression("encouraging")
 
-        # ── KINESTHETIC LOOP (Applies to all states on first level failure) ──
-        if not self.kinesthetic_attempts.get(level, False):
-            self.kinesthetic_attempts[level] = True
+        # ── KINESTHETIC LOOP (Per cascade node — each evaluate node gets its own kinesthetic chance) ──
+        if self.cascade_index not in self.kinesthetic_used_at:
+            self.kinesthetic_used_at.add(self.cascade_index)
             self.used_kinesthetic_this_round = True
-            print(f"[FlowController] First L{level} failure → Kinesthetic side-loop")
+            print(f"[FlowController] First L{level} failure at cascade[{self.cascade_index}] → Kinesthetic side-loop")
             state_manager.current_stage = "kinesthetic"
             try:
                 from core.navigator import navigator
@@ -274,23 +278,19 @@ class FlowController:
                 print(f"[FlowController] Routing error: {e}")
 
         # If kinesthetic was already tried, proceed with state-specific logic
-        if self.progression_state == "IDENTIFYING":
-            self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
-        elif self.progression_state == "CONFIRMING":
+        if self.progression_state != "IDENTIFYING":
+            # Stay at the identified phase — don't drop to full cascade
+            if self.progression_state == "ADVANCING":
+                self.progression_state = "CONFIRMING"
             self.baseline_confirms = 0
-            print(f"[FlowController] Failed baseline. Resetting confirms. Moving to next student.")
             student_name = state_manager.get_current_student() or "unknown"
+            print(f"[FlowController] CONFIRMING/ADVANCING failure. Staying at phase '{self.identified_phase}'. Moving to next student.")
             self._save_student_state(student_name)
             import core.session_logic as session_logic
             session_logic.next_student()
-        elif self.progression_state == "ADVANCING":
-            print(f"[FlowController] Failed advancement. Falling back to '{self.identified_phase}'.")
-            self.progression_state = "CONFIRMING"
-            self.baseline_confirms = 0
-            student_name = state_manager.get_current_student() or "unknown"
-            self._save_student_state(student_name)
-            import core.session_logic as session_logic
-            session_logic.next_student()
+            return
+
+        self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
 
     def _cascade_incorrect(self, parent_widget, is_timeout=False):
         """During IDENTIFYING: run the full cascade."""
@@ -353,6 +353,10 @@ class FlowController:
             else:
                 phase = self.identified_phase
             eval_level = self._get_eval_level(phase) if phase else 1
+
+            phase_to_eval_index = {"none": 0, "engage": 2, "explore": 4, "explain": 6, "elaborate": 8}
+            self.cascade_index = phase_to_eval_index.get(phase, 0)
+
             state_manager.set_affordance_level(eval_level)
             state_manager.current_stage = f"evaluate_L{eval_level}"
             print(f"[FlowController] Scaffolding done → evaluate L{eval_level}")
@@ -378,17 +382,20 @@ class FlowController:
         level = int(current_node[-1]) if current_node.startswith("evaluate_L") else state_manager.get_affordance_level()
         print(f"[FlowController] Kinesthetic L{level} failed | State: {self.progression_state}")
 
-        if self.progression_state == "IDENTIFYING":
-            print("[FlowController] Dropping to next scaffolding phase")
-            self._cascade_incorrect(parent_widget)
-        else:
-            # CONFIRMING or ADVANCING: Kinesthetic failed -> treat as baseline failure and skip
-            print("[FlowController] Failed baseline after kinesthetic. Moving to next student.")
+        if self.progression_state != "IDENTIFYING":
+            # Stay at the identified phase — don't drop to full cascade
+            if self.progression_state == "ADVANCING":
+                self.progression_state = "CONFIRMING"
             self.baseline_confirms = 0
             student_name = state_manager.get_current_student() or "unknown"
+            print(f"[FlowController] CONFIRMING/ADVANCING kinesthetic failure. Staying at phase '{self.identified_phase}'. Moving to next student.")
             self._save_student_state(student_name)
             import core.session_logic as session_logic
             session_logic.next_student()
+            return
+
+        print("[FlowController] Dropping to next scaffolding phase")
+        self._cascade_incorrect(parent_widget)
 
     # ── Timeout / Skip / Break ──
 

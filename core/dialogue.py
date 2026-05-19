@@ -54,7 +54,7 @@ class DialoguePool:
     ]
 
     MOTIVATION_NUDGE_L3 = [
-        "{name}, take a deep breath. You are doing amazing! Just say yes or no when you are ready.",
+        "{name}, take a deep breath. You are doing amazing! Just say yes or no when you are okay.",
         "It's okay to feel stuck, {name}. Just give it your best guess by saying yes or no! I'm proud of you no matter what.",
         "Take all the time you need, {name}. Look at the choice on the screen and say yes or no.",
         "You've worked so hard today, {name}! Just one more try. You're doing wonderful! Just say yes or no!"
@@ -73,9 +73,9 @@ class DialoguePool:
     ]
 
     BREAK_RETURN = [
-        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and say 'Okay' when you're ready to try again!",
+        "Wow {name}, that was amazing hopping! You must feel so energized now! Come sit down and say 'Okay' when you're okay to try again!",
         "Great job hopping, {name}! You're such a fast bunny! Now come back to your seat and say 'Okay'. Let's try the question again!",
-        "Awesome, {name}! What fantastic hopping! Come back, sit down, and say 'Okay' when you're ready. I know you can do it this time!"
+        "Awesome, {name}! What fantastic hopping! Come back, sit down, and say 'Okay' when you're okay. I know you can do it this time!"
     ]
 
     BREAK_HURRY = [

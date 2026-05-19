@@ -45,7 +45,7 @@ def on_show():
 
 def on_ready():
     get_robot_eyes().set_expression("encouraging")
-    greeting_message = "Hello there! I am Jinglu! Ready to learn something fun today?"
+    greeting_message = "Hello there! I am Jinglu! Let's learn something fun today!"
     print(f"[Robot Speaks]: {greeting_message}")
     
     duration_ms = 3000

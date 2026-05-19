@@ -176,7 +176,7 @@ def handle_key_press(action):
             "task_id": task_id,
             "result": "incorrect",
             "affordance_level_reached": state_manager.get_affordance_level(),
-            "path_taken": ["evaluate_L1", "elaborate", "evaluate_L2", "explain"]
+            "path_taken": getattr(state_manager, 'current_path', [])
         }
         
         if not hasattr(state_manager, 'session_logs'):
