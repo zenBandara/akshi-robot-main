@@ -141,6 +141,25 @@ class CalibrationGameWidget(QWidget):
         self.owl_pixmap = QPixmap(_OWL_PATH) if os.path.exists(_OWL_PATH) else None
         self.bunny_pixmap = QPixmap(_BUNNY_PATH) if os.path.exists(_BUNNY_PATH) else None
         self.celebration_pixmap = QPixmap(_CELEBRATION_PATH) if os.path.exists(_CELEBRATION_PATH) else None
+        
+        self.cached_owl = None
+        self.cached_bunny = None
+        self.cached_celebration = None
+        self.last_h = 0
+
+    def _get_scaled_pixmap(self, original, target_h):
+        if original is None: return None
+        if self.last_h == target_h and self.cached_owl and original == self.owl_pixmap: return self.cached_owl
+        if self.last_h == target_h and self.cached_bunny and original == self.bunny_pixmap: return self.cached_bunny
+        if self.last_h == target_h and self.cached_celebration and original == self.celebration_pixmap: return self.cached_celebration
+        
+        scaled = original.scaledToHeight(target_h, Qt.SmoothTransformation)
+        if original == self.owl_pixmap: self.cached_owl = scaled
+        elif original == self.bunny_pixmap: self.cached_bunny = scaled
+        elif original == self.celebration_pixmap: self.cached_celebration = scaled
+        self.last_h = target_h
+        return scaled
+
 
         # Animation timer (30 FPS)
         self.anim_timer = QTimer(self)
@@ -194,6 +213,9 @@ class CalibrationGameWidget(QWidget):
 
     def _animate(self):
         """Animation tick."""
+        if not self.isVisible():
+            return
+
         self.tick += 1
 
         # Update stars
@@ -205,8 +227,6 @@ class CalibrationGameWidget(QWidget):
             for ff in self.fireflies:
                 ff.update(self.tick)
 
-        # Breathing animation (removed — user didn't like it)
-
         # Update confetti
         if self.phase == "done":
             for piece in self.confetti:
@@ -216,7 +236,13 @@ class CalibrationGameWidget(QWidget):
 
     def paintEvent(self, event):
         """Render the current scene."""
+        if not self.isVisible():
+            return
+            
         painter = QPainter(self)
+        if not painter.isActive():
+            return
+            
         try:
             painter.setRenderHint(QPainter.Antialiasing)
             w, h = self.width(), self.height()
@@ -268,7 +294,7 @@ class CalibrationGameWidget(QWidget):
         # Draw owl preview peeking from the right
         if self.owl_pixmap:
             owl_h = int(h * 0.55)
-            scaled = self.owl_pixmap.scaledToHeight(owl_h, Qt.SmoothTransformation)
+            scaled = self._get_scaled_pixmap(self.owl_pixmap, owl_h)
             owl_x = w - int(scaled.width() * 0.75)
             owl_y = int(h * 0.42)
             p.drawPixmap(owl_x, owl_y, scaled)
@@ -324,7 +350,7 @@ class CalibrationGameWidget(QWidget):
         # Draw owl character — anchored to right side, branch extends off-screen
         if self.owl_pixmap:
             owl_h = min(450, int(h * 0.7))
-            scaled = self.owl_pixmap.scaledToHeight(owl_h, Qt.SmoothTransformation)
+            scaled = self._get_scaled_pixmap(self.owl_pixmap, owl_h)
             # Position so the right part of the branch goes off the window edge
             owl_x = w - int(scaled.width() * 0.72)
             owl_y = int(h * 0.22)
@@ -418,7 +444,7 @@ class CalibrationGameWidget(QWidget):
         # Draw bunny character (static, no wiggle)
         if self.bunny_pixmap:
             bunny_h = min(380, int(h * 0.50))
-            scaled = self.bunny_pixmap.scaledToHeight(bunny_h, Qt.SmoothTransformation)
+            scaled = self._get_scaled_pixmap(self.bunny_pixmap, bunny_h)
             bunny_x = w // 2 - scaled.width() // 2
             bunny_y = int(h * 0.46)
             p.drawPixmap(bunny_x, bunny_y, scaled)
@@ -495,7 +521,7 @@ class CalibrationGameWidget(QWidget):
         # Draw celebration image (single combined owl+bunny, centered, static)
         if self.celebration_pixmap:
             cel_h = min(350, int(h * 0.50))
-            scaled = self.celebration_pixmap.scaledToHeight(cel_h, Qt.SmoothTransformation)
+            scaled = self._get_scaled_pixmap(self.celebration_pixmap, cel_h)
             p.drawPixmap(int(w / 2 - scaled.width() / 2),
                          int(h * 0.42), scaled)
 

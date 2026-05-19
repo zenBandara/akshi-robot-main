@@ -54,7 +54,8 @@ def get_ui():
         
         # Force UI update before blocking voice generation
         window.update()
-        QApplication.processEvents()
+        # QApplication.processEvents() # REMOVED: Triggers re-entrancy bugs with QGraphicsView stack transitions
+
 
         get_robot_eyes().set_expression("encouraging")
         

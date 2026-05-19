@@ -249,15 +249,11 @@ class FlowController:
 
         # If kinesthetic was already tried, proceed with state-specific logic
         if self.progression_state != "IDENTIFYING":
+            print(f"[FlowController] Failed baseline/advancement. Dropping to IDENTIFYING cascade.")
             self.baseline_confirms = 0
-            if self.progression_state == "ADVANCING":
-                # Failed to move up — revert to CONFIRMING at baseline phase
-                self.progression_state = "CONFIRMING"
-                student_name = state_manager.get_current_student() or "unknown"
-                print(f"[FlowController] ADVANCING failure. Reverting to baseline phase '{self.identified_phase}'. Moving to next student.")
-                self._save_student_state(student_name)
-                import core.session_logic as session_logic
-                session_logic.next_student()
+            self.progression_state = "IDENTIFYING"
+
+        self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
                 return
             elif self.progression_state == "CONFIRMING":
                 # Failed baseline — drop to cascade to re-identify
