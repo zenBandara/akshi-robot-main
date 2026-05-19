@@ -172,7 +172,7 @@ class TeacherInterventionWidget(QWidget):
         # Hint below
         p.setFont(QFont("Helvetica", 14))
         p.setPen(QColor(100, 116, 139))             # #64748B muted
-        p.drawText(QRectF(0, btn_y + actual_h + 12, w, 30), Qt.AlignCenter,
+        p.drawText(QRectF(0, btn_y + btn_h + 12, w, 30), Qt.AlignCenter,
                    "Please assist the student with the question above")
 
 
