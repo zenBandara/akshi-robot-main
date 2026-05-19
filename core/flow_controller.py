@@ -283,14 +283,6 @@ class FlowController:
             self.progression_state = "IDENTIFYING"
 
         self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
-                return
-            elif self.progression_state == "CONFIRMING":
-                # Failed baseline — drop to cascade to re-identify
-                print(f"[FlowController] CONFIRMING failure! Dropping to IDENTIFYING cascade to re-identify new phase.")
-                self.progression_state = "IDENTIFYING"
-                # Falls through to _cascade_incorrect below
-
-        self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
 
     def _cascade_incorrect(self, parent_widget, is_timeout=False):
         """During IDENTIFYING: run the full cascade."""

@@ -1,1 +1,1 @@
-{"type": "pause_frames"}
+{"type": "metrics", "calibration_status": "DONE", "overall": 74.17, "eye": 84.09, "face": 64.24, "emotion": "neutral", "timestamp": 1779198887.742722}

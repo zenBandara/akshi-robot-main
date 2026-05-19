@@ -145,7 +145,7 @@ class CalibrationScreenUI(QWidget):
                     get_robot_eyes().set_expression("sleeping")
                     voice_manager.stop()
                     delay_ms = voice_manager.speak(
-                        "Amazing! Now the owl is sleepy! Can you close your eyes like a cozy sleeping bunny? Shhh... the moon is rising!",
+                        "Amazing! Now the owl is sleepy! Can you close your eyes like a cozy sleeping bunny? the moon is rising!",
                         "sleeping_bunny"
                     )
                     
@@ -191,14 +191,6 @@ class CalibrationScreenUI(QWidget):
     def handle_key_press(self, mapped_action):
         if mapped_action == "SKIP":
             print("[Calibration Override] Manual skip via SKIP key.")
-            
-            # Log telemetry for research
-            try:
-                from core.telemetry_logger import telemetry_logger
-                telemetry_logger.log_event("USER_INPUT", detail="Student skipped calibration manually")
-            except Exception:
-                pass
-
             if state_timer:
                 state_timer.stop()
             self.prompt_state = "done"

@@ -26,7 +26,7 @@ class TelemetryLogger:
                 writer = csv.writer(f)
                 writer.writerow(self.headers)
 
-    def log_event(self, event_type, event_detail="-", is_correct="-", sync=False):
+    def log_event(self, event_type, detail="-", is_correct="-", sync=False):
         """
         Logs an event to the CSV file. 
         Automatically gathers context from state_manager and flow_controller.
@@ -50,7 +50,7 @@ class TelemetryLogger:
 
         row = [
             timestamp, session_id, student_name, task_id,
-            event_type, event_detail, is_correct,
+            event_type, detail, is_correct,
             current_phase, current_state, affordance_level
         ]
 

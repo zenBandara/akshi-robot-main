@@ -16,7 +16,5 @@ requirements_mac.txt
 
 # Firebase Credentials
 serviceAccountKey.json
-
-# Data
+logs/
 data/
-
