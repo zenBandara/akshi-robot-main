@@ -181,10 +181,17 @@ def on_show():
 def present_option(idx):
     """Highlight option at index `idx`, explain it, then ask YES/NO."""
     global current_presenting_idx, presentation_keys, awaiting_yes_no
-    global key_mapping, input_enabled
+    global key_mapping, input_enabled, evaluate_timer, motivation_timer
 
     if not input_enabled:
         return
+
+    # Stop current timers before presenting new option
+    if evaluate_timer:
+        evaluate_timer.stop()
+    if motivation_timer:
+        motivation_timer.stop()
+        motivation_timer = None
 
     presentation_keys = sorted(list(key_mapping.keys()))
     student_name = str(state_manager.get_current_student() or "friend").capitalize()
@@ -227,42 +234,55 @@ def present_option(idx):
 
     # Enable YES/NO input AFTER the robot finishes speaking
     def unlock_input():
-        global awaiting_yes_no
+        global awaiting_yes_no, evaluate_timer, motivation_timer
         if input_enabled and current_presenting_idx == idx:
             awaiting_yes_no = True
             print(f"[Evaluate Screen] Waiting for YES/NO on option {current_key}...")
             
+            # ── PER-OPTION TIMER LOGIC ──
+            level = state_manager.get_affordance_level()
+            is_last_option = (idx == len(presentation_keys) - 1)
+            
+            # Level 1: 60s per option
+            # Level 2/3: 120s for the last option (applying to all options for consistency)
+            if level == 1:
+                total_seconds = 60
+                nudge_seconds = 30
+            else:
+                total_seconds = 120
+                nudge_seconds = 60
+                
+            print(f"[Evaluate Screen] Starting {total_seconds}s timer for option {current_key}...")
+
+            evaluate_timer = EmojiTimerWidget(
+                label_widget=timer_label,
+                total_seconds=total_seconds,
+                clock_count=10 if level == 1 else 12, # Just visual clock counts
+                timeout_callback=on_timer_expire,
+                progress_callback=lambda p: game_widget.set_timer_progress(p)
+            )
+            evaluate_timer.start()
+
+            motivation_timer = QTimer()
+            motivation_timer.setSingleShot(True)
+            motivation_timer.setInterval(nudge_seconds * 1000)
+            motivation_timer.timeout.connect(on_motivation_nudge)
+            motivation_timer.start()
+
             # ── LEVEL 3 FOCUS DIMMING ──
-            if state_manager.get_affordance_level() >= 3:
+            if level >= 3:
                 game_widget.set_focus_mode(True)
 
     QTimer.singleShot(op_delay_ms + 200, unlock_input)
 
 def enable_input():
-    global input_enabled, evaluate_timer, motivation_timer, motivation_given
+    global input_enabled
     input_enabled = True
-    motivation_given = False
     keyboard_manager.register_handler(handle_key_press)
-    print("[Evaluate Screen L1] Speech finished. Keyboard input enabled.")
-
-    # ── Main Timer: 3 MINUTES (180 seconds) total before auto-escalation ──
-    evaluate_timer = EmojiTimerWidget(
-        label_widget=timer_label,
-        total_seconds=180,
-        clock_count=18,
-        timeout_callback=on_timer_expire,
-        progress_callback=lambda p: game_widget.set_timer_progress(p)
-    )
-
-    # ── Motivation Timer: 1 MINUTE (60 seconds) nudge ──
-    motivation_timer = QTimer()
-    motivation_timer.setSingleShot(True)
-    motivation_timer.setInterval(60_000)  # 60 seconds
-    motivation_timer.timeout.connect(on_motivation_nudge)
-    print("[Evaluate Screen] Motivation nudge scheduled at 60 seconds, timeout at 180 seconds.")
+    print("[Evaluate Screen] Speech finished. Keyboard input enabled.")
 
 def on_motivation_nudge():
-    """At 1 minute of no response, give the student an encouraging push."""
+    """Give the student an encouraging push halfway through the timeout."""
     global motivation_given
     if not input_enabled:
         return  # Student already answered
@@ -276,27 +296,35 @@ def on_motivation_nudge():
     # Use level-specific motivation
     if level >= 3:
         nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge_l3", student_name)
-        print(f"⏰ [1 MIN NUDGE L3] 🤖 ROBOT MOTIVATES (GENTLE): \"{nudge_template.format(name=nudge_name)}\"")
     elif level == 2:
         nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge_l2", student_name)
-        print(f"⏰ [1 MIN NUDGE L2] 🤖 ROBOT MOTIVATES (STRONG): \"{nudge_template.format(name=nudge_name)}\"")
     else:
         nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge", student_name)
-        print(f"⏰ [1 MIN NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge_template.format(name=nudge_name)}\"")
+        
+    print(f"⏰ [MOTIVATION NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge_template.format(name=nudge_name)}\"")
     voice_manager.speak_with_name(nudge_template, nudge_name, f"motivation_{student_name}")
 
 def on_timer_expire():
-    """Called at 3 minutes — L1: escalate to kinesthetic, L2: rabbit jump break."""
-    global input_enabled, motivation_timer
+    """Called when the per-option timer expires."""
+    global input_enabled, motivation_timer, evaluate_timer, current_presenting_idx, presentation_keys
     if not input_enabled:
         return
 
-    input_enabled = False
     level = state_manager.get_affordance_level()
-    print(f"[Evaluate Screen] ⏰ 3-MINUTE TIMER EXPIRED at Level {level}!")
+    is_last_option = (current_presenting_idx == len(presentation_keys) - 1)
+    
+    print(f"[Evaluate Screen] ⏰ Timer expired for option index {current_presenting_idx} (Level {level})")
+    
+    if not is_last_option:
+        # Not the last option? Move to next option
+        print("[Evaluate Screen] Moving to next option due to timeout...")
+        present_option(current_presenting_idx + 1)
+        return
+
+    # LAST OPTION TIMEOUT LOGIC
+    input_enabled = False
     get_robot_eyes().set_expression("sad")
 
-    # Stop motivation timer if it's still active
     if motivation_timer:
         motivation_timer.stop()
         motivation_timer = None
@@ -312,9 +340,9 @@ def on_timer_expire():
     student_name = state_manager.get_current_student() or "friend"
 
     if level >= 3:
-        # ── L3: Student is too unresponsive, skip entirely to next student ──
+        # ── L3: Skip the student ──
         from core.dialogue import DialoguePool
-        print(f"[Evaluate Screen] ⏭️ L3 timeout → Skipping student {student_name}!")
+        print(f"[Evaluate Screen] ⏭️ L3 FINAL timeout → Skipping student {student_name}!")
         skip_template, skip_name = DialoguePool.get_template("skip_l3", student_name)
         delay_ms = voice_manager.speak_with_name(skip_template, skip_name, f"timeout_skip_{student_name}")
 
@@ -329,8 +357,8 @@ def on_timer_expire():
 
         QTimer.singleShot(delay_ms, skip_student)
     elif level == 2:
-        # ── L2: Route to Rabbit Jump Break screen ──
-        print(f"[Evaluate Screen] 🐰 L2 timeout → Rabbit Jump Break for {student_name}!")
+        # ── L2: Route to Rabbit Jump Break ──
+        print(f"[Evaluate Screen] 🐰 L2 FINAL timeout → Rabbit Jump Break for {student_name}!")
         timeout_template = "Hey {name}! I think you need some energy! Let's do something super fun!"
         delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_break_{student_name}")
 
@@ -343,12 +371,10 @@ def on_timer_expire():
 
         QTimer.singleShot(delay_ms, go_to_break)
     else:
-        # ── L1: Route to Water Break Screen ──
-        if motivation_given:
-            timeout_template = "That's okay {name}! I think you might need a little rest!"
-        else:
-            timeout_template = "Hey {name}, it looks like you could use a small break!"
-        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_3min_{student_name}")
+        # ── L1: Route to Phase Below (Kinesthetic/Water Break) ──
+        print(f"[Evaluate Screen] 💧 L1 FINAL timeout → Phase below for {student_name}!")
+        timeout_template = "That's okay {name}! I think you might need a little rest!"
+        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_l1_{student_name}")
 
         def transition_after_speech():
             try:
@@ -356,7 +382,8 @@ def on_timer_expire():
                 parent_stack = window.parentWidget()
                 if parent_stack:
                     flow_controller.on_timeout(parent_stack)
-            except ImportError: pass
+            except Exception as e:
+                print(f"[Evaluate Screen] Transition error: {e}")
 
         QTimer.singleShot(delay_ms, transition_after_speech)
 
