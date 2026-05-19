@@ -41,26 +41,25 @@ class FlowController:
         self.identified_phase = None
         self.baseline_confirms = 0
         self.used_kinesthetic_this_round = False
-        # Per-student state persistence across rounds
-        self.student_states = {}
 
     # ── State Persistence ──
 
     def _save_student_state(self, student_name):
-        self.student_states[student_name] = {
-            "state": self.progression_state,
-            "phase": self.identified_phase,
-            "confirms": self.baseline_confirms,
-        }
-        print(f"[FlowController] Saved state for {student_name}: {self.student_states[student_name]}")
+        try:
+            import core.database as database
+            database.save_student_state(student_name, self.progression_state, self.identified_phase, self.baseline_confirms)
+        except Exception as e:
+            print(f"[FlowController] DB Save error: {e}")
 
     def _load_student_state(self, student_name):
-        if student_name in self.student_states:
-            s = self.student_states[student_name]
-            self.progression_state = s["state"]
-            self.identified_phase = s["phase"]
-            self.baseline_confirms = s["confirms"]
-            return True
+        try:
+            import core.database as database
+            row = database.load_student_state(student_name)
+            if row:
+                self.progression_state, self.identified_phase, self.baseline_confirms = row
+                return True
+        except Exception as e:
+            print(f"[FlowController] DB Load error: {e}")
         return False
 
     # ── Utilities ──
@@ -103,48 +102,19 @@ class FlowController:
         """Called when a student is ready. ONE question per student per round."""
         self.reset_for_new_student()
 
-
-
-        # Try to restore saved state from a previous round
+        # Try to restore permanently saved state from database
         if self._load_student_state(student_name):
-            print(f"[FlowController] Restored {student_name}: {self.progression_state} | Phase: {self.identified_phase} | Confirms: {self.baseline_confirms}")
+            print(f"[FlowController] Restored {student_name} from DB: {self.progression_state} | Phase: {self.identified_phase} | Confirms: {self.baseline_confirms}")
             self._route_for_progression()
             return
-
-        # Check DB for historical phase
-        try:
-            import core.database as database
-            method_used, eval_passed, used_kinesthetic = database.get_student_optimal_starting_method(student_name)
-        except Exception:
-            method_used = None
-            eval_passed = None
-            used_kinesthetic = 0
-
-        if method_used and method_used in PHASE_LADDER:
-            self.identified_phase = method_used
-            self.baseline_confirms = 0
-
-            # Analyze evaluation_passed to restore precise progress
-            if eval_passed == "promoted":
-                self.progression_state = "CONFIRMING"
-                print(f"[FlowController] Returning student (DB): phase='{method_used}' (Promoted Last Session) → CONFIRMING (0/2)")
-            elif eval_passed == "null":
-                self.progression_state = "CONFIRMING"
-                print(f"[FlowController] Returning student (DB): phase='{method_used}' (Failed Last Session) → CONFIRMING (0/2)")
-            elif eval_passed and eval_passed.startswith("evaluate_"):
-                self.progression_state = "CONFIRMING"
-                self.baseline_confirms = 1  # Give them their progress back!
-                print(f"[FlowController] Returning student (DB): phase='{method_used}' (Success Last Session) → CONFIRMING (1/2)")
-            else:
-                self.progression_state = "CONFIRMING"
-                print(f"[FlowController] Returning student (DB): phase='{method_used}' → CONFIRMING")
-
-            self._route_for_progression()
-        else:
-            self.progression_state = "IDENTIFYING"
-            print(f"[FlowController] New student → IDENTIFYING cascade")
-            from core.navigator import navigator
-            navigator.navigate_to("evaluate")
+            
+        # If absolutely no record exists in student_states or metrics, brand new student!
+        self.progression_state = "IDENTIFYING"
+        self.identified_phase = "none"
+        self.baseline_confirms = 0
+        print(f"[FlowController] Brand new student {student_name} → IDENTIFYING cascade")
+        from core.navigator import navigator
+        navigator.navigate_to("evaluate")
 
     def _route_for_progression(self):
         """Route to the correct screen for CONFIRMING or ADVANCING states."""

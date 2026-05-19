@@ -25,6 +25,16 @@ def init_db():
     )
     ''')
     
+    # 1.5 Student States (Persistent Memory) table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS student_states (
+        student_name TEXT PRIMARY KEY,
+        progression_state TEXT,
+        identified_phase TEXT,
+        baseline_confirms INTEGER
+    )
+    ''')
+    
     # 2. Student Telemetry (RL Metrics) table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS student_metrics (
@@ -127,6 +137,37 @@ def update_student_phase(session_id, student_name, new_phase, used_kinesthetic=0
     conn.commit()
     conn.close()
     print(f"[RL Telemetry] PHASE PROMOTION: Student:{student_name} promoted to phase: {new_phase} | Kinesthetic:{used_kinesthetic} | TeacherIntervention:{teacher_intervention}")
+
+def save_student_state(student_name, state, phase, confirms):
+    """Saves the student's progression state permanently to the database."""
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO student_states (student_name, progression_state, identified_phase, baseline_confirms)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(student_name) DO UPDATE SET
+            progression_state=excluded.progression_state,
+            identified_phase=excluded.identified_phase,
+            baseline_confirms=excluded.baseline_confirms
+    ''', (str(student_name), str(state), str(phase), int(confirms)))
+    conn.commit()
+    conn.close()
+    print(f"[Database] Permanent State Saved: {student_name} -> [{state} | {phase} | {confirms}]")
+
+def load_student_state(student_name):
+    """Loads the student's progression state from the database."""
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT progression_state, identified_phase, baseline_confirms
+        FROM student_states WHERE student_name = ?
+    ''', (str(student_name),))
+    row = cursor.fetchone()
+    conn.close()
+    
+    if row:
+        return row[0], row[1], row[2]
+    return None
 
 # Immediately initialize the DB upon module import securely
 init_db()
