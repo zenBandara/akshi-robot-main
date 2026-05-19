@@ -140,7 +140,12 @@ def on_show():
     options = []
     for physical_key in sorted(key_mapping.keys()):
         json_key = key_mapping[physical_key]
-        label = mc_words.get(json_key, f"Option {physical_key}")
+        
+        # Hide text for L1 and L2 so the student can't just read the answer
+        if level in [1, 2]:
+            label = ""
+        else:
+            label = mc_words.get(json_key, f"Option {physical_key}")
 
         img_path = mc_images.get(json_key, "")
         pixmap = None
