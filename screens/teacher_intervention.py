@@ -235,6 +235,10 @@ def handle_key_press(action):
         voice_manager.stop()
         get_robot_eyes().set_expression("encouraging")
         print("[Teacher Intervention] Teacher said OKAY/YES. Logging complete cascade and resetting.")
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("TEACHER_INTERVENTION_OVERRIDE", detail="Teacher assisted student and continued")
 
         # Log Result (Complete Cascade Failure -> Teacher Assisted)
         task_data = state_manager.get_current_task()

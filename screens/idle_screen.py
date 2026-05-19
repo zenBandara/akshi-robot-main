@@ -49,7 +49,12 @@ def get_ui():
             background-color: rgba(255, 0, 0, 150);
         }
     """)
-    quit_btn.clicked.connect(lambda: QApplication.instance().quit())
+    def quit_app():
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("SYSTEM_QUIT", detail="Teacher pressed Quit button", sync=True)
+        QApplication.instance().quit()
+
+    quit_btn.clicked.connect(quit_app)
 
     setup_animations()
     
@@ -126,12 +131,9 @@ def handle_key_press(mapped_action):
     if mapped_action == "WAKE":
         print("[Idle Screen] WAKE command triggered! Starting new session & fetching data...")
         
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("USER_INPUT", detail="Robot WAKE command triggered")
-        except Exception:
-            pass
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("ROBOT_WAKE", detail="Teacher triggered WAKE command")
 
         get_robot_eyes().set_expression("surprised")
         selected_teacher = state_manager.get_selected_teacher()

@@ -312,6 +312,11 @@ def on_motivation_nudge():
         nudge_template, nudge_name = DialoguePool.get_template("motivation_nudge", student_name)
         
     print(f"⏰ [MOTIVATION NUDGE] 🤖 ROBOT MOTIVATES: \"{nudge_template.format(name=nudge_name)}\"")
+    
+    # Telemetry Log
+    from core.telemetry_logger import telemetry_logger
+    telemetry_logger.log_event("PEDAGOGICAL_NUDGE", detail=f"Motivation nudge given to {student_name}")
+
     voice_manager.speak_with_name(nudge_template, nudge_name, f"motivation_{student_name}")
 
 def on_timer_expire():
@@ -411,12 +416,9 @@ def handle_key_press(action):
         voice_manager.stop()
         print(f"[Evaluate Screen] Student pressed BREAK (Level {level}). Suspending session...")
 
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("USER_INPUT", detail=f"Student requested BREAK (Level {level})")
-        except Exception:
-            pass
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("USER_INPUT", detail=f"Pressed BREAK at L{level}")
 
         if evaluate_timer:
             evaluate_timer.stop()
@@ -465,13 +467,6 @@ def handle_key_press(action):
         voice_manager.stop()
         print("[Evaluate Screen] Student pressed SKIP. Logging and skipping student...")
 
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("USER_INPUT", detail="Student requested SKIP (Level 3)")
-        except Exception:
-            pass
-
         if evaluate_timer:
             evaluate_timer.stop()
         if motivation_timer:
@@ -499,13 +494,6 @@ def handle_key_press(action):
         current_key = presentation_keys[current_presenting_idx]
         selected_option = key_mapping[current_key]
 
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("USER_INPUT", detail=f"Student said YES to Option {current_key} ({selected_option})")
-        except Exception:
-            pass
-
         task_data = state_manager.get_current_task()
         eval_data = task_data.get("evaluate", {}) if task_data else {}
         correct_option = eval_data.get("correct_option")
@@ -513,6 +501,10 @@ def handle_key_press(action):
         is_correct = (selected_option == correct_option)
 
         print(f"[Evaluate Screen] Student said YES to option {current_key} ({selected_option}). Correct: {is_correct}")
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("USER_INPUT", detail=f"Said YES to option {current_key} ({selected_option})")
 
         if is_correct:
             # Highlight green and finish
@@ -537,14 +529,11 @@ def handle_key_press(action):
         current_key = presentation_keys[current_presenting_idx]
         selected_option = key_mapping[current_key]
 
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("USER_INPUT", detail=f"Student said NO to Option {current_key} ({selected_option})")
-        except Exception:
-            pass
-
         print(f"[Evaluate Screen] Student said NO to option {current_key} ({selected_option}).")
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("USER_INPUT", detail=f"Said NO to option {current_key} ({selected_option})")
 
         # Always move to the next option, even if they rejected the correct answer
         print(f"[Evaluate Screen] Moving to next option...")

@@ -157,12 +157,9 @@ class FlowController:
 
         print(f"[FlowController] ✅ Success at: {current_node} | State: {self.progression_state}")
         
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("EVALUATION_RESULT", detail=f"Success at {current_node}", is_correct=True)
-        except Exception:
-            pass
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("EVALUATION_RESULT", detail=f"Correct at {current_node}", is_correct=True)
 
         get_robot_eyes().set_expression("surprised")
 
@@ -175,6 +172,11 @@ class FlowController:
             self.progression_state = "CONFIRMING"
             self.baseline_confirms = 0
             print(f"[FlowController] 🎯 IDENTIFIED: '{self.identified_phase}'")
+            
+            # Telemetry Log
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("IDENTIFIED", detail=f"Identified baseline phase: {self.identified_phase}")
+
             try:
                 import core.database as database
                 session_id = state_manager.get_current_session()
@@ -205,6 +207,11 @@ class FlowController:
             if new:
                 self.identified_phase = new
                 print(f"[FlowController] 🎉 PROMOTED: '{old}' → '{new}'")
+                
+                # Telemetry Log
+                from core.telemetry_logger import telemetry_logger
+                telemetry_logger.log_event("PROMOTION", detail=f"Promoted from {old} to {new}")
+
                 try:
                     import core.database as database
                     session_id = state_manager.get_current_session()
@@ -238,14 +245,13 @@ class FlowController:
 
         print(f"[FlowController] ❌ {'Timeout' if is_timeout else 'Incorrect'} at level {level} | State: {self.progression_state}")
         
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            ev_type = "TIMEOUT" if is_timeout else "EVALUATION_RESULT"
-            ev_detail = f"Timeout at {log_node} (L{level})" if is_timeout else f"Incorrect at {log_node} (L{level})"
-            telemetry_logger.log_event(ev_type, detail=ev_detail, is_correct=False)
-        except Exception:
-            pass
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event(
+            "TIMEOUT" if is_timeout else "EVALUATION_RESULT", 
+            detail=f"{'Timeout' if is_timeout else 'Incorrect'} at L{level} ({current_node})",
+            is_correct=False
+        )
 
         if is_timeout:
             get_robot_eyes().set_expression("thinking")
@@ -268,8 +274,21 @@ class FlowController:
         # If kinesthetic was already tried, proceed with state-specific logic
         if self.progression_state != "IDENTIFYING":
             print(f"[FlowController] Failed baseline/advancement. Dropping to IDENTIFYING cascade.")
+            
+            # Telemetry Log
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("DOWNGRADE", detail=f"Failed {self.progression_state} at {current_node}. Dropping to IDENTIFYING.")
+
             self.baseline_confirms = 0
             self.progression_state = "IDENTIFYING"
+
+        self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
+                return
+            elif self.progression_state == "CONFIRMING":
+                # Failed baseline — drop to cascade to re-identify
+                print(f"[FlowController] CONFIRMING failure! Dropping to IDENTIFYING cascade to re-identify new phase.")
+                self.progression_state = "IDENTIFYING"
+                # Falls through to _cascade_incorrect below
 
         self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
 
@@ -352,12 +371,9 @@ class FlowController:
         level = int(current_node[-1]) if current_node.startswith("evaluate_L") else state_manager.get_affordance_level()
         print(f"[FlowController] Kinesthetic L{level} passed → retrying {current_node}")
         
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("KINESTHETIC_RESULT", detail=f"Passed L{level} kinesthetic", is_correct=True)
-        except Exception:
-            pass
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("KINESTHETIC_RESULT", detail=f"Passed Kinesthetic at L{level}", is_correct=True)
 
         state_manager.current_stage = current_node
         try:
@@ -370,18 +386,27 @@ class FlowController:
         current_node = self.get_current_node()
         level = int(current_node[-1]) if current_node.startswith("evaluate_L") else state_manager.get_affordance_level()
         print(f"[FlowController] Kinesthetic L{level} failed | State: {self.progression_state}")
-
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("KINESTHETIC_RESULT", detail=f"Failed L{level} kinesthetic", is_correct=False)
-        except Exception:
-            pass
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("KINESTHETIC_RESULT", detail=f"Failed Kinesthetic at L{level}", is_correct=False)
 
         if self.progression_state != "IDENTIFYING":
-            print("[FlowController] Failed baseline/advancement after kinesthetic. Dropping to IDENTIFYING cascade.")
             self.baseline_confirms = 0
-            self.progression_state = "IDENTIFYING"
+            if self.progression_state == "ADVANCING":
+                # Failed to move up — revert to CONFIRMING at baseline phase
+                self.progression_state = "CONFIRMING"
+                student_name = state_manager.get_current_student() or "unknown"
+                print(f"[FlowController] ADVANCING kinesthetic failure. Reverting to baseline phase '{self.identified_phase}'. Moving to next student.")
+                self._save_student_state(student_name)
+                import core.session_logic as session_logic
+                session_logic.next_student()
+                return
+            elif self.progression_state == "CONFIRMING":
+                # Failed baseline — drop to cascade to re-identify
+                print(f"[FlowController] CONFIRMING kinesthetic failure! Dropping to IDENTIFYING cascade to re-identify new phase.")
+                self.progression_state = "IDENTIFYING"
+                # Falls through to _cascade_incorrect below
 
         print("[FlowController] Dropping to next scaffolding phase")
         self._cascade_incorrect(parent_widget)
@@ -396,6 +421,11 @@ class FlowController:
         current_node = self.get_current_node()
         student_name = state_manager.get_current_student() or "unknown"
         print(f"[FlowController] Skip at: {current_node} | Student: {student_name} — NO data saved, re-queuing.")
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("USER_SKIP", detail=f"Skipped at {current_node}")
+
         get_robot_eyes().set_expression("sad")
 
         # Re-add the student to the END of the queue so they are called again

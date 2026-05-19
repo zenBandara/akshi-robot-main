@@ -137,14 +137,11 @@ def handle_key_press(mapped_action):
         keyboard_manager.unregister_handler()  # Prevent duplicate key events from re-triggering the flow
         selected_teacher = teacher_map[mapped_action]
         print(f"Teacher selected: {selected_teacher}")
-
-        # Log telemetry for research
-        try:
-            from core.telemetry_logger import telemetry_logger
-            telemetry_logger.log_event("USER_INPUT", detail=f"Teacher selected: {selected_teacher}")
-        except Exception:
-            pass
         
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("TEACHER_SELECTED", detail=f"Teacher {selected_teacher} selected")
+
         state_manager.set_selected_teacher(selected_teacher)
         window.title_label.setText("Authenticating Teacher...")
         

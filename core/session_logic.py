@@ -14,6 +14,11 @@ def next_student():
         with open("ginglu-the-robot/calibration_command.json", "w") as f:
             json.dump({"type": "end_session"}, f)
         print("[Session Logic] Student session ended via IPC.")
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        student_name = state_manager.get_current_student() or "unknown"
+        telemetry_logger.log_event("STUDENT_SESSION_END", detail=f"Session ended for {student_name}")
     except Exception as e:
         print(f"[Session Logic] IPC end_session error: {e}")
 
@@ -63,6 +68,11 @@ def next_student():
 
         # If no lesson or error, truly complete the session
         print("[Session Logic] All students complete for this task!")
+        
+        # Telemetry Log
+        from core.telemetry_logger import telemetry_logger
+        telemetry_logger.log_event("SESSION_COMPLETE", detail="All students in queue complete")
+
         navigator.navigate_to("session_complete")
         return
         
@@ -84,4 +94,9 @@ def start_student_questions():
     from core.flow_controller import flow_controller
     student_name = state_manager.get_current_student() or "unknown"
     print(f"[Session Logic] Starting adaptive flow for: {student_name}")
+    
+    # Telemetry Log
+    from core.telemetry_logger import telemetry_logger
+    telemetry_logger.log_event("STUDENT_SESSION_START", detail=f"Adaptive flow started for {student_name}")
+
     flow_controller.start_student_flow(student_name)

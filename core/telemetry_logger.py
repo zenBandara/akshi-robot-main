@@ -1,98 +1,73 @@
 import os
 import csv
-import json
+import datetime
 import threading
-import queue
-from datetime import datetime
 from core.state_manager import state_manager
 
-# File paths
-CSV_FILE_PATH = "data/student_telemetry.csv"
-STATE_FILE = "ginglu-the-robot/calibration_state.json"
-
 class TelemetryLogger:
-    """
-    High-granularity CSV logger for research analysis.
-    Captures every UI interaction, screen transition, and evaluation result.
-    """
     def __init__(self):
-        self.log_queue = queue.Queue()
+        self.log_dir = "logs"
+        self.filename = os.path.join(self.log_dir, "telemetry.csv")
+        self.lock = threading.Lock()
+        
         self.headers = [
             "timestamp", "session_id", "student_name", "task_id", 
             "event_type", "event_detail", "is_correct", 
-            "current_phase", "current_state", "face_visible"
+            "current_phase", "current_state", "affordance_level"
         ]
         
-        # Ensure directory exists
-        os.makedirs(os.path.dirname(CSV_FILE_PATH), exist_ok=True)
-        
+        # Ensure log directory exists
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+            
         # Initialize CSV with headers if it doesn't exist
-        if not os.path.exists(CSV_FILE_PATH):
-            with open(CSV_FILE_PATH, 'w', newline='') as f:
+        if not os.path.exists(self.filename):
+            with open(self.filename, mode='w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(self.headers)
-        
-        # Start background worker thread for non-blocking writes
-        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
-        self.worker_thread.start()
 
-    def _get_face_visibility(self):
-        """Reads real-time face visibility from the calibration state file."""
-        try:
-            if os.path.exists(STATE_FILE):
-                with open(STATE_FILE, 'r') as f:
-                    data = json.load(f)
-                    # Support both "face_visible" and "calibration_status" checks if needed
-                    return data.get("face_visible", False)
-        except Exception:
-            pass
-        return False
-
-    def log_event(self, event_type, detail, is_correct=None):
+    def log_event(self, event_type, event_detail="-", is_correct="-", sync=False):
         """
-        Public API to log an event. 
+        Logs an event to the CSV file. 
         Automatically gathers context from state_manager and flow_controller.
         """
-        # We import flow_controller inside to avoid circular dependencies
-        from core.flow_controller import flow_controller
+        # Gather context
+        timestamp = datetime.datetime.now().isoformat()
+        session_id = state_manager.get_current_session() or "unknown"
+        student_name = state_manager.get_current_student() or "unknown"
+        current_task = state_manager.get_current_task()
+        task_id = current_task.get("task_id", "unknown") if current_task else "unknown"
+        affordance_level = state_manager.get_affordance_level()
         
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        
-        # Context gathering
-        session_id = state_manager.get_current_session() or "SYSTEM_INIT"
-        student_name = state_manager.get_current_student() or "SYSTEM"
-        task = state_manager.get_current_task()
-        task_id = task.get("task_id", "none") if task else "none"
-        
-        # Get phase and state from flow_controller
-        current_phase = flow_controller.identified_phase or "none"
-        current_state = flow_controller.progression_state or "IDENTIFYING"
-        
-        face_visible = self._get_face_visibility()
-        
+        # We import flow_controller here to avoid circular dependency
+        try:
+            from core.flow_controller import flow_controller
+            current_phase = flow_controller.identified_phase or "none"
+            current_state = flow_controller.progression_state or "unknown"
+        except ImportError:
+            current_phase = "unknown"
+            current_state = "unknown"
+
         row = [
             timestamp, session_id, student_name, task_id,
-            event_type, detail, 
-            str(is_correct) if is_correct is not None else "-",
-            current_phase, current_state, str(face_visible)
+            event_type, event_detail, is_correct,
+            current_phase, current_state, affordance_level
         ]
-        
-        self.log_queue.put(row)
 
-    def _worker(self):
-        """Background thread that writes queued logs to disk."""
-        while True:
-            row = self.log_queue.get()
-            if row is None:
-                break
+        if sync:
+            self._write_row(row)
+        else:
+            # Write to CSV in a background thread to prevent UI lag
+            threading.Thread(target=self._write_row, args=(row,), daemon=True).start()
+
+    def _write_row(self, row):
+        with self.lock:
             try:
-                with open(CSV_FILE_PATH, 'a', newline='') as f:
+                with open(self.filename, mode='a', newline='') as f:
                     writer = csv.writer(f)
                     writer.writerow(row)
             except Exception as e:
-                print(f"[TelemetryLogger] Write error: {e}")
-            finally:
-                self.log_queue.task_done()
+                print(f"[TelemetryLogger] Error writing to CSV: {e}")
 
-# Singleton instance
+# Global singleton
 telemetry_logger = TelemetryLogger()
