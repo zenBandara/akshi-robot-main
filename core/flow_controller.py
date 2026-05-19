@@ -279,16 +279,21 @@ class FlowController:
 
         # If kinesthetic was already tried, proceed with state-specific logic
         if self.progression_state != "IDENTIFYING":
-            # Stay at the identified phase — don't drop to full cascade
-            if self.progression_state == "ADVANCING":
-                self.progression_state = "CONFIRMING"
             self.baseline_confirms = 0
-            student_name = state_manager.get_current_student() or "unknown"
-            print(f"[FlowController] CONFIRMING/ADVANCING failure. Staying at phase '{self.identified_phase}'. Moving to next student.")
-            self._save_student_state(student_name)
-            import core.session_logic as session_logic
-            session_logic.next_student()
-            return
+            if self.progression_state == "ADVANCING":
+                # Failed to move up — revert to CONFIRMING at baseline phase
+                self.progression_state = "CONFIRMING"
+                student_name = state_manager.get_current_student() or "unknown"
+                print(f"[FlowController] ADVANCING failure. Reverting to baseline phase '{self.identified_phase}'. Moving to next student.")
+                self._save_student_state(student_name)
+                import core.session_logic as session_logic
+                session_logic.next_student()
+                return
+            elif self.progression_state == "CONFIRMING":
+                # Failed baseline — drop to cascade to re-identify
+                print(f"[FlowController] CONFIRMING failure! Dropping to IDENTIFYING cascade to re-identify new phase.")
+                self.progression_state = "IDENTIFYING"
+                # Falls through to _cascade_incorrect below
 
         self._cascade_incorrect(parent_widget, is_timeout=is_timeout)
 
@@ -383,16 +388,21 @@ class FlowController:
         print(f"[FlowController] Kinesthetic L{level} failed | State: {self.progression_state}")
 
         if self.progression_state != "IDENTIFYING":
-            # Stay at the identified phase — don't drop to full cascade
-            if self.progression_state == "ADVANCING":
-                self.progression_state = "CONFIRMING"
             self.baseline_confirms = 0
-            student_name = state_manager.get_current_student() or "unknown"
-            print(f"[FlowController] CONFIRMING/ADVANCING kinesthetic failure. Staying at phase '{self.identified_phase}'. Moving to next student.")
-            self._save_student_state(student_name)
-            import core.session_logic as session_logic
-            session_logic.next_student()
-            return
+            if self.progression_state == "ADVANCING":
+                # Failed to move up — revert to CONFIRMING at baseline phase
+                self.progression_state = "CONFIRMING"
+                student_name = state_manager.get_current_student() or "unknown"
+                print(f"[FlowController] ADVANCING kinesthetic failure. Reverting to baseline phase '{self.identified_phase}'. Moving to next student.")
+                self._save_student_state(student_name)
+                import core.session_logic as session_logic
+                session_logic.next_student()
+                return
+            elif self.progression_state == "CONFIRMING":
+                # Failed baseline — drop to cascade to re-identify
+                print(f"[FlowController] CONFIRMING kinesthetic failure! Dropping to IDENTIFYING cascade to re-identify new phase.")
+                self.progression_state = "IDENTIFYING"
+                # Falls through to _cascade_incorrect below
 
         print("[FlowController] Dropping to next scaffolding phase")
         self._cascade_incorrect(parent_widget)
