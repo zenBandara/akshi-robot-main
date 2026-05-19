@@ -94,55 +94,68 @@ class WebSocketServer:
                             data["face_visible"] = self.last_client_data["face_visible"]
                         
                         self.last_client_data = data
-                        with open("calibration_state.json", "w") as f:
-                            json.dump(data, f)
-                        print("Received metrics:", data)
+                        # We let state_writer handle the file writing
                     except:
                         print("Received raw message:", msg)
 
             except websockets.exceptions.ConnectionClosed:
                 print("Listener stopped")
 
-        
+        async def state_writer():
+            """Writes calibration_state.json at most 10 times a second if data changed."""
+            last_written = None
+            while True:
+                try:
+                    if self.last_client_data != last_written:
+                        to_write = self.last_client_data.copy()
+                        with open("calibration_state.json", "w") as f:
+                            json.dump(to_write, f)
+                        last_written = to_write
+                except Exception as e:
+                    pass
+                await asyncio.sleep(0.1)
 
         async def ipc_controller():
             last_command = None
+            last_mtime = 0
             while True:
                 try:
-                    with open("calibration_command.json", "r") as f:
-                        cmd = json.load(f)
-                    
-                    if cmd and cmd != last_command:
-                        last_command = cmd
-                        await websocket.send(json.dumps(cmd))
-                        new_state = {"type": cmd.get("type", "unknown")}
-                        if "face_visible" in self.last_client_data:
-                            new_state["face_visible"] = self.last_client_data["face_visible"]
+                    mtime = os.path.getmtime("calibration_command.json")
+                    if mtime != last_mtime:
+                        last_mtime = mtime
+                        with open("calibration_command.json", "r") as f:
+                            cmd = json.load(f)
+                        
+                        if cmd and cmd != last_command:
+                            last_command = cmd
+                            await websocket.send(json.dumps(cmd))
+                            new_state = {"type": cmd.get("type", "unknown")}
+                            if "face_visible" in self.last_client_data:
+                                new_state["face_visible"] = self.last_client_data["face_visible"]
+                                
+                            self.last_client_data = new_state
                             
-                        self.last_client_data = new_state
-                        with open("calibration_state.json", "w") as f:
-                            json.dump(self.last_client_data, f)
-                        
-                        # Toggle tracking based on student session commands
-                        cmd_type = cmd.get("type")
-                        if cmd_type in ["start_session", "resume_frames"]:
-                            self.tracking_active = True
-                            print(f"[WebSocket] Tracking ON ({cmd_type})")
-                        elif cmd_type in ["end_session", "pause_frames"]:
-                            self.tracking_active = False
-                            print(f"[WebSocket] Tracking OFF ({cmd_type})")
-                        
-                        print("Sent IPC command to server:", cmd)
+                            # Toggle tracking based on student session commands
+                            cmd_type = cmd.get("type")
+                            if cmd_type in ["start_session", "resume_frames"]:
+                                self.tracking_active = True
+                                print(f"[WebSocket] Tracking ON ({cmd_type})")
+                            elif cmd_type in ["end_session", "pause_frames"]:
+                                self.tracking_active = False
+                                print(f"[WebSocket] Tracking OFF ({cmd_type})")
+                            
+                            print("Sent IPC command to server:", cmd)
                 except Exception as e:
                     pass
                 await asyncio.sleep(0.05)
 
         sender_task = asyncio.create_task(sender())
         listener_task = asyncio.create_task(listener())
+        writer_task = asyncio.create_task(state_writer())
         session_task = asyncio.create_task(ipc_controller())
 
         done, pending = await asyncio.wait(
-            [sender_task, listener_task, session_task],
+            [sender_task, listener_task, writer_task, session_task],
             return_when=asyncio.FIRST_EXCEPTION
         )
 
