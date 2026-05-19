@@ -114,7 +114,7 @@ class FlowController:
         # Check DB for historical phase
         try:
             import core.database as database
-            method_used, _ = database.get_student_optimal_starting_method(student_name)
+            method_used, _, _ = database.get_student_optimal_starting_method(student_name)
         except Exception:
             method_used = None
 
