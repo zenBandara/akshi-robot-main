@@ -6,6 +6,8 @@ import threading
 import json
 import firebase_request as fr
 import os
+import queue
+import time
 
 # Set IP to Firebase
 fr.update_connected_ip()
@@ -14,31 +16,58 @@ fr.update_connected_ip()
 class WebSocketServer:
 
     def __init__(self):
+        self.state_file = "calibration_state.json"
+        self.command_file = "calibration_command.json"
         
         # Ensure json files exist
-        if not os.path.exists("calibration_command.json"):
-            with open("calibration_command.json", "w") as f:
+        if not os.path.exists(self.command_file):
+            with open(self.command_file, "w") as f:
                 json.dump({}, f)
-        if not os.path.exists("calibration_state.json"):
-            with open("calibration_state.json", "w") as f:
+        if not os.path.exists(self.state_file):
+            with open(self.state_file, "w") as f:
                 json.dump({"calibration_status": "Not started yet", "face_visible": True}, f)
 
-
         self.latest_frame = None
-        self.last_client_data = {}  # store received data
+        self.last_client_data = {"calibration_status": "Not started yet", "face_visible": True}
         self.tracking_active = False  # Toggled by start_session/end_session IPC commands
+        
+        # NEW: Async state-writing queue to prevent blocking the frame loops
+        self.state_queue = queue.Queue()
+        self.state_lock = threading.Lock()
+        self.write_thread = threading.Thread(target=self._state_writer_worker, daemon=True)
+        self.write_thread.start()
+
+    def _state_writer_worker(self):
+        """Background thread that writes state to disk only when it changes."""
+        last_written_data = None
+        while True:
+            try:
+                # Wait for new data to write
+                data = self.state_queue.get()
+                if data is None: break
+                
+                # Only write if the data is different from what's already on disk
+                if data != last_written_data:
+                    try:
+                        with open(self.state_file, "w") as f:
+                            json.dump(data, f)
+                        last_written_data = data.copy()
+                    except Exception as e:
+                        print(f"[WebSocket] State write error: {e}")
+                
+                self.state_queue.task_done()
+            except Exception:
+                time.sleep(0.01)
 
     def set_face_visible(self, visible):
         """Update the face visibility status in the shared state file."""
-        if self.last_client_data is None:
-            self.last_client_data = {}
-        
-        self.last_client_data["face_visible"] = visible
-        try:
-            with open("calibration_state.json", "w") as f:
-                json.dump(self.last_client_data, f)
-        except Exception as e:
-            print(f"[WebSocket] Error writing face_visible to JSON: {e}")
+        with self.state_lock:
+            if self.last_client_data.get("face_visible") == visible:
+                return # Skip if no change
+            
+            self.last_client_data["face_visible"] = visible
+            # Push to the async writer
+            self.state_queue.put(self.last_client_data.copy())
 
     def update_frame(self, frame):
         self.latest_frame = frame
@@ -53,31 +82,31 @@ class WebSocketServer:
                         await asyncio.sleep(0.05)
                         continue
 
-                    frame = self.latest_frame.copy()
+                    # On Pi, deep copies of high-res frames in a loop can be slow. 
+                    # Use a fast resize or direct encode if possible, but keeping original logic mostly intact.
+                    frame = self.latest_frame
                     
                     if not self.tracking_active:
-                        # Send pitch-black frames to keep connection alive but prevent face detection
-                        frame[:] = 0
+                        # Optimization: don't even process if inactive, just send tiny black frame
+                        data = b"\x00" * 100 # Dummy small data
                     else:
                         frame = cv2.flip(frame, 1)
-                        frame = cv2.GaussianBlur(frame, (0, 0), 1)
-                        frame = cv2.addWeighted(frame, 1.5, frame, -0.5, 0)
-
-                    ret, buffer = cv2.imencode(
-                        ".jpg",
-                        frame,
-                        [cv2.IMWRITE_JPEG_QUALITY, 60]
-                    )
-
-                    if not ret:
-                        continue
-
-                    data = buffer.tobytes()
+                        # GAUSSIAN BLUR is very expensive on a Pi CPU! 
+                        # frame = cv2.GaussianBlur(frame, (0, 0), 1)
+                        # Use a faster blur or skip it if lag is severe
+                        
+                        ret, buffer = cv2.imencode(
+                            ".jpg",
+                            frame,
+                            [cv2.IMWRITE_JPEG_QUALITY, 50] # Lower quality slightly for speed
+                        )
+                        if not ret: continue
+                        data = buffer.tobytes()
 
                     await websocket.send(struct.pack(">I", len(data)))
                     await websocket.send(data)
 
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(0.06) # Throttle slightly for Pi stability
 
             except websockets.exceptions.ConnectionClosed:
                 print("Sender stopped")
@@ -86,42 +115,44 @@ class WebSocketServer:
             try:
                 while True:
                     msg = await websocket.recv()
-
                     try:
                         data = json.loads(msg)
-                        # Merge local state with received metrics
-                        if "face_visible" in self.last_client_data:
-                            data["face_visible"] = self.last_client_data["face_visible"]
+                        with self.state_lock:
+                            # Preserve face_visible state maintained by the local robot process
+                            if "face_visible" in self.last_client_data:
+                                data["face_visible"] = self.last_client_data["face_visible"]
+                            
+                            self.last_client_data = data
+                            # Async write to disk
+                            self.state_queue.put(data.copy())
                         
-                        self.last_client_data = data
-                        with open("calibration_state.json", "w") as f:
-                            json.dump(data, f)
-                        print("Received metrics:", data)
                     except:
-                        print("Received raw message:", msg)
+                        pass
 
             except websockets.exceptions.ConnectionClosed:
                 print("Listener stopped")
-
-        
 
         async def ipc_controller():
             last_command = None
             while True:
                 try:
-                    with open("calibration_command.json", "r") as f:
-                        cmd = json.load(f)
+                    if os.path.exists(self.command_file):
+                        with open(self.command_file, "r") as f:
+                            cmd = json.load(f)
+                    else:
+                        cmd = {}
                     
                     if cmd and cmd != last_command:
                         last_command = cmd
                         await websocket.send(json.dumps(cmd))
-                        new_state = {"type": cmd.get("type", "unknown")}
-                        if "face_visible" in self.last_client_data:
-                            new_state["face_visible"] = self.last_client_data["face_visible"]
+                        
+                        with self.state_lock:
+                            new_state = {"type": cmd.get("type", "unknown")}
+                            if "face_visible" in self.last_client_data:
+                                new_state["face_visible"] = self.last_client_data["face_visible"]
                             
-                        self.last_client_data = new_state
-                        with open("calibration_state.json", "w") as f:
-                            json.dump(self.last_client_data, f)
+                            self.last_client_data = new_state
+                            self.state_queue.put(new_state.copy())
                         
                         # Toggle tracking based on student session commands
                         cmd_type = cmd.get("type")
@@ -131,11 +162,10 @@ class WebSocketServer:
                         elif cmd_type in ["end_session", "pause_frames"]:
                             self.tracking_active = False
                             print(f"[WebSocket] Tracking OFF ({cmd_type})")
-                        
-                        print("Sent IPC command to server:", cmd)
-                except Exception as e:
+                except Exception:
                     pass
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.1) # Less frequent check for Pi CPU relief
+
 
         sender_task = asyncio.create_task(sender())
         listener_task = asyncio.create_task(listener())
