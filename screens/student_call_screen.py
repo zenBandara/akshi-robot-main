@@ -49,7 +49,7 @@ def get_ui():
         display_name = student_name if student_name else "Buddy"
         
         window.student_name_label.setText(f"{display_name}! 🎉")
-        window.hint_label.setText("Say 'Okay' to start, or 'No' to skip! 🌟")
+        window.hint_label.setText("Say 'Okay' to start, or 'Skip' to go to the next student! 🌟")
         
         # Force UI update before blocking voice generation
         window.update()
