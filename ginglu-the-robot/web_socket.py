@@ -43,44 +43,56 @@ class WebSocketServer:
     def update_frame(self, frame):
         self.latest_frame = frame
 
+    def _prepare_frame(self):
+        """Process and encode the frame in a thread-safe way."""
+        frame = self.latest_frame
+        if frame is None:
+            return None
+            
+        # Convert RGB (from maincopy.py) to BGR for OpenCV encoding
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
+        if not self.tracking_active:
+            # Send pitch-black frames to keep connection alive
+            frame[:] = 0
+        else:
+            # Combine operations
+            frame = cv2.flip(frame, 1)
+            # Apply sharpening (unsharp mask) - much faster at 640x360
+            blurred = cv2.GaussianBlur(frame, (0, 0), 1)
+            frame = cv2.addWeighted(frame, 1.5, blurred, -0.5, 0)
+
+        ret, buffer = cv2.imencode(
+            ".jpg",
+            frame,
+            [cv2.IMWRITE_JPEG_QUALITY, 60]
+        )
+        return buffer.tobytes() if ret else None
+
     async def stream(self, websocket):
         print("Client connected")
 
         async def sender():
             try:
                 while True:
-                    if self.latest_frame is None:
+                    # Run CPU-bound image processing in a thread
+                    data = await asyncio.to_thread(self._prepare_frame)
+                    
+                    if data is None:
                         await asyncio.sleep(0.05)
                         continue
 
-                    frame = self.latest_frame.copy()
-                    
-                    if not self.tracking_active:
-                        # Send pitch-black frames to keep connection alive but prevent face detection
-                        frame[:] = 0
-                    else:
-                        frame = cv2.flip(frame, 1)
-                        frame = cv2.GaussianBlur(frame, (0, 0), 1)
-                        frame = cv2.addWeighted(frame, 1.5, frame, -0.5, 0)
-
-                    ret, buffer = cv2.imencode(
-                        ".jpg",
-                        frame,
-                        [cv2.IMWRITE_JPEG_QUALITY, 60]
-                    )
-
-                    if not ret:
-                        continue
-
-                    data = buffer.tobytes()
-
-                    await websocket.send(struct.pack(">I", len(data)))
-                    await websocket.send(data)
+                    try:
+                        await websocket.send(struct.pack(">I", len(data)))
+                        await websocket.send(data)
+                    except websockets.exceptions.ConnectionClosed:
+                        break
 
                     await asyncio.sleep(0.05)
 
-            except websockets.exceptions.ConnectionClosed:
-                print("Sender stopped")
+            except Exception as e:
+                print(f"Sender error: {e}")
+            print("Sender stopped")
 
         async def listener():
             try:

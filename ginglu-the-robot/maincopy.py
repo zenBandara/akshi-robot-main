@@ -46,8 +46,8 @@ SERVO_MIN_US, SERVO_MAX_US = 600, 2400
 SERVO_MIN_DEG, SERVO_MAX_DEG = 5.0, 170.0
 START_YAW_DEG, START_PITCH_DEG = 90.0, 90.0
 
-# FRAME_W, FRAME_H = 640, 360
-FRAME_W, FRAME_H = 1280, 720
+FRAME_W, FRAME_H = 640, 360
+# FRAME_W, FRAME_H = 1280, 720
 
 CAM_FOV_X_DEG, CAM_FOV_Y_DEG = 62.0, 48.8
 
@@ -199,7 +199,7 @@ while running:
         print("Face detection error:", e)
         center = None
 
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    # Pass the RGB frame directly; WebSocketServer will handle conversion in a thread
     ws.update_frame(frame)
 
     # Only run tracking logic during an active student session
