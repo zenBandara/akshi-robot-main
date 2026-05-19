@@ -1,6 +1,11 @@
 from core.state_manager import state_manager
 from core.navigator import navigator
 
+# ── TOGGLE FOR TESTING ──
+# Set to True: If Firebase has ANY task, the session will loop indefinitely (useful for testing with only 1 task).
+# Set to False (Production): The session will ONLY restart if the teacher has selected a DIFFERENT task.
+LOOP_SAME_TASK_IN_TESTING = False
+
 def next_student():
     """Pick the next student from the queue. If all students are done, advance to next task round."""
     # End the current student's WebSocket session
@@ -15,10 +20,6 @@ def next_student():
     queue = state_manager.get_student_queue()
     
     if not queue:
-        # ── DEVELOPMENT STAGE LOGIC ──
-        # Check Firebase again to see if we should start another round.
-        # In Production: We should only repeat if (new_lesson != old_lesson).
-        # In Development: We repeat as long as Firebase has ANY lesson information.
         print("[Session Logic] All students complete. Re-checking Firebase for next round...")
         
         try:
@@ -30,7 +31,15 @@ def next_student():
             lesson_id = firebase.get_current_lesson(selected_teacher) if selected_teacher else None
             
             if lesson_id:
-                print(f"[Session Logic] Round Complete. Firebase has task '{lesson_id}'. Starting another round.")
+                # Production check: ensure the new lesson is actually different from the one we just did
+                current_task = state_manager.get_current_task()
+                current_task_id = current_task.get("task_id") if current_task else None
+                
+                if not LOOP_SAME_TASK_IN_TESTING and lesson_id == current_task_id:
+                    print(f"[Session Logic] Task '{lesson_id}' is the same as the current one. Ending session.")
+                    # Falls through to the 'Session Complete' screen below
+                else:
+                    print(f"[Session Logic] Round Complete. Starting new round for task '{lesson_id}'.")
                 
                 # 1. Refetch students
                 students = firebase.get_students(selected_teacher)
@@ -38,6 +47,7 @@ def next_student():
                 new_queue = students.copy()
                 random.shuffle(new_queue)
                 state_manager.set_student_queue(new_queue)
+                state_manager.has_shown_task_intro = False
                 
                 # 2. Load the task
                 all_tasks = task_loader.get_loaded_tasks()
@@ -63,11 +73,8 @@ def next_student():
     print(f"Next student selected: {student}")
     
     # First student gets the task introduction screen
-    student_list = state_manager.get_student_list()
-    remaining = state_manager.get_student_queue()
-    is_first_student = (len(remaining) == len(student_list) - 1) if student_list else True
-    
-    if is_first_student:
+    if not getattr(state_manager, 'has_shown_task_intro', False):
+        state_manager.has_shown_task_intro = True
         navigator.navigate_to("task_intro")
     else:
         navigator.navigate_to("student_call")

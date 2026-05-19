@@ -191,6 +191,14 @@ class CalibrationScreenUI(QWidget):
     def handle_key_press(self, mapped_action):
         if mapped_action == "SKIP":
             print("[Calibration Override] Manual skip via SKIP key.")
+            
+            # Log telemetry for research
+            try:
+                from core.telemetry_logger import telemetry_logger
+                telemetry_logger.log_event("USER_INPUT", detail="Student skipped calibration manually")
+            except Exception:
+                pass
+
             if state_timer:
                 state_timer.stop()
             self.prompt_state = "done"

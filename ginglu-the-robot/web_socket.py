@@ -21,12 +21,24 @@ class WebSocketServer:
                 json.dump({}, f)
         if not os.path.exists("calibration_state.json"):
             with open("calibration_state.json", "w") as f:
-                json.dump({"calibration_status": "Not started yet"}, f)
+                json.dump({"calibration_status": "Not started yet", "face_visible": True}, f)
 
 
         self.latest_frame = None
-        self.last_client_data = None  # store received data
+        self.last_client_data = {}  # store received data
         self.tracking_active = False  # Toggled by start_session/end_session IPC commands
+
+    def set_face_visible(self, visible):
+        """Update the face visibility status in the shared state file."""
+        if self.last_client_data is None:
+            self.last_client_data = {}
+        
+        self.last_client_data["face_visible"] = visible
+        try:
+            with open("calibration_state.json", "w") as f:
+                json.dump(self.last_client_data, f)
+        except Exception as e:
+            print(f"[WebSocket] Error writing face_visible to JSON: {e}")
 
     def update_frame(self, frame):
         self.latest_frame = frame
@@ -77,6 +89,10 @@ class WebSocketServer:
 
                     try:
                         data = json.loads(msg)
+                        # Merge local state with received metrics
+                        if "face_visible" in self.last_client_data:
+                            data["face_visible"] = self.last_client_data["face_visible"]
+                        
                         self.last_client_data = data
                         with open("calibration_state.json", "w") as f:
                             json.dump(data, f)
@@ -99,7 +115,11 @@ class WebSocketServer:
                     if cmd and cmd != last_command:
                         last_command = cmd
                         await websocket.send(json.dumps(cmd))
-                        self.last_client_data = {"type": cmd.get("type", "unknown")}
+                        new_state = {"type": cmd.get("type", "unknown")}
+                        if "face_visible" in self.last_client_data:
+                            new_state["face_visible"] = self.last_client_data["face_visible"]
+                            
+                        self.last_client_data = new_state
                         with open("calibration_state.json", "w") as f:
                             json.dump(self.last_client_data, f)
                         

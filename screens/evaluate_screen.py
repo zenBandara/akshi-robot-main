@@ -411,6 +411,13 @@ def handle_key_press(action):
         voice_manager.stop()
         print(f"[Evaluate Screen] Student pressed BREAK (Level {level}). Suspending session...")
 
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail=f"Student requested BREAK (Level {level})")
+        except Exception:
+            pass
+
         if evaluate_timer:
             evaluate_timer.stop()
         if motivation_timer:
@@ -458,6 +465,13 @@ def handle_key_press(action):
         voice_manager.stop()
         print("[Evaluate Screen] Student pressed SKIP. Logging and skipping student...")
 
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail="Student requested SKIP (Level 3)")
+        except Exception:
+            pass
+
         if evaluate_timer:
             evaluate_timer.stop()
         if motivation_timer:
@@ -484,6 +498,13 @@ def handle_key_press(action):
         # Student said YES to the currently highlighted option
         current_key = presentation_keys[current_presenting_idx]
         selected_option = key_mapping[current_key]
+
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail=f"Student said YES to Option {current_key} ({selected_option})")
+        except Exception:
+            pass
 
         task_data = state_manager.get_current_task()
         eval_data = task_data.get("evaluate", {}) if task_data else {}
@@ -515,6 +536,13 @@ def handle_key_press(action):
 
         current_key = presentation_keys[current_presenting_idx]
         selected_option = key_mapping[current_key]
+
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail=f"Student said NO to Option {current_key} ({selected_option})")
+        except Exception:
+            pass
 
         print(f"[Evaluate Screen] Student said NO to option {current_key} ({selected_option}).")
 

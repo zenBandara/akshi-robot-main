@@ -89,6 +89,13 @@ def setup_animations():
 
 def handle_key_press(mapped_action):
     if mapped_action in ["ENTER", "YES"]:
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail="Student confirmed presence (YES)")
+        except Exception:
+            pass
+
         keyboard_manager.unregister_handler()
         voice_manager.stop()
         get_robot_eyes().set_expression("surprised")
@@ -96,6 +103,13 @@ def handle_key_press(mapped_action):
         # Route to calibration for face tracking BEFORE starting the learning flow
         navigator.navigate_to("calibration")
     elif mapped_action in ["ESCAPE", "NO", "SKIP"]:
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail=f"Student call declined/skipped ({mapped_action})")
+        except Exception:
+            pass
+
         keyboard_manager.unregister_handler()
         voice_manager.stop()
         get_robot_eyes().set_expression("sad")

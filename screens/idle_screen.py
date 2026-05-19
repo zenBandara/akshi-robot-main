@@ -125,6 +125,14 @@ def handle_key_press(mapped_action):
     global frame_timer
     if mapped_action == "WAKE":
         print("[Idle Screen] WAKE command triggered! Starting new session & fetching data...")
+        
+        # Log telemetry for research
+        try:
+            from core.telemetry_logger import telemetry_logger
+            telemetry_logger.log_event("USER_INPUT", detail="Robot WAKE command triggered")
+        except Exception:
+            pass
+
         get_robot_eyes().set_expression("surprised")
         selected_teacher = state_manager.get_selected_teacher()
         if selected_teacher:
@@ -144,6 +152,7 @@ def handle_key_press(mapped_action):
             student_queue = students.copy()
             random.shuffle(student_queue)
             state_manager.set_student_queue(student_queue)
+            state_manager.has_shown_task_intro = False
             
             # Fetch single task
             lesson_id = firebase.get_current_lesson(selected_teacher)

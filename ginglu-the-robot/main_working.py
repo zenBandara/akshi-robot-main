@@ -147,6 +147,7 @@ no_face_start_time = None
 NO_FACE_DELAY = 2.0
 ws = WebSocketServer()
 ws.start()
+ws.set_face_visible(True)
 
 # calibration window
 app = QApplication(sys.argv)
@@ -174,6 +175,7 @@ while running:
 
         if last_face_state == False:
             play_sound(FACE_OK_MP3)
+            ws.set_face_visible(True)
 
         last_face_state = True
         cx, cy = center
@@ -274,6 +276,7 @@ while running:
             if last_face_state == True:
                 play_sound(NO_FACE_MP3)
                 last_face_state = False
+                ws.set_face_visible(False)
 
     # cv2.imshow(WINDOW_NAME, frame)
 

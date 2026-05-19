@@ -19,6 +19,13 @@ class Navigator:
             widget = self.screens[screen_name]
             self.stack.setCurrentWidget(widget)
             
+            # Log the transition for research analysis
+            try:
+                from core.telemetry_logger import telemetry_logger
+                telemetry_logger.log_event("SCREEN_TRANSITION", detail=f"Navigated to {screen_name}")
+            except Exception:
+                pass
+
             # Fire the on_show lifecycle hook if the widget defines one
             if hasattr(widget, "on_show"):
                 widget.on_show()
