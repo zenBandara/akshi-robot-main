@@ -416,9 +416,21 @@ def handle_key_press(action):
             parent_stack = window.parentWidget()
             if parent_stack:
                 if level >= 3:
-                    # L3 Break Request -> Skip Student
-                    print("[Evaluate Screen] L3 Break requested. Skipping student...")
-                    flow_controller.on_skip(parent_stack)
+                    # L3 Break Request -> Cheer and Skip Student
+                    print("[Evaluate Screen] L3 Break requested. Cheering and skipping student...")
+                    student_name = state_manager.get_current_student() or "friend"
+                    get_robot_eyes().set_expression("encouraging")
+                    cheer_msg = f"You did a great job trying so hard, {student_name}! You're amazing! Let's let the next friend have a turn now!"
+                    print(f"🤖 ROBOT SPEAKS (L3 Break Skip): \"{cheer_msg}\"")
+                    delay_ms = voice_manager.speak(cheer_msg, f"l3_break_skip_{student_name}")
+                    
+                    def skip_student():
+                        try:
+                            flow_controller.on_skip(parent_stack)
+                        except Exception as e:
+                            print(f"[Evaluate Screen] Error skipping student: {e}")
+                            
+                    QTimer.singleShot(delay_ms, skip_student)
                 else:
                     # L1/L2 Break Request -> Rabbit Jump Break
                     flow_controller.on_break(parent_stack)
