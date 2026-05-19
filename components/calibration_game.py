@@ -217,19 +217,22 @@ class CalibrationGameWidget(QWidget):
     def paintEvent(self, event):
         """Render the current scene."""
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        w, h = self.width(), self.height()
+        try:
+            painter.setRenderHint(QPainter.Antialiasing)
+            w, h = self.width(), self.height()
 
-        if self.phase == "init":
-            self._draw_intro(painter, w, h)
-        elif self.phase == "open":
-            self._draw_owl_scene(painter, w, h)
-        elif self.phase == "closed":
-            self._draw_bunny_scene(painter, w, h)
-        elif self.phase == "done":
-            self._draw_celebration(painter, w, h)
-
-        painter.end()
+            if self.phase == "init":
+                self._draw_intro(painter, w, h)
+            elif self.phase == "open":
+                self._draw_owl_scene(painter, w, h)
+            elif self.phase == "closed":
+                self._draw_bunny_scene(painter, w, h)
+            elif self.phase == "done":
+                self._draw_celebration(painter, w, h)
+        except Exception as e:
+            print(f"[CalibrationGame] Paint error: {e}")
+        finally:
+            painter.end()
 
     # ─────────────────── INTRO SCENE ───────────────────
     def _draw_intro(self, p: QPainter, w, h):

@@ -42,8 +42,9 @@ def get_ui():
         except Exception as e:
             print("[Student Call Screen] Error pausing frames:", e)
             
-        voice_manager.stop()  # Kill any lingering audio from task_intro or previous screens
-        keyboard_manager.register_handler(handle_key_press)
+        # Stop lingering audio and clear old handler
+        voice_manager.stop()  
+        keyboard_manager.unregister_handler()
         
         student_name = state_manager.get_current_student()
         display_name = student_name if student_name else "Buddy"
@@ -66,6 +67,9 @@ def get_ui():
         # Ensure name is visible immediately
         if hasattr(window, "student_name_label"):
             window.student_name_label.setGraphicsEffect(None)
+            
+        # Enable input ONLY after speech finishes to prevent accidental skips from previous screens
+        QTimer.singleShot(duration_ms + 200, lambda: keyboard_manager.register_handler(handle_key_press))
 
     window.on_show = on_show
     return window
