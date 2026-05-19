@@ -114,15 +114,31 @@ class FlowController:
         # Check DB for historical phase
         try:
             import core.database as database
-            method_used, _, _ = database.get_student_optimal_starting_method(student_name)
+            method_used, eval_passed, used_kinesthetic = database.get_student_optimal_starting_method(student_name)
         except Exception:
             method_used = None
+            eval_passed = None
+            used_kinesthetic = 0
 
         if method_used and method_used in PHASE_LADDER:
-            self.progression_state = "CONFIRMING"
             self.identified_phase = method_used
             self.baseline_confirms = 0
-            print(f"[FlowController] Returning student (DB): phase='{method_used}' → CONFIRMING")
+
+            # Analyze evaluation_passed to restore precise progress
+            if eval_passed == "promoted":
+                self.progression_state = "CONFIRMING"
+                print(f"[FlowController] Returning student (DB): phase='{method_used}' (Promoted Last Session) → CONFIRMING (0/2)")
+            elif eval_passed == "null":
+                self.progression_state = "CONFIRMING"
+                print(f"[FlowController] Returning student (DB): phase='{method_used}' (Failed Last Session) → CONFIRMING (0/2)")
+            elif eval_passed and eval_passed.startswith("evaluate_"):
+                self.progression_state = "CONFIRMING"
+                self.baseline_confirms = 1  # Give them their progress back!
+                print(f"[FlowController] Returning student (DB): phase='{method_used}' (Success Last Session) → CONFIRMING (1/2)")
+            else:
+                self.progression_state = "CONFIRMING"
+                print(f"[FlowController] Returning student (DB): phase='{method_used}' → CONFIRMING")
+
             self._route_for_progression()
         else:
             self.progression_state = "IDENTIFYING"
