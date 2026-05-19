@@ -393,12 +393,13 @@ def handle_key_press(action):
     if not input_enabled:
         return
 
-    # L2 Control Affordance: Break
-    if action == "BREAK" and state_manager.get_affordance_level() >= 2:
+    # Manual Break (Only in Evaluation Screens)
+    if action == "BREAK":
+        level = state_manager.get_affordance_level()
         input_enabled = False
         awaiting_yes_no = False
         voice_manager.stop()
-        print("[Evaluate Screen] Student pressed BREAK. Suspending session...")
+        print(f"[Evaluate Screen] Student pressed BREAK (Level {level}). Suspending session...")
 
         if evaluate_timer:
             evaluate_timer.stop()
@@ -414,7 +415,13 @@ def handle_key_press(action):
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
             if parent_stack:
-                flow_controller.on_break(parent_stack)
+                if level >= 3:
+                    # L3 Break Request -> Skip Student
+                    print("[Evaluate Screen] L3 Break requested. Skipping student...")
+                    flow_controller.on_skip(parent_stack)
+                else:
+                    # L1/L2 Break Request -> Rabbit Jump Break
+                    flow_controller.on_break(parent_stack)
         except ImportError: pass
         return
 
