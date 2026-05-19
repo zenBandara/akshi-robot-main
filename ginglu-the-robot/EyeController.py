@@ -1,6 +1,7 @@
 import serial
 import time
 import threading
+import queue
 
 class EyeController:
     def __init__(self):
@@ -8,31 +9,35 @@ class EyeController:
         self.baudrate = 115200
         self.timeout = 1
         self.ser = None
+        self.cmd_queue = queue.Queue()
 
-        # Connect in a background thread so the 2-second sleep doesn't block startup
-        threading.Thread(target=self._connect, daemon=True).start()
+        # Start a dedicated worker thread for serial communication
+        threading.Thread(target=self._worker, daemon=True).start()
 
-    def _connect(self):
+    def _worker(self):
+        # 1. Connect and allow ESP32 to reset
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
-            time.sleep(2)  # wait for ESP32 reset
-            print("Connected to ESP32")
+            time.sleep(2)  # Wait for ESP32 reset
+            print("Connected to ESP32 Eyes")
         except Exception as e:
-            print(f"Connection failed: {e}")
+            print(f"EyeController Connection failed: {e}")
+            return  # Exit if we can't connect
 
-    def send(self, cmd):
-        def _send_task():
+        # 2. Process commands sequentially
+        while True:
+            cmd = self.cmd_queue.get()
             if self.ser and self.ser.is_open:
                 try:
                     self.ser.write((cmd + '\n').encode())
-                    print(f"Sent: {cmd}")
+                    self.ser.flush()  # Ensure data is sent to hardware before thread continues
+                    print(f"Sent to Eyes: {cmd}")
                 except Exception as e:
-                    print(f"Serial write error: {e}")
-            else:
-                print("Serial not connected")
-                
-        # Send in a background thread so serial lag doesn't block the camera loop
-        threading.Thread(target=_send_task, daemon=True).start()
+                    print(f"EyeController write error: {e}")
+
+    def send(self, cmd):
+        # Put command in queue instantly (does not block main loop)
+        self.cmd_queue.put(cmd)
 
     # Emotion methods
     def happy(self):
@@ -50,4 +55,4 @@ class EyeController:
     def close(self):
         if self.ser and self.ser.is_open:
             self.ser.close()
-            print("Serial closed")
+            print("Serial to Eyes closed")
