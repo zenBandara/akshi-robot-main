@@ -26,7 +26,7 @@ class WebSocketServer:
 
         self.latest_frame = None
         self.last_client_data = {}  # store received data
-        self.tracking_active = False  # Toggled by start_session/end_session IPC commands
+        self.tracking_active = True  # Default to True for standalone testing; toggled by IPC commands
 
     def set_face_visible(self, visible):
         """Update the face visibility status in the shared state file."""
@@ -34,6 +34,7 @@ class WebSocketServer:
             self.last_client_data = {}
         
         self.last_client_data["face_visible"] = visible
+        print(f"[WebSocket] Updating face_visible to: {visible}")
         try:
             with open("calibration_state.json", "w") as f:
                 json.dump(self.last_client_data, f)

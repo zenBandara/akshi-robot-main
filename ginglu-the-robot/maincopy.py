@@ -204,6 +204,10 @@ while running:
 
     # Only run tracking logic during an active student session
     if not ws.tracking_active:
+        # Avoid spamming the console
+        if getattr(globals(), '_last_idle_log', 0) < time.time() - 5:
+            print("[Tracking] IDLE: Waiting for 'start_session' command via IPC...")
+            globals()['_last_idle_log'] = time.time()
         time.sleep(STEP_DT)
         continue
 
@@ -212,6 +216,7 @@ while running:
         no_face_start_time = None
 
         if last_face_state == False:
+            print("[Tracking] Face FOUND!")
             eyes.happy()
             # eyes.close()
             play_sound(FACE_OK_MP3)
@@ -314,6 +319,7 @@ while running:
 
         if time.time() - no_face_start_time > NO_FACE_DELAY:
             if last_face_state == True:
+                print("[Tracking] Face LOST!")
                 eyes.sad()
                 # eyes.close()
                 play_sound(NO_FACE_MP3)
