@@ -21,7 +21,8 @@ class SoundManager:
                 "correct": os.path.join(base_dir, "assets", "sounds", "correct.wav"),
                 "incorrect": os.path.join(base_dir, "assets", "sounds", "incorrect.wav"),
                 "celebration": os.path.join(base_dir, "assets", "sounds", "celebration.wav"),
-                "tick": os.path.join(base_dir, "assets", "sounds", "tick.wav")
+                "tick": os.path.join(base_dir, "assets", "sounds", "tick.wav"),
+                "background": os.path.join(base_dir, "assets", "sounds", "background.mp3")
             }
         except Exception as e:
             print(f"[SoundManager] Critical Failure initializing PyGame audio driver: {e}")

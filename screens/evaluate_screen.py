@@ -133,6 +133,8 @@ def on_show():
         if level == 2:
             sound_manager.play_bell()
             sound_manager.play_bgm("arcade")
+        elif level >= 3:
+            sound_manager.play_bgm("background", volume=0.1)
     else:
         key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 
