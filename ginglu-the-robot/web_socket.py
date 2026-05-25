@@ -122,9 +122,15 @@ class WebSocketServer:
                 try:
                     mtime = os.path.getmtime("calibration_command.json")
                     if mtime != last_mtime:
-                        last_mtime = mtime
-                        with open("calibration_command.json", "r") as f:
-                            cmd = json.load(f)
+                        try:
+                            with open("calibration_command.json", "r") as f:
+                                cmd = json.load(f)
+                            # Only update last_mtime if parsing was successful
+                            last_mtime = mtime
+                        except json.JSONDecodeError:
+                            # File is probably partially written; wait and try again next loop
+                            await asyncio.sleep(0.01)
+                            continue
                         
                         if cmd and cmd != last_command:
                             last_command = cmd

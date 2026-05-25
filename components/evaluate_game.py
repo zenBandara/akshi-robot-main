@@ -226,70 +226,75 @@ class EvaluateGameWidget(QWidget):
 
     def paintEvent(self, event):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setRenderHint(QPainter.TextAntialiasing)
-        w, h = self.width(), self.height()
+        try:
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setRenderHint(QPainter.TextAntialiasing)
+            w, h = self.width(), self.height()
 
-        if self.level >= 3:
-            # Level 3: Underwater Gamified Theme (eval3background.png)
-            if self.l3_bg_pixmap and not self.l3_bg_pixmap.isNull():
-                p.drawPixmap(0, 0, w, h, self.l3_bg_pixmap.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation))
-            else:
-                # 1. Base Dark Void
-                grad = QLinearGradient(0, 0, 0, h)
-                grad.setColorAt(0, QColor(5, 5, 20))
-                grad.setColorAt(1, QColor(0, 0, 5))
-                p.fillRect(0, 0, w, h, grad)
+            if self.level >= 3:
+                # Level 3: Underwater Gamified Theme (eval3background.png)
+                if self.l3_bg_pixmap and not self.l3_bg_pixmap.isNull():
+                    p.drawPixmap(0, 0, w, h, self.l3_bg_pixmap.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation))
+                else:
+                    # 1. Base Dark Void
+                    grad = QLinearGradient(0, 0, 0, h)
+                    grad.setColorAt(0, QColor(5, 5, 20))
+                    grad.setColorAt(1, QColor(0, 0, 5))
+                    p.fillRect(0, 0, w, h, grad)
 
-                # 2. Pulsing Nebulae
-                for neb in self.nebulae:
-                    nx, ny, nr, ncolor = neb.get_current_state(self.tick)
-                    neb_grad = QRadialGradient(nx, ny, nr)
-                    neb_grad.setColorAt(0, ncolor)
-                    neb_grad.setColorAt(1, QColor(0, 0, 0, 0))
+                    # 2. Pulsing Nebulae
+                    for neb in self.nebulae:
+                        nx, ny, nr, ncolor = neb.get_current_state(self.tick)
+                        neb_grad = QRadialGradient(nx, ny, max(1.0, nr))
+                        neb_grad.setColorAt(0, ncolor)
+                        neb_grad.setColorAt(1, QColor(0, 0, 0, 0))
+                        p.setPen(Qt.NoPen)
+                        p.setBrush(neb_grad)
+                        p.drawEllipse(QPointF(nx, ny), nr, nr)
+
+                    # 3. Twinkling Stars
                     p.setPen(Qt.NoPen)
-                    p.setBrush(neb_grad)
-                    p.drawEllipse(QPointF(nx, ny), nr, nr)
+                    for star in self.stars:
+                        star_color = QColor(star.color)
+                        star_color.setAlpha(int(star.opacity))
+                        p.setBrush(star_color)
+                        p.drawEllipse(QPointF(star.x, star.y), star.size, star.size)
+                
+                # Dim the background if in focus mode
+                if self.focus_mode:
+                    p.setPen(Qt.NoPen)
+                    p.setBrush(QColor(0, 0, 0, 140))
+                    p.drawRect(0, 0, w, h)
 
-                # 3. Twinkling Stars
+                # Draw only focused components
+                self._draw_owl_and_bubble(p, w, h)
+                self._draw_answer_cards(p, w, h)
+            else:
+                # Level 1/2: Enchanted Forest Theme
+                self._draw_sky(p, w, h)
+                self._draw_sun(p, w, h)
+                self._draw_clouds(p, w, h)
+                self._draw_owl_and_bubble(p, w, h)
+                self._draw_answer_cards(p, w, h)   # cards drawn BEFORE hills
+                self._draw_hills(p, w, h)           # hills cover the bottom of the posts
+                self._draw_flowers(p, w, h)
+                self._draw_butterflies(p, w, h)
+
+            # Dim overlay when highlighting a specific option (ONLY for L1/L2)
+            if self.highlighted_key is not None and self.level < 3:
                 p.setPen(Qt.NoPen)
-                for star in self.stars:
-                    star_color = QColor(star.color)
-                    star_color.setAlpha(int(star.opacity))
-                    p.setBrush(star_color)
-                    p.drawEllipse(QPointF(star.x, star.y), star.size, star.size)
-            
-            # Dim the background if in focus mode
-            if self.focus_mode:
-                p.setPen(Qt.NoPen)
-                p.setBrush(QColor(0, 0, 0, 140))
+                p.setBrush(QColor(0, 0, 0, 100))
                 p.drawRect(0, 0, w, h)
+                # Redraw ONLY the highlighted card on top of the dim
+                self._draw_highlighted_card_on_top(p, w, h)
 
-            # Draw only focused components
-            self._draw_owl_and_bubble(p, w, h)
-            self._draw_answer_cards(p, w, h)
-        else:
-            # Level 1/2: Enchanted Forest Theme
-            self._draw_sky(p, w, h)
-            self._draw_sun(p, w, h)
-            self._draw_clouds(p, w, h)
-            self._draw_owl_and_bubble(p, w, h)
-            self._draw_answer_cards(p, w, h)   # cards drawn BEFORE hills
-            self._draw_hills(p, w, h)           # hills cover the bottom of the posts
-            self._draw_flowers(p, w, h)
-            self._draw_butterflies(p, w, h)
-
-        # Dim overlay when highlighting a specific option (ONLY for L1/L2)
-        if self.highlighted_key is not None and self.level < 3:
-            p.setPen(Qt.NoPen)
-            p.setBrush(QColor(0, 0, 0, 100))
-            p.drawRect(0, 0, w, h)
-            # Redraw ONLY the highlighted card on top of the dim
-            self._draw_highlighted_card_on_top(p, w, h)
-
-        self._draw_timer_bar(p, w, h)
-
-        p.end()
+            self._draw_timer_bar(p, w, h)
+        except Exception as e:
+            import traceback
+            print("Exception in EvaluateGameWidget.paintEvent:")
+            traceback.print_exc()
+        finally:
+            p.end()
 
     # ═══════════════════ SKY ═══════════════════
     def _draw_sky(self, p, w, h):
@@ -539,7 +544,7 @@ class EvaluateGameWidget(QWidget):
             
             # ── GLOW EFFECT (L3 Focus Mode) ──
             if l3_mode and getattr(self, "focus_mode", False):
-                glow_r = max(scaled_pix.width(), scaled_pix.height()) * 0.8
+                glow_r = max(1.0, max(scaled_pix.width(), scaled_pix.height()) * 0.8)
                 glow = QRadialGradient(px + scaled_pix.width()/2, py + scaled_pix.height()/2, glow_r)
                 glow.setColorAt(0, QColor(255, 255, 220, 150)) # Soft warm white
                 glow.setColorAt(1, QColor(255, 255, 220, 0))

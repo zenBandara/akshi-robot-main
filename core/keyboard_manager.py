@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QObject, Signal
 # Toggle this to switch between keyboard and AI Thinker voice input
 # False = Keyboard only (development laptop)
 # True  = AI Thinker VC-02 voice input + keyboard fallback (Raspberry Pi)
-USE_VOICE_INPUT = False
+USE_VOICE_INPUT = True
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Test

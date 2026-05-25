@@ -1,1 +1,1 @@
-{"type": "metrics", "calibration_status": "DONE", "overall": 74.17, "eye": 84.09, "face": 64.24, "emotion": "neutral", "timestamp": 1779198887.742722}
+{"type": "metrics", "overall": 0, "eye": 0, "face": 0, "emotion": "NIL", "calibration_status": "DONE", "timestamp": 1779554970.1401572, "face_visible": true}

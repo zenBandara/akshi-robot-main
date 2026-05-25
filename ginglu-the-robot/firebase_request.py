@@ -6,7 +6,7 @@ import socket
 cred = credentials.Certificate("serviceAccountKey.json")
 
 firebase_admin.initialize_app(cred, {
-    "databaseURL": "https://ginglu-robot-default-rtdb.firebaseio.com"
+    "databaseURL": "https://akshi-robot-default-rtdb.firebaseio.com"
 })
 
 
@@ -25,3 +25,4 @@ def update_connected_ip():
     except Exception as e:
         print("Error updating IP:", e)
 
+update_connected_ip()
