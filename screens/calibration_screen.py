@@ -95,9 +95,14 @@ class CalibrationScreenUI(QWidget):
 
     def begin_backend_tracking(self):
         student_name = state_manager.get_current_student() or "friend"
+        # Use the real classroom task_id so the analytics backend saves results
+        # under the expected (student, task) key.
+        task_data = state_manager.get_current_task() or {}
+        task_id = task_data.get("task_id") or "face_calibration"
         try:
             with open(COMMAND_FILE, "w") as f:
-                json.dump({"type": "start_session", "student_name": student_name, "task_id": "face_calibration"}, f)
+                json.dump({"type": "start_session", "student_name": student_name, "task_id": task_id}, f)
+            state_manager.set_analytics_session_active(True)
         except Exception as e:
             print("[Calibration Error] Failed to write command file:", e)
 
@@ -199,6 +204,7 @@ class CalibrationScreenUI(QWidget):
             try:
                 with open(COMMAND_FILE, "w") as f:
                     json.dump({"type": "end_session"}, f)
+                state_manager.set_analytics_session_active(False)
             except:
                 pass
             self.proceed_to_task()

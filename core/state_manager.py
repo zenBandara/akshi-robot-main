@@ -16,6 +16,15 @@ class StateManager:
         self._affordance_level = 1
         self._five_e_stage = "evaluate"
 
+        # Analytics session lifecycle (WebSocket control messages)
+        self._analytics_session_active = False
+
+    def is_analytics_session_active(self):
+        return bool(self._analytics_session_active)
+
+    def set_analytics_session_active(self, active: bool):
+        self._analytics_session_active = bool(active)
+
     # Session ID Tracking
     def get_current_session(self):
         return self._current_session_id

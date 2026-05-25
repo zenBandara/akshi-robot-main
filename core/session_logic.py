@@ -8,19 +8,22 @@ LOOP_SAME_TASK_IN_TESTING = False
 
 def next_student():
     """Pick the next student from the queue. If all students are done, advance to next task round."""
-    # End the current student's WebSocket session
-    import json
-    try:
-        with open("ginglu-the-robot/calibration_command.json", "w") as f:
-            json.dump({"type": "end_session"}, f)
-        print("[Session Logic] Student session ended via IPC.")
-        
-        # Telemetry Log
-        from core.telemetry_logger import telemetry_logger
-        student_name = state_manager.get_current_student() or "unknown"
-        telemetry_logger.log_event("STUDENT_SESSION_END", detail=f"Session ended for {student_name}")
-    except Exception as e:
-        print(f"[Session Logic] IPC end_session error: {e}")
+    # End the current student's analytics session (analytics client saves on end_session).
+    # Only send if we previously started one for this student.
+    if state_manager.is_analytics_session_active():
+        import json
+        try:
+            with open("ginglu-the-robot/calibration_command.json", "w") as f:
+                json.dump({"type": "end_session"}, f)
+            state_manager.set_analytics_session_active(False)
+            print("[Session Logic] Student session ended via IPC.")
+
+            # Telemetry Log
+            from core.telemetry_logger import telemetry_logger
+            student_name = state_manager.get_current_student() or "unknown"
+            telemetry_logger.log_event("STUDENT_SESSION_END", detail=f"Session ended for {student_name}")
+        except Exception as e:
+            print(f"[Session Logic] IPC end_session error: {e}")
 
     queue = state_manager.get_student_queue()
     

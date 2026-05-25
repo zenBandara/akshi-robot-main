@@ -226,6 +226,15 @@ class FlowController:
         self._save_student_state(student_name)
         self.reset_cascade()
 
+        # Tell analytics to finalize immediately. The backend analytics code saves results on end_session.
+        try:
+            import json
+            with open("ginglu-the-robot/calibration_command.json", "w") as f:
+                json.dump({"type": "end_session"}, f)
+            state_manager.set_analytics_session_active(False)
+        except Exception:
+            pass
+
         from core.navigator import navigator
         navigator.navigate_to("celebration")
 
@@ -314,6 +323,15 @@ class FlowController:
             from core.navigator import navigator
             nav_target = SCREEN_MAP.get(next_node)
             if nav_target:
+                if nav_target == "teacher_intervention":
+                    # Finalize analytics before teacher takes over.
+                    try:
+                        import json
+                        with open("ginglu-the-robot/calibration_command.json", "w") as f:
+                            json.dump({"type": "end_session"}, f)
+                        state_manager.set_analytics_session_active(False)
+                    except Exception:
+                        pass
                 navigator.navigate_to(nav_target)
         except Exception as e:
             print(f"[FlowController] Routing error: {e}")
