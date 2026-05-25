@@ -154,10 +154,9 @@ class KeyboardManager:
             print(f"[GLOBAL STOP] Warning: Could not stop backend manager: {e}")
 
         # 2. Reset the IPC JSON file
-        import json
+        from core.ipc_queue import append_ipc_command
         try:
-            with open("ginglu-the-robot/calibration_command.json", "w") as f:
-                json.dump({"type": "end_session"}, f)
+            append_ipc_command({"type": "end_session"}, "ginglu-the-robot/calibration_command.json")
         except Exception:
             pass
 

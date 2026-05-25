@@ -5,6 +5,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from components.robot_eyes import get_robot_eyes
+from core.ipc_queue import append_ipc_command
 
 window = None
 
@@ -30,10 +31,8 @@ def get_ui():
         keyboard_manager.register_handler(handle_key_press)
         
         # Notify backend that the student's session has historically concluded so it saves to DB
-        import json
         try:
-            with open("ginglu-the-robot/calibration_command.json", "w") as f:
-                json.dump({"type": "end_session"}, f)
+            append_ipc_command({"type": "end_session"}, "ginglu-the-robot/calibration_command.json")
             print("Session End dispatched to backend.")
         except Exception as e:
             print("IPC Error notifying end_session:", e)

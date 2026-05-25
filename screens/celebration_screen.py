@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
+from core.ipc_queue import append_ipc_command
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -37,9 +38,7 @@ def on_show():
     
     # Pause frames during celebration
     try:
-        import json
-        with open("ginglu-the-robot/calibration_command.json", "w") as f:
-            json.dump({"type": "pause_frames"}, f)
+        append_ipc_command({"type": "pause_frames"}, "ginglu-the-robot/calibration_command.json")
     except Exception as e:
         print("[Celebration Screen] Error pausing frames:", e)
     

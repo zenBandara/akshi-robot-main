@@ -21,6 +21,7 @@ from core.timer_widget import EmojiTimerWidget
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
 from components.evaluate_game import EvaluateGameWidget
+from core.ipc_queue import append_ipc_command
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -73,9 +74,7 @@ def on_show():
 
     # Resume sending real frames to backend as the task is starting
     try:
-        import json
-        with open("ginglu-the-robot/calibration_command.json", "w") as f:
-            json.dump({"type": "resume_frames"}, f)
+        append_ipc_command({"type": "resume_frames"}, "ginglu-the-robot/calibration_command.json")
     except Exception as e:
         print("[Evaluate Screen] Error resuming frames:", e)
 

@@ -6,6 +6,7 @@ import threading
 import json
 import firebase_request as fr
 import os
+from pathlib import Path
 
 # Set IP to Firebase
 fr.update_connected_ip()
@@ -15,10 +16,11 @@ class WebSocketServer:
 
     def __init__(self):
         
-        # Ensure json files exist
+        # Ensure IPC files exist
+        # calibration_command.json is now JSONL (one JSON command per line).
         if not os.path.exists("calibration_command.json"):
-            with open("calibration_command.json", "w") as f:
-                json.dump({}, f)
+            with open("calibration_command.json", "w", encoding="utf-8") as f:
+                f.write("")
         if not os.path.exists("calibration_state.json"):
             with open("calibration_state.json", "w") as f:
                 json.dump({"calibration_status": "Not started yet", "face_visible": True}, f)
@@ -116,41 +118,47 @@ class WebSocketServer:
                 await asyncio.sleep(0.1)
 
         async def ipc_controller():
-            last_command = None
-            last_mtime = 0
+            # JSONL queue reader: forward every new line exactly once.
+            last_pos = 0
             while True:
                 try:
-                    mtime = os.path.getmtime("calibration_command.json")
-                    if mtime != last_mtime:
-                        try:
-                            with open("calibration_command.json", "r") as f:
-                                cmd = json.load(f)
-                            # Only update last_mtime if parsing was successful
-                            last_mtime = mtime
-                        except json.JSONDecodeError:
-                            # File is probably partially written; wait and try again next loop
-                            await asyncio.sleep(0.01)
+                    path = Path("calibration_command.json")
+                    if not path.exists():
+                        await asyncio.sleep(0.05)
+                        continue
+
+                    with path.open("r", encoding="utf-8") as f:
+                        f.seek(last_pos)
+                        lines = f.readlines()
+                        last_pos = f.tell()
+
+                    for line in lines:
+                        line = line.strip()
+                        if not line:
                             continue
-                        
-                        if cmd and cmd != last_command:
-                            last_command = cmd
-                            await websocket.send(json.dumps(cmd))
-                            new_state = {"type": cmd.get("type", "unknown")}
-                            if "face_visible" in self.last_client_data:
-                                new_state["face_visible"] = self.last_client_data["face_visible"]
-                                
-                            self.last_client_data = new_state
-                            
-                            # Toggle tracking based on student session commands
-                            cmd_type = cmd.get("type")
-                            if cmd_type in ["start_session", "resume_frames"]:
-                                self.tracking_active = True
-                                print(f"[WebSocket] Tracking ON ({cmd_type})")
-                            elif cmd_type in ["end_session", "pause_frames"]:
-                                self.tracking_active = False
-                                print(f"[WebSocket] Tracking OFF ({cmd_type})")
-                            
-                            print("Sent IPC command to server:", cmd)
+                        try:
+                            cmd = json.loads(line)
+                        except json.JSONDecodeError:
+                            # Ignore malformed/partial line.
+                            continue
+
+                        await websocket.send(json.dumps(cmd))
+
+                        new_state = {"type": cmd.get("type", "unknown")}
+                        if "face_visible" in self.last_client_data:
+                            new_state["face_visible"] = self.last_client_data["face_visible"]
+                        self.last_client_data = new_state
+
+                        # Toggle tracking based on student session commands
+                        cmd_type = cmd.get("type")
+                        if cmd_type in ["start_session", "resume_frames"]:
+                            self.tracking_active = True
+                            print(f"[WebSocket] Tracking ON ({cmd_type})")
+                        elif cmd_type in ["end_session", "pause_frames"]:
+                            self.tracking_active = False
+                            print(f"[WebSocket] Tracking OFF ({cmd_type})")
+
+                        print("Sent IPC command to server:", cmd)
                 except Exception as e:
                     pass
                 await asyncio.sleep(0.05)

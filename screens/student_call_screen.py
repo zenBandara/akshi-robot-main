@@ -7,6 +7,7 @@ from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
+from core.ipc_queue import append_ipc_command
 
 window = None
 fade_anim = None
@@ -36,9 +37,7 @@ def get_ui():
         
         # Pause frames during student selection
         try:
-            import json
-            with open("ginglu-the-robot/calibration_command.json", "w") as f:
-                json.dump({"type": "pause_frames"}, f)
+            append_ipc_command({"type": "pause_frames"}, "ginglu-the-robot/calibration_command.json")
         except Exception as e:
             print("[Student Call Screen] Error pausing frames:", e)
             
@@ -102,4 +101,3 @@ def handle_key_press(mapped_action):
         print("Student absent! Skipping to next student...")
         import core.session_logic as session_logic
         session_logic.next_student()
-

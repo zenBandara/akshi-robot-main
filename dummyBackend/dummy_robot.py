@@ -23,6 +23,7 @@ import time
 import math
 import numpy as np
 import cv2
+from pathlib import Path
 
 # ── IPC file paths (relative to ginglu-the-robot/, same as real code) ──
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -140,15 +141,29 @@ class DummyWebSocketServer:
                 print("[DummyRobot] Listener stopped — client disconnected")
 
         async def ipc_controller():
-            """Poll calibration_command.json and forward commands to the server."""
-            last_command = None
+            """Read JSONL calibration_command.json and forward commands to the server."""
+            last_pos = 0
             while True:
                 try:
-                    with open(COMMAND_FILE, "r") as f:
-                        cmd = json.load(f)
+                    path = Path(COMMAND_FILE)
+                    if not path.exists():
+                        await asyncio.sleep(0.05)
+                        continue
 
-                    if cmd and cmd != last_command:
-                        last_command = cmd
+                    with path.open("r", encoding="utf-8") as f:
+                        f.seek(last_pos)
+                        lines = f.readlines()
+                        last_pos = f.tell()
+
+                    for line in lines:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            cmd = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+
                         await websocket.send(json.dumps(cmd))
 
                         self.last_client_data = {"type": cmd.get("type", "unknown")}

@@ -13,6 +13,7 @@ import re
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from core.state_manager import state_manager
+from core.ipc_queue import append_ipc_command
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
@@ -44,7 +45,8 @@ class CalibrationScreenUI(QWidget):
 
         if not os.path.exists(COMMAND_FILE):
             with open(COMMAND_FILE, "w") as f:
-                json.dump({}, f)
+                # JSONL queue file
+                f.write("")
         if not os.path.exists(STATE_FILE):
             with open(STATE_FILE, "w") as f:
                 json.dump({"calibration_status": "Not started yet"}, f)
@@ -100,11 +102,10 @@ class CalibrationScreenUI(QWidget):
         task_data = state_manager.get_current_task() or {}
         task_id = task_data.get("task_id") or "face_calibration"
         try:
-            with open(COMMAND_FILE, "w") as f:
-                json.dump({"type": "start_session", "student_name": student_name, "task_id": task_id}, f)
+            append_ipc_command({"type": "start_session", "student_name": student_name, "task_id": task_id}, COMMAND_FILE)
             state_manager.set_analytics_session_active(True)
         except Exception as e:
-            print("[Calibration Error] Failed to write command file:", e)
+            print("[Calibration Error] Failed to append command:", e)
 
         # Start polling for authentic server signals
         global state_timer
@@ -142,8 +143,7 @@ class CalibrationScreenUI(QWidget):
                     
                     # 🛑 CRITICAL: Immediately pause the backend from counting frames while we speak!
                     try:
-                        with open(COMMAND_FILE, "w") as f:
-                            json.dump({"type": "pause_frames"}, f)
+                        append_ipc_command({"type": "pause_frames"}, COMMAND_FILE)
                     except: pass
 
                     self.game.set_phase("closed")
@@ -163,8 +163,7 @@ class CalibrationScreenUI(QWidget):
                     self.prompt_state = "done"
                     
                     try:
-                        with open(COMMAND_FILE, "w") as f:
-                            json.dump({"type": "pause_frames"}, f)
+                        append_ipc_command({"type": "pause_frames"}, COMMAND_FILE)
                     except: pass
                     
                     self.game.set_phase("done")
@@ -189,8 +188,7 @@ class CalibrationScreenUI(QWidget):
 
     def resume_backend_tracking(self):
         try:
-            with open(COMMAND_FILE, "w") as f:
-                json.dump({"type": "resume_frames"}, f)
+            append_ipc_command({"type": "resume_frames"}, COMMAND_FILE)
         except: pass
 
     def handle_key_press(self, mapped_action):
@@ -202,8 +200,7 @@ class CalibrationScreenUI(QWidget):
             keyboard_manager.unregister_handler()
             voice_manager.stop()
             try:
-                with open(COMMAND_FILE, "w") as f:
-                    json.dump({"type": "end_session"}, f)
+                append_ipc_command({"type": "end_session"}, COMMAND_FILE)
                 state_manager.set_analytics_session_active(False)
             except:
                 pass

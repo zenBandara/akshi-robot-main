@@ -1,5 +1,6 @@
 from core.state_manager import state_manager
 from core.navigator import navigator
+from core.ipc_queue import append_ipc_command
 
 # ── TOGGLE FOR TESTING ──
 # Set to True: If Firebase has ANY task, the session will loop indefinitely (useful for testing with only 1 task).
@@ -11,10 +12,8 @@ def next_student():
     # End the current student's analytics session (analytics client saves on end_session).
     # Only send if we previously started one for this student.
     if state_manager.is_analytics_session_active():
-        import json
         try:
-            with open("ginglu-the-robot/calibration_command.json", "w") as f:
-                json.dump({"type": "end_session"}, f)
+            append_ipc_command({"type": "end_session"}, "ginglu-the-robot/calibration_command.json")
             state_manager.set_analytics_session_active(False)
             print("[Session Logic] Student session ended via IPC.")
 

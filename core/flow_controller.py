@@ -1,6 +1,7 @@
 from core.state_manager import state_manager
 from core.transitions import switch_screen
 from components.robot_eyes import get_robot_eyes
+from core.ipc_queue import append_ipc_command
 
 # CASCADE: Used ONLY during IDENTIFYING state (Q1 for new students)
 CASCADE = [
@@ -228,9 +229,7 @@ class FlowController:
 
         # Tell analytics to finalize immediately. The backend analytics code saves results on end_session.
         try:
-            import json
-            with open("ginglu-the-robot/calibration_command.json", "w") as f:
-                json.dump({"type": "end_session"}, f)
+            append_ipc_command({"type": "end_session"}, "ginglu-the-robot/calibration_command.json")
             state_manager.set_analytics_session_active(False)
         except Exception:
             pass
@@ -326,9 +325,7 @@ class FlowController:
                 if nav_target == "teacher_intervention":
                     # Finalize analytics before teacher takes over.
                     try:
-                        import json
-                        with open("ginglu-the-robot/calibration_command.json", "w") as f:
-                            json.dump({"type": "end_session"}, f)
+                        append_ipc_command({"type": "end_session"}, "ginglu-the-robot/calibration_command.json")
                         state_manager.set_analytics_session_active(False)
                     except Exception:
                         pass
