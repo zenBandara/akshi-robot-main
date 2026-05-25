@@ -16,6 +16,7 @@ from core.keyboard_manager import keyboard_manager
 from core.sound_manager import sound_manager
 from core.voice_manager import VoiceManager
 from core.dialogue import DialoguePool
+from core.stream_control import set_frame_streaming
 from components.rabbit_break_game import RabbitBreakWidget
 from components.robot_eyes import get_robot_eyes
 
@@ -58,6 +59,12 @@ def on_show():
     print("[Break Screen] 🐰 Rabbit Jump Break starting!")
     state_manager.set_current_screen("break")
     get_robot_eyes().set_expression("sleeping")
+
+    # Stop tracking the face while the student is hopping around
+    try:
+        set_frame_streaming(False, reason="break_screen")
+    except Exception:
+        pass
 
     input_enabled = False
     voice_manager.stop()

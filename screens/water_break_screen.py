@@ -7,6 +7,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
+from core.stream_control import set_frame_streaming
 from components.robot_eyes import get_robot_eyes
 
 voice_manager = VoiceManager()
@@ -105,6 +106,12 @@ def on_show():
     print("[Water Break Screen] Becoming active...")
     state_manager.set_current_screen("water_break")
     get_robot_eyes().set_expression("sleeping")
+
+    # Stop tracking the face while the student is drinking water
+    try:
+        set_frame_streaming(False, reason="water_break")
+    except Exception:
+        pass
 
     input_enabled = False
     voice_manager.stop()
