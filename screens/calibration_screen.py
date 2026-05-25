@@ -64,6 +64,7 @@ class CalibrationScreenUI(QWidget):
         # Reset the game visuals
         self.game.reset()
         self.game.set_phase("init")
+        self.game.set_clock_enabled(False)
 
         # 1. Magical Intro Prompt!
         intro_msg = (
@@ -86,6 +87,7 @@ class CalibrationScreenUI(QWidget):
         if self.prompt_state == "done": return # Aborted
         
         self.game.set_phase("open")
+        self.game.set_clock_enabled(False)
         self.prompt_state = "open"
         get_robot_eyes().set_expression("surprised")
         delay_ms = voice_manager.speak(
@@ -105,6 +107,8 @@ class CalibrationScreenUI(QWidget):
         try:
             append_ipc_command({"type": "start_session", "student_name": student_name, "task_id": task_id}, COMMAND_FILE)
             state_manager.set_analytics_session_active(True)
+            # Show clock indicator only once tracking actually starts.
+            self.game.set_clock_enabled(True)
         except Exception as e:
             print("[Calibration Error] Failed to append command:", e)
 
@@ -141,6 +145,7 @@ class CalibrationScreenUI(QWidget):
             if status.startswith("Keep eyes CLOSED"):
                 if self.prompt_state != "closed":
                     self.prompt_state = "closed"
+                    self.game.set_clock_enabled(False)
                     
                     # 🛑 CRITICAL: Immediately pause the backend from counting frames while we speak!
                     try:
@@ -162,6 +167,7 @@ class CalibrationScreenUI(QWidget):
             elif status.startswith("DONE"):
                 if self.prompt_state != "done":
                     self.prompt_state = "done"
+                    self.game.set_clock_enabled(False)
                     
                     try:
                         set_frame_streaming(False, reason="calibration_done_speech")
@@ -190,6 +196,7 @@ class CalibrationScreenUI(QWidget):
     def resume_backend_tracking(self):
         try:
             set_frame_streaming(True, reason="calibration_resume")
+            self.game.set_clock_enabled(True)
         except: pass
 
     def handle_key_press(self, mapped_action):

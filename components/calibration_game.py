@@ -20,6 +20,10 @@ from PySide6.QtGui import (
     QFont, QPen, QBrush, QPixmap, QPainterPath
 )
 
+from PySide6.QtWidgets import QLabel
+from PySide6.QtGui import QMovie
+from core.sound_manager import sound_manager
+
 
 # ── Asset paths ──
 _BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,6 +31,7 @@ _IMG_DIR = os.path.join(_BASE_DIR, "assets", "images", "calibration")
 _OWL_PATH = os.path.join(_IMG_DIR, "owl.png")
 _BUNNY_PATH = os.path.join(_IMG_DIR, "bunny.png")
 _CELEBRATION_PATH = os.path.join(_IMG_DIR, "celebration.png")
+_CLOCK_GIF_PATH = os.path.join(_IMG_DIR, "clock.gif")
 
 
 class Star:
@@ -147,6 +152,35 @@ class CalibrationGameWidget(QWidget):
         self.cached_celebration = None
         self.last_h = 0
 
+        # Top-right activity indicator (GIF) shown during open/closed phases.
+        self._clock_label = QLabel(self)
+        self._clock_label.setAttribute(Qt.WA_TranslucentBackground)
+        self._clock_label.setStyleSheet("background: transparent;")
+        self._clock_label.setVisible(False)
+        self._clock_movie = None
+        self._clock_sound_playing = False
+        if os.path.exists(_CLOCK_GIF_PATH):
+            self._clock_movie = QMovie(_CLOCK_GIF_PATH)
+            self._clock_label.setMovie(self._clock_movie)
+            self._clock_movie.start()
+
+        # Replace the legacy circular progress indicator with the clock GIF.
+        self._show_progress_arc = False
+
+        # Clock is only shown when the screen says it's time (after speech prompts).
+        self._clock_enabled = False
+
+        # Animation timer (30 FPS)
+        self.anim_timer = QTimer(self)
+        self.anim_timer.timeout.connect(self._animate)
+        self.anim_timer.start(33)
+
+        self._update_clock_overlay()
+
+    def set_clock_enabled(self, enabled: bool) -> None:
+        self._clock_enabled = bool(enabled)
+        self._update_clock_overlay()
+
     def _get_scaled_pixmap(self, original, target_h):
         if original is None: return None
         if self.last_h == target_h and self.cached_owl and original == self.owl_pixmap: return self.cached_owl
@@ -160,11 +194,39 @@ class CalibrationGameWidget(QWidget):
         self.last_h = target_h
         return scaled
 
+    def resizeEvent(self, event):
+        self._update_clock_overlay()
+        super().resizeEvent(event)
 
-        # Animation timer (30 FPS)
-        self.anim_timer = QTimer(self)
-        self.anim_timer.timeout.connect(self._animate)
-        self.anim_timer.start(33)
+    def _update_clock_overlay(self):
+        if self._clock_movie is None:
+            return
+
+        show = self._clock_enabled and self.phase in ("open", "closed")
+        
+        # Play or stop the clock ticking sound based on visibility change
+        if show and not getattr(self, '_clock_sound_playing', False):
+            sound_manager.play_clock(0.7)
+            self._clock_sound_playing = True
+        elif not show and getattr(self, '_clock_sound_playing', False):
+            sound_manager.stop_clock()
+            self._clock_sound_playing = False
+
+        self._clock_label.setVisible(show)
+        if not show:
+            return
+
+        # Place the clock where the progress indicator used to be.
+        w, h = self.width(), self.height()
+        if self.phase == "open":
+            cx, cy, size = int(w * 0.3), int(h * 0.5), 220
+        else:
+            # closed
+            cx, cy, size = int(w - 110), 110, 180
+
+        self._clock_label.setFixedSize(size, size)
+        self._clock_movie.setScaledSize(self._clock_label.size())
+        self._clock_label.move(int(cx - size / 2), int(cy - size / 2))
 
 
     def _generate_stars(self):
@@ -190,6 +252,8 @@ class CalibrationGameWidget(QWidget):
             self.celebration_started = True
             w, h = self.width(), self.height()
             self.confetti = [ConfettiPiece(w, h) for _ in range(120)]
+
+        self._update_clock_overlay()
 
         self.update()
 
@@ -356,8 +420,9 @@ class CalibrationGameWidget(QWidget):
             owl_y = int(h * 0.22)
             p.drawPixmap(owl_x, owl_y, scaled)
 
-        # Constellation progress arc (centered in left area, bigger)
-        self._draw_progress_arc(p, int(w * 0.3), int(h * 0.5), 65, self.progress, QColor(255, 220, 100))
+        # Progress indicator removed (clock GIF overlays this area).
+        if self._show_progress_arc:
+            self._draw_progress_arc(p, int(w * 0.3), int(h * 0.5), 65, self.progress, QColor(255, 220, 100))
 
         # Phase label
         label_font = QFont("Georgia", 36, QFont.Bold)
@@ -365,13 +430,6 @@ class CalibrationGameWidget(QWidget):
         self._draw_fancy_text(p, "🦉 Owl Eyes! Keep watching!", label_font,
                               QColor(255, 245, 200), QColor(200, 160, 50, 100),
                               QRectF(0, label_y, w * 0.7, 60))
-
-        # Star count
-        visible = sum(1 for s in self.stars if s.visible)
-        count_font = QFont("Georgia", 20)
-        self._draw_fancy_text(p, f"⭐ {visible} / {self.max_stars} stars discovered!", count_font,
-                              QColor(200, 215, 255, 220), QColor(100, 120, 200, 60),
-                              QRectF(0, h - 55, w * 0.7, 40))
 
     # ─────────────────── BUNNY SCENE (Eyes Closed) ───────────────────
     def _draw_bunny_scene(self, p: QPainter, w, h):
@@ -449,8 +507,9 @@ class CalibrationGameWidget(QWidget):
             bunny_y = int(h * 0.46)
             p.drawPixmap(bunny_x, bunny_y, scaled)
 
-        # Moon progress arc (near the moon)
-        self._draw_progress_arc(p, w - 80, 70, 45, self.progress, QColor(200, 180, 255))
+        # Progress indicator removed (clock GIF overlays this area).
+        if self._show_progress_arc:
+            self._draw_progress_arc(p, w - 80, 70, 45, self.progress, QColor(200, 180, 255))
 
         # Phase label
         label_font = QFont("Georgia", 36, QFont.Bold)
@@ -458,12 +517,6 @@ class CalibrationGameWidget(QWidget):
         self._draw_fancy_text(p, "🐰 Shh... Sleeping Bunny!", label_font,
                               QColor(230, 210, 255), QColor(140, 100, 200, 100),
                               QRectF(0, label_y, w, 60))
-
-        # Moon progress text
-        count_font = QFont("Georgia", 20)
-        self._draw_fancy_text(p, f"🌙 Moon rising... {int(self.progress * 100)}%", count_font,
-                              QColor(220, 200, 255, 220), QColor(100, 80, 180, 60),
-                              QRectF(0, h - 55, w, 40))
 
     # ─────────────────── CELEBRATION (Done) ───────────────────
     def _draw_celebration(self, p: QPainter, w, h):
@@ -590,4 +643,7 @@ class CalibrationGameWidget(QWidget):
         self._generate_stars()
         for ff in self.fireflies:
             ff.__init__(self.width() or 900, self.height() or 700)
+        
+        self.set_clock_enabled(False)
+        self._update_clock_overlay()
         self.update()

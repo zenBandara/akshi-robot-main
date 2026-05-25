@@ -1,2 +1,35 @@
 {"type": "end_session", "id": "7e132cad-b382-45bf-8266-90ff01b49690", "ts": 1779709354.329149}
 {"type": "pause_frames", "id": "46b71b15-8410-42ce-8f3a-fd8b418fdefd", "ts": 1779709354.329351}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "8740e4a5-5daf-4226-805a-67c0b3b1a24b", "ts": 1779714884.851168}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "35b3648c-613c-4e4b-9e69-e592423492d5", "ts": 1779715042.8483572}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "656d9aec-3e1d-430e-a193-265a7e9bcca0", "ts": 1779715285.85776}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "7160d09e-6cf8-4095-b7aa-db39aed775b8", "ts": 1779715509.494823}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "62c48f97-549d-4399-86e7-0dadaad924fb", "ts": 1779715513.461408}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "bb812e04-833d-4acc-b807-08b6da4cada4", "ts": 1779715516.465545}
+{"type": "resume_frames", "reason": "calibration_resume", "id": "5ca8b6ed-9275-4acb-ba3c-628c0d669796", "ts": 1779715522.8532212}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "5beb310b-bd79-4611-9954-2ef13c644318", "ts": 1779715526.5246139}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "b14fa985-2ae3-46b7-9c6c-2807b89589fb", "ts": 1779715530.363329}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "4341a21b-1ad3-496c-aef6-fb2ae8601340", "ts": 1779715533.3677921}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "21dd38f2-149c-4255-be21-87972b010ab0", "ts": 1779715545.445796}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "13fc03bd-a59d-4c17-add0-5b75f032cf0b", "ts": 1779715549.055697}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "a130ceb7-6ed0-42e6-b081-001786ced3cd", "ts": 1779715553.759265}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "0b932509-5075-435d-8eba-0e5278b690c8", "ts": 1779715557.360351}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "85817a70-2f48-4a2c-a838-6cb5ef379dd9", "ts": 1779715560.3636649}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "d3afeb18-b568-4247-add6-3360d13ea217", "ts": 1779715565.995617}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "f791963f-24f0-48d9-a07a-706501b41b01", "ts": 1779715569.954041}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "f75a18fe-4cd8-4c57-b1f6-9a1281eb9149", "ts": 1779715999.853624}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "ffa66964-81b0-44a0-9b3d-7dec57a777eb", "ts": 1779716003.052924}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "e1a65155-3bc5-4cf5-8b43-f9230f3b9453", "ts": 1779716006.052126}
+{"type": "resume_frames", "reason": "calibration_resume", "id": "8335c00d-d4c4-4407-bc6a-99b87f4ad10f", "ts": 1779716012.859566}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "064b9317-ca0b-4e0a-9933-126554b60349", "ts": 1779716259.881978}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "ad3d3d9b-148a-41d6-8f36-d1f47eda1a4d", "ts": 1779716263.0808718}
+{"type": "resume_frames", "reason": "calibration_resume", "id": "dd0aca90-45e6-4be1-be50-c55f1eedfa67", "ts": 1779716272.8956292}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "df2df941-7be2-4e04-9b1c-2758b6c92966", "ts": 1779716275.7804701}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "99f35a4b-e388-4cc6-af39-b6eabaf70848", "ts": 1779716915.884671}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "61f35494-f6b4-4dd9-9ba7-2e377d856e58", "ts": 1779716919.0841532}
+{"type": "resume_frames", "reason": "calibration_resume", "id": "0bf40690-2320-4772-b262-782d37144ed4", "ts": 1779716928.938354}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "c3789562-0ffc-42c0-8ba5-c0351e176fe5", "ts": 1779716931.8835719}
+{"type": "start_session", "student_name": "friend", "task_id": "face_calibration", "id": "aac895a7-178a-4446-a39d-83702a3eae77", "ts": 1779717041.8845959}
+{"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "0c46b40a-b50d-4ae0-8f15-31802b7d1743", "ts": 1779717045.085206}
+{"type": "resume_frames", "reason": "calibration_resume", "id": "ea039e9f-cf38-41b6-bfea-274f8054abbe", "ts": 1779717054.88325}
+{"type": "pause_frames", "reason": "calibration_done_speech", "id": "d4dd0206-bf6d-46c5-8758-d02acb82f3fb", "ts": 1779717057.783885}

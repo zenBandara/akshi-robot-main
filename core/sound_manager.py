@@ -22,7 +22,8 @@ class SoundManager:
                 "incorrect": os.path.join(base_dir, "assets", "sounds", "incorrect.wav"),
                 "celebration": os.path.join(base_dir, "assets", "sounds", "celebration.wav"),
                 "tick": os.path.join(base_dir, "assets", "sounds", "tick.wav"),
-                "background": os.path.join(base_dir, "assets", "sounds", "background.mp3")
+                "background": os.path.join(base_dir, "assets", "sounds", "background.mp3"),
+                "clock": os.path.join(base_dir, "assets", "audio", "clock.mp3")
             }
         except Exception as e:
             print(f"[SoundManager] Critical Failure initializing PyGame audio driver: {e}")
@@ -79,6 +80,26 @@ class SoundManager:
             except Exception: pass
             self.active_bgm = None
             
+    def play_clock(self, volume=0.7):
+        """Play the clock ticking sound in a loop."""
+        if not self.is_initialized: return
+        path = self.sound_paths.get("clock")
+        if path and os.path.exists(path):
+            try:
+                if "clock" not in self.sounds:
+                    self.sounds["clock"] = pygame.mixer.Sound(path)
+                self.sounds["clock"].set_volume(volume)
+                self.sounds["clock"].play(loops=-1)
+            except Exception: pass
+            
+    def stop_clock(self):
+        """Stop the clock ticking sound."""
+        if not self.is_initialized: return
+        if "clock" in self.sounds:
+            try:
+                self.sounds["clock"].stop()
+            except Exception: pass
+
     def stop_all(self):
         """Emergency mute executing explicit physical hardware overrides."""
         if self.is_initialized:
