@@ -6,7 +6,7 @@ from core.state_manager import state_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
-from core.ipc_queue import append_ipc_command
+from core.stream_control import set_frame_streaming
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -38,12 +38,11 @@ def on_show():
     state_manager.set_current_screen("task_intro")
     get_robot_eyes().set_expression("surprised")
     
-    # Pause frames during task introduction
+    # Ensure analytics receives real frames unless explicitly paused elsewhere.
     try:
-        import json
-        append_ipc_command({"type": "pause_frames"}, "ginglu-the-robot/calibration_command.json")
+        set_frame_streaming(True, reason="task_intro")
     except Exception as e:
-        print("[Task Intro Screen] Error pausing frames:", e)
+        print("[Task Intro Screen] Error resuming frames:", e)
     
     # Stop any lingering audio from the previous screen
     voice_manager.stop()

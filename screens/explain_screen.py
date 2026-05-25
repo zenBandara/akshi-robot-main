@@ -7,6 +7,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
+from core.stream_control import set_frame_streaming
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -40,6 +41,12 @@ def on_show():
     print("[Explain Screen] Becoming active...")
     state_manager.set_current_screen("explain")
     get_robot_eyes().set_expression("thinking")
+
+    # Ensure real frames are streaming during explain.
+    try:
+        set_frame_streaming(True, reason="explain")
+    except Exception as e:
+        print("[Explain Screen] Error resuming frames:", e)
     
     task_data = state_manager.get_current_task()
     if not task_data or "explain" not in task_data:

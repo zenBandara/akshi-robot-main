@@ -18,6 +18,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
+from core.stream_control import set_frame_streaming
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -200,6 +201,12 @@ def on_show():
     print("[Teacher Intervention Screen] Becoming active...")
     state_manager.set_current_screen("teacher_intervention")
     get_robot_eyes().set_expression("sad")
+
+    # Keep real frames streaming so analytics isn't stuck in black-frame mode.
+    try:
+        set_frame_streaming(True, reason="teacher_intervention")
+    except Exception as e:
+        print("[Teacher Intervention] Error resuming frames:", e)
 
     input_enabled = False
 

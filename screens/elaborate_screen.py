@@ -6,6 +6,7 @@ from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
+from core.stream_control import set_frame_streaming
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -33,6 +34,12 @@ def get_ui():
 def on_show():
     print("[Elaborate Screen Guided Mode] Becoming active...")
     state_manager.set_current_screen("elaborate")
+
+    # Keep real frames streaming during scaffolding.
+    try:
+        set_frame_streaming(True, reason="elaborate")
+    except Exception as e:
+        print("[Elaborate Screen] Error resuming frames:", e)
     
     # Hide the obsolete timer
     window.timer_label.hide()

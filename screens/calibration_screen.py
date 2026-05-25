@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from core.state_manager import state_manager
 from core.ipc_queue import append_ipc_command
+from core.stream_control import set_frame_streaming
 from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
@@ -143,7 +144,7 @@ class CalibrationScreenUI(QWidget):
                     
                     # 🛑 CRITICAL: Immediately pause the backend from counting frames while we speak!
                     try:
-                        append_ipc_command({"type": "pause_frames"}, COMMAND_FILE)
+                        set_frame_streaming(False, reason="calibration_closed_prompt")
                     except: pass
 
                     self.game.set_phase("closed")
@@ -163,7 +164,7 @@ class CalibrationScreenUI(QWidget):
                     self.prompt_state = "done"
                     
                     try:
-                        append_ipc_command({"type": "pause_frames"}, COMMAND_FILE)
+                        set_frame_streaming(False, reason="calibration_done_speech")
                     except: pass
                     
                     self.game.set_phase("done")
@@ -188,7 +189,7 @@ class CalibrationScreenUI(QWidget):
 
     def resume_backend_tracking(self):
         try:
-            append_ipc_command({"type": "resume_frames"}, COMMAND_FILE)
+            set_frame_streaming(True, reason="calibration_resume")
         except: pass
 
     def handle_key_press(self, mapped_action):

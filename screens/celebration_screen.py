@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QGraphicsOpacityEffect
 from core.state_manager import state_manager
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
-from core.ipc_queue import append_ipc_command
+from core.stream_control import set_frame_streaming
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(current_dir)
@@ -36,9 +36,9 @@ def on_show():
     state_manager.set_current_screen("celebration")
     get_robot_eyes().set_expression("surprised")
     
-    # Pause frames during celebration
+    # Pause (send black frames) during celebration speech.
     try:
-        append_ipc_command({"type": "pause_frames"}, "ginglu-the-robot/calibration_command.json")
+        set_frame_streaming(False, reason="celebration")
     except Exception as e:
         print("[Celebration Screen] Error pausing frames:", e)
     

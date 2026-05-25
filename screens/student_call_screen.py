@@ -7,7 +7,7 @@ from core.keyboard_manager import keyboard_manager
 from core.navigator import navigator
 from core.voice_manager import VoiceManager
 from components.robot_eyes import get_robot_eyes
-from core.ipc_queue import append_ipc_command
+from core.stream_control import set_frame_streaming
 
 window = None
 fade_anim = None
@@ -35,11 +35,11 @@ def get_ui():
         print("[Student Call Screen] Becoming active...")
         state_manager.set_current_screen("student_call")
         
-        # Pause frames during student selection
+        # Keep real frames flowing while we wait for the student.
         try:
-            append_ipc_command({"type": "pause_frames"}, "ginglu-the-robot/calibration_command.json")
+            set_frame_streaming(True, reason="student_call")
         except Exception as e:
-            print("[Student Call Screen] Error pausing frames:", e)
+            print("[Student Call Screen] Error resuming frames:", e)
             
         # Stop lingering audio and clear old handler
         voice_manager.stop()  
