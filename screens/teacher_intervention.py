@@ -300,6 +300,6 @@ def handle_key_press(action):
         state_manager.current_path = []
         
         get_robot_eyes().set_expression("default")
-        print("[Teacher Intervention] Phase set to 'elaborate'. Moving to next student...")
-        import core.session_logic as session_logic
-        session_logic.next_student()
+        print("[Teacher Intervention] Phase set to 'elaborate'. Moving to goodbye screen...")
+        from core.navigator import navigator
+        navigator.navigate_to("goodbye")

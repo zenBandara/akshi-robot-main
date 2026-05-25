@@ -36,7 +36,7 @@ from screens import (
     session_complete_screen, evaluate_screen, elaborate_screen, 
     celebration_screen, engage_screen, explain_screen, explore_screen,
     teacher_intervention, break_screen, kinestatic, task_intro_screen,
-    calibration_screen, water_break_screen
+    calibration_screen, water_break_screen, goodbye_screen
 )
 
 class ScalableWindow(QMainWindow):
@@ -140,6 +140,7 @@ screens = {
     "kinestatic": kinestatic.get_ui(),
     "task_intro": task_intro_screen.get_ui(),
     "calibration": calibration_screen.get_ui(),
+    "goodbye": goodbye_screen.get_ui(),
 }
 
 # Register all valid screens in the navigator

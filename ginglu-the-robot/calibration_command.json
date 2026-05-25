@@ -33,3 +33,4 @@
 {"type": "pause_frames", "reason": "calibration_closed_prompt", "id": "0c46b40a-b50d-4ae0-8f15-31802b7d1743", "ts": 1779717045.085206}
 {"type": "resume_frames", "reason": "calibration_resume", "id": "ea039e9f-cf38-41b6-bfea-274f8054abbe", "ts": 1779717054.88325}
 {"type": "pause_frames", "reason": "calibration_done_speech", "id": "d4dd0206-bf6d-46c5-8758-d02acb82f3fb", "ts": 1779717057.783885}
+{"type": "pause_frames", "reason": "goodbye_screen", "id": "8f269fba-059b-4a43-b2f7-7e206b8e2c6a", "ts": 1779717655.545899}

@@ -104,6 +104,6 @@ def end_celebration():
         
     print(f"[Celebration Screen] LOGGED SUCCESS: {log_data}")
     
-    # 8. Move to the next student in this round
-    import core.session_logic as session_logic
-    session_logic.next_student()
+    # 8. Move to the goodbye screen
+    from core.navigator import navigator
+    navigator.navigate_to("goodbye")
