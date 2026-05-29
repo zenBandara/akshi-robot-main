@@ -13,9 +13,10 @@ window = None
 fade_anim = None
 fade_effect = None
 voice_manager = VoiceManager()
+prompt_timer = None
 
 def get_ui():
-    global window
+    global window, prompt_timer
     current_dir = os.path.dirname(__file__)
     project_root = os.path.dirname(current_dir)
     # Reuse studentCallUI for a consistent layout
@@ -31,10 +32,18 @@ def get_ui():
     file.close()
 
     setup_animations()
+    
+    # Initialize our 20-second loop timer
+    prompt_timer = QTimer()
+    prompt_timer.setInterval(20000) # 20 seconds
+    prompt_timer.timeout.connect(prompt_for_bye)
 
     def on_show():
         print("[Goodbye Screen] Becoming active...")
         state_manager.set_current_screen("goodbye")
+        
+        # Ensure timer is stopped when we start
+        prompt_timer.stop()
         
         # Black frames during the goodbye speech
         try:
@@ -49,25 +58,44 @@ def get_ui():
         display_name = str(student_name).capitalize() if student_name else "Buddy"
         
         window.student_name_label.setText(f"Goodbye {display_name}! 👋")
-        window.hint_label.setText("Say 'Yes' to finish your turn! 🌟")
+        # Hide the hint label initially
+        window.hint_label.setText("")
         
         window.update()
         QApplication.processEvents()
 
         get_robot_eyes().set_expression("encouraging")
         
-        intro_template = "You did amazing today, {name}! Please say 'Yes' so your friend can have a turn!"
+        # Initial speech doesn't ask for bye yet
+        intro_template = "You did amazing today, {name}! See you next time!"
         print(f"[Robot Speaks]: {intro_template.replace('{name}', display_name)}")
         duration_ms = voice_manager.speak_with_name(intro_template, display_name, f"goodbye_{display_name}")
             
         if hasattr(window, "student_name_label"):
             window.student_name_label.setGraphicsEffect(None)
             
-        # Enable input after speech finishes
-        QTimer.singleShot(duration_ms + 200, lambda: keyboard_manager.register_handler(handle_key_press))
+        # Enable input and start the 20-second reminder timer after the initial speech finishes
+        def on_speech_done():
+            keyboard_manager.register_handler(handle_key_press)
+            prompt_timer.start()
+            
+        QTimer.singleShot(duration_ms + 200, on_speech_done)
 
     window.on_show = on_show
     return window
+
+def prompt_for_bye():
+    """Triggered every 20 seconds if the student hasn't said BYE yet."""
+    global window
+    if not window: return
+    
+    window.hint_label.setText("Say 'Bye' to finish your turn! 🌟")
+    window.update()
+    QApplication.processEvents()
+    
+    msg = "Alright superstar, say 'bye' so your friends can have a turn!"
+    print(f"[Goodbye Screen Reminder]: {msg}")
+    voice_manager.speak(msg, "goodbye_reminder")
 
 def setup_animations():
     global window, fade_anim, fade_effect
@@ -80,10 +108,14 @@ def setup_animations():
     fade_anim.setEasingCurve(QEasingCurve.OutCubic)
 
 def handle_key_press(mapped_action):
-    if mapped_action in ["ENTER", "YES"]:
+    global prompt_timer
+    if mapped_action == "BYE":
         keyboard_manager.unregister_handler()
         voice_manager.stop()
+        if prompt_timer:
+            prompt_timer.stop()
+            
         get_robot_eyes().set_expression("default")
-        print("[Goodbye Screen] Student said YES. Moving to next student...")
+        print("[Goodbye Screen] Student said BYE. Moving to next student...")
         import core.session_logic as session_logic
         session_logic.next_student()

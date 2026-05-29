@@ -25,7 +25,8 @@ class KeyboardManager:
         self.key_mapping = {
             Qt.Key_W: "WAKE",
             Qt.Key_S: "SKIP",
-            Qt.Key_B: "BREAK",
+            Qt.Key_T: "BREAK",  # T for Tired/Take a break (B reassigned to BYE)
+            Qt.Key_B: "BYE",
             Qt.Key_Return: "ENTER",
             Qt.Key_Enter: "ENTER",
             Qt.Key_Escape: "ESCAPE",
@@ -57,6 +58,7 @@ class KeyboardManager:
             0x08: "BREAK",      # "I'm tired" (Reusing for Take a break)
             0x09: "ENTER",      # "Said Ok" (Used for pass/continue)
             0x11: "STOP",       # "Stop" command
+            0x12: "BYE",        # "Said Bye"
         }
 
         # ── Voice Input Thread (Raspberry Pi only) ──
