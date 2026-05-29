@@ -57,7 +57,7 @@ def get_ui():
         student_name = state_manager.get_current_student()
         display_name = str(student_name).capitalize() if student_name else "Buddy"
         
-        window.student_name_label.setText(f"Goodbye {display_name}! 👋")
+        window.student_name_label.setText(f"Bye {display_name}! 👋")
         # Hide the hint label initially
         window.hint_label.setText("")
         
@@ -67,7 +67,7 @@ def get_ui():
         get_robot_eyes().set_expression("encouraging")
         
         # Initial speech doesn't ask for bye yet
-        intro_template = "You did amazing today, {name}! See you next time!"
+        intro_template = "You did amazing today, {name}! Bye!"
         print(f"[Robot Speaks]: {intro_template.replace('{name}', display_name)}")
         duration_ms = voice_manager.speak_with_name(intro_template, display_name, f"goodbye_{display_name}")
             
