@@ -56,7 +56,7 @@ class CalibrationScreenUI(QWidget):
         print("[Calibration Screen] 🎮 Magical Eyes game starting...")
         state_manager.set_current_screen("calibration")
         keyboard_manager.register_handler(self.handle_key_press)
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("default")
 
         student_name = state_manager.get_current_student() or "friend"
         self.prompt_state = "init"
@@ -89,7 +89,7 @@ class CalibrationScreenUI(QWidget):
         self.game.set_phase("open")
         self.game.set_clock_enabled(False)
         self.prompt_state = "open"
-        get_robot_eyes().set_expression("surprised")
+        get_robot_eyes().set_expression("default")
         delay_ms = voice_manager.speak(
             "Wow! Can you make your eyes BIG like a magical owl? Look! Stars are appearing in the sky!",
             "owl_eyes"
@@ -153,7 +153,7 @@ class CalibrationScreenUI(QWidget):
                     except: pass
 
                     self.game.set_phase("closed")
-                    get_robot_eyes().set_expression("sleeping")
+                    get_robot_eyes().set_expression("default")
                     voice_manager.stop()
                     delay_ms = voice_manager.speak(
                         "Amazing! Now the owl is sleepy! Can you close your eyes like a cozy sleeping bunny? the moon is rising!",
@@ -174,7 +174,7 @@ class CalibrationScreenUI(QWidget):
                     except: pass
                     
                     self.game.set_phase("done")
-                    get_robot_eyes().set_expression("surprised")
+                    get_robot_eyes().set_expression("default")
                     
                     if state_timer:
                         state_timer.stop()
@@ -215,7 +215,7 @@ class CalibrationScreenUI(QWidget):
             self.proceed_to_task()
 
     def proceed_to_task(self):
-        get_robot_eyes().set_expression("default")
+        get_robot_eyes().set_expression("surprised")
         print("Calibration completed or skipped. Starting adaptive question flow...")
         import core.session_logic as session_logic
         session_logic.start_student_questions()

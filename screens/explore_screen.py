@@ -140,7 +140,7 @@ def on_show():
     speech_middle = explore_data.get("speech_middle", "Look closely!")
     speech_end = explore_data.get("speech_end", "Say 'Okay' when you are done!")
     
-    get_robot_eyes().set_expression("encouraging")
+    get_robot_eyes().set_expression("default")
     
     def complete_explore():
         if not input_enabled: return
@@ -154,7 +154,7 @@ def on_show():
     def play_middle():
         if not input_enabled: return
         swap_video("step_1", explore_data)
-        get_robot_eyes().set_expression("surprised")
+        get_robot_eyes().set_expression("default")
         if speech_middle:
             window.robot_text_label.setText(f"🤖 \"{speech_middle}\"")
             print(f"🤖 ROBOT SPEAKS: \"{speech_middle}\"")

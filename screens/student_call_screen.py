@@ -56,7 +56,7 @@ def get_ui():
         # QApplication.processEvents() # REMOVED: Triggers re-entrancy bugs with QGraphicsView stack transitions
 
 
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("default")
         
         # Simple call — the task introduction is handled by the dedicated task_intro_screen
         intro_template = "{name}, can you please come on up? It is your turn to shine!"
@@ -90,14 +90,14 @@ def handle_key_press(mapped_action):
     if mapped_action in ["ENTER", "YES"]:
         keyboard_manager.unregister_handler()
         voice_manager.stop()
-        get_robot_eyes().set_expression("surprised")
+        get_robot_eyes().set_expression("default")
         print("Student present! Transitioning to Calibration Screen...")
         # Route to calibration for face tracking BEFORE starting the learning flow
         navigator.navigate_to("calibration")
     elif mapped_action in ["ESCAPE", "NO", "SKIP"]:
         keyboard_manager.unregister_handler()
         voice_manager.stop()
-        get_robot_eyes().set_expression("sad")
+        get_robot_eyes().set_expression("default")
         print("Student absent! Skipping to next student...")
         import core.session_logic as session_logic
         session_logic.next_student()

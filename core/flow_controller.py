@@ -262,9 +262,9 @@ class FlowController:
         )
 
         if is_timeout:
-            get_robot_eyes().set_expression("thinking")
+            get_robot_eyes().set_expression("default")
         else:
-            get_robot_eyes().set_expression("encouraging")
+            get_robot_eyes().set_expression("default")
 
         # ── KINESTHETIC LOOP (Per cascade node — each evaluate node gets its own kinesthetic chance) ──
         if self.cascade_index not in self.kinesthetic_used_at:
@@ -433,7 +433,7 @@ class FlowController:
         from core.telemetry_logger import telemetry_logger
         telemetry_logger.log_event("USER_SKIP", detail=f"Skipped at {current_node}")
 
-        get_robot_eyes().set_expression("sad")
+        get_robot_eyes().set_expression("default")
 
         # Re-add the student to the END of the queue so they are called again
         queue = state_manager.get_student_queue()

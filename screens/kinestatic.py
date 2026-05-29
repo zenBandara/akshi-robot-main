@@ -141,7 +141,7 @@ def on_show():
     speech_step_2 = kinesthetic_data.get("speech_step_2", "")
     speech_end = kinesthetic_data.get("speech_end", "")
     
-    get_robot_eyes().set_expression("thinking")
+    get_robot_eyes().set_expression("default")
     
     def step_4():
         if not input_enabled: return
@@ -155,7 +155,7 @@ def on_show():
     def step_3():
         if not input_enabled: return
         swap_video("step_2", kinesthetic_data)
-        get_robot_eyes().set_expression("surprised")
+        get_robot_eyes().set_expression("default")
         if speech_step_2:
             window.robot_text_label.setText(f"🤖 \"{speech_step_2}\"")
             print(f"🤖 ROBOT SPEAKS: \"{speech_step_2}\"")
@@ -167,7 +167,7 @@ def on_show():
     def step_2():
         if not input_enabled: return
         swap_video("step_1", kinesthetic_data)
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("default")
         if speech_step_1:
             window.robot_text_label.setText(f"🤖 \"{speech_step_1}\"")
             print(f"🤖 ROBOT SPEAKS: \"{speech_step_1}\"")
@@ -207,7 +207,7 @@ def handle_key_press(action):
         if frame_timer:
             frame_timer.stop()
         print("[Kinesthetic Screen] Passed! Returning to evaluation...")
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("default")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()
@@ -221,7 +221,7 @@ def handle_key_press(action):
         if frame_timer:
             frame_timer.stop()
         print("[Kinesthetic Screen] Failed! Dropping to scaffolding phase...")
-        get_robot_eyes().set_expression("sad")
+        get_robot_eyes().set_expression("default")
         try:
             from core.flow_controller import flow_controller
             parent_stack = window.parentWidget()

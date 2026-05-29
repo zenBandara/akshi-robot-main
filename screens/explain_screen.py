@@ -40,7 +40,7 @@ def get_ui():
 def on_show():
     print("[Explain Screen] Becoming active...")
     state_manager.set_current_screen("explain")
-    get_robot_eyes().set_expression("thinking")
+    get_robot_eyes().set_expression("default")
 
     # Ensure real frames are streaming during explain.
     try:
@@ -168,7 +168,7 @@ def handle_key_press(action):
     if action in ["ENTER", "YES"]: # Hardware mapping for Return/Enter or Yes
         input_enabled = False
         voice_manager.stop()
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("default")
         if frame_timer:
             frame_timer.stop()
         print("[Explain Screen] Student said OKAY/YES. Logging failure and advancing...")

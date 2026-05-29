@@ -200,7 +200,7 @@ def on_show():
     global input_enabled
     print("[Teacher Intervention Screen] Becoming active...")
     state_manager.set_current_screen("teacher_intervention")
-    get_robot_eyes().set_expression("sad")
+    get_robot_eyes().set_expression("default")
 
     # Keep real frames streaming so analytics isn't stuck in black-frame mode.
     try:
@@ -240,7 +240,7 @@ def handle_key_press(action):
     if action in ["ENTER", "YES"]:
         input_enabled = False
         voice_manager.stop()
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("default")
         print("[Teacher Intervention] Teacher said OKAY/YES. Logging complete cascade and resetting.")
         
         # Telemetry Log

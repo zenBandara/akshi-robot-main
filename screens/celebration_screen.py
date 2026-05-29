@@ -34,7 +34,7 @@ def get_ui():
 def on_show():
     print("[Celebration Screen] Becoming active...")
     state_manager.set_current_screen("celebration")
-    get_robot_eyes().set_expression("surprised")
+    get_robot_eyes().set_expression("encouraging")
     
     # Pause (send black frames) during celebration speech.
     try:

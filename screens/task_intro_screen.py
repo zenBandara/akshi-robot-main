@@ -36,7 +36,7 @@ def on_show():
     global name_opacity, name_anim
     print("[Task Intro Screen] Becoming active...")
     state_manager.set_current_screen("task_intro")
-    get_robot_eyes().set_expression("surprised")
+    get_robot_eyes().set_expression("default")
     
     # Ensure analytics receives real frames unless explicitly paused elsewhere.
     try:

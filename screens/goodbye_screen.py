@@ -64,7 +64,7 @@ def get_ui():
         window.update()
         QApplication.processEvents()
 
-        get_robot_eyes().set_expression("encouraging")
+        get_robot_eyes().set_expression("surprised")
         
         # Initial speech doesn't ask for bye yet
         intro_template = "You did amazing today, {name}! Bye!"

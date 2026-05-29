@@ -70,7 +70,7 @@ def on_show():
 
     print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
     state_manager.set_current_screen("evaluate")
-    get_robot_eyes().set_expression("thinking")
+    get_robot_eyes().set_expression("default")
 
     # Resume sending real frames to backend as the task is starting
     try:
@@ -232,7 +232,7 @@ def present_option(idx):
 
     # Highlight this option in BLUE to indicate it's the current one being asked
     game_widget.highlight_answer(op_code, correct="present")
-    get_robot_eyes().set_expression("encouraging")
+    get_robot_eyes().set_expression("default")
 
     # Speak the option explanation + ask YES/NO
     op_speech = options_speech.get(op_code, f"Option {int(current_key)}.")
@@ -297,7 +297,7 @@ def on_motivation_nudge():
         return  # Student already answered
 
     motivation_given = True
-    get_robot_eyes().set_expression("encouraging")
+    get_robot_eyes().set_expression("default")
     student_name = state_manager.get_current_student() or "friend"
     level = state_manager.get_affordance_level()
 
@@ -337,7 +337,7 @@ def on_timer_expire():
 
     # LAST OPTION TIMEOUT LOGIC
     input_enabled = False
-    get_robot_eyes().set_expression("sad")
+    get_robot_eyes().set_expression("default")
 
     if motivation_timer:
         motivation_timer.stop()
@@ -437,7 +437,7 @@ def handle_key_press(action):
                     # L3 Break Request -> Cheer and Skip Student (no data saved, re-queued)
                     print("[Evaluate Screen] L3 Break requested. Cheering and skipping student...")
                     student_name = state_manager.get_current_student() or "friend"
-                    get_robot_eyes().set_expression("encouraging")
+                    get_robot_eyes().set_expression("default")
                     cheer_msg = f"You did a great job trying so hard, {student_name}! You're amazing! Let's let the next friend have a turn now!"
                     print(f"🤖 ROBOT SPEAKS (L3 Break Skip): \"{cheer_msg}\"")
                     delay_ms = voice_manager.speak(cheer_msg, f"l3_break_skip_{student_name}")

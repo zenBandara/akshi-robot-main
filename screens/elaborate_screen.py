@@ -105,7 +105,7 @@ def on_show():
     input_enabled = False
     voice_manager.stop()
     
-    get_robot_eyes().set_expression("encouraging")
+    get_robot_eyes().set_expression("default")
     
     speech_start = elab_data.get("speech_start", "Let's review this together!")
     keys_to_speak = ["1", "2", "3", "4"]
@@ -129,7 +129,7 @@ def on_show():
         if not input_enabled:
             return
         # Read final correct answer sequence
-        get_robot_eyes().set_expression("surprised")
+        get_robot_eyes().set_expression("default")
         reset_all_highlights()
         
         # Reverse map correct_option ("op1") back to key ("1")
