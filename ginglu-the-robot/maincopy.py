@@ -174,6 +174,18 @@ last_face_state = True
 no_face_start_time = None
 NO_FACE_DELAY = 2.0
 ws = WebSocketServer()
+
+def handle_eye_command(expr):
+    if expr == "happy":
+        eyes.happy()
+    elif expr == "sad":
+        eyes.sad()
+    elif expr == "cheer":
+        eyes.cheer()
+    elif expr == "lovely":
+        eyes.lovely()
+        
+ws.on_eye_command = handle_eye_command
 ws.start()
 ws.set_face_visible(True)
 

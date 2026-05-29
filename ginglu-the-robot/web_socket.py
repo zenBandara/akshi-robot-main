@@ -157,6 +157,9 @@ class WebSocketServer:
                         elif cmd_type in ["end_session", "pause_frames"]:
                             self.tracking_active = False
                             print(f"[WebSocket] Tracking OFF ({cmd_type})")
+                        elif cmd_type == "set_eye_expression":
+                            if hasattr(self, "on_eye_command"):
+                                self.on_eye_command(cmd.get("expression"))
 
                         print("Sent IPC command to server:", cmd)
                 except Exception as e:

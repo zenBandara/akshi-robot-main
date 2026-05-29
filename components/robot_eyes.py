@@ -2,6 +2,7 @@ import os
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from core.styles import Styling
+from core.ipc_queue import append_ipc_command
 
 class RobotEyesWidget(QWidget):
     """A floating, emotionally expressive global widget overlay that universally binds across all Qt layouts."""
@@ -47,10 +48,30 @@ class RobotEyesWidget(QWidget):
         self.current_state = "default"
 
     def set_expression(self, state_name):
-        """Update the physical robotic GUI ascii eye pattern manually."""
+        """Update the physical robotic GUI ascii eye pattern manually and sync with physical hardware."""
         if state_name in self.expressions:
             self.current_state = state_name
             self.eyes_label.setText(self.expressions[state_name])
+            
+            # Map GUI state to physical hardware command
+            hw_map = {
+                "default": "happy",
+                "sad": "sad",
+                "encouraging": "cheer",
+                "surprised": "lovely",
+                "thinking": "happy", 
+                "sleeping": "happy"  
+            }
+            expr = hw_map.get(state_name, "happy")
+            
+            # Send IPC command to the face tracker subprocess
+            try:
+                append_ipc_command(
+                    {"type": "set_eye_expression", "expression": expr}, 
+                    "ginglu-the-robot/calibration_command.json"
+                )
+            except Exception as e:
+                print(f"[RobotEyesWidget] IPC error: {e}")
             
     def blink(self):
         """Physical blinking interrupt mechanism strictly scoped to positive rest constraints."""
