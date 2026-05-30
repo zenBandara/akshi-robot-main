@@ -71,7 +71,7 @@ def on_show():
     global current_speech_rate
 
     level = state_manager.get_affordance_level()
-    current_speech_rate = "+0%" if level == 3 else "+10%"
+    current_speech_rate = "-10%" if level == 3 else "+10%"
     
     print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
     state_manager.set_current_screen("evaluate")
