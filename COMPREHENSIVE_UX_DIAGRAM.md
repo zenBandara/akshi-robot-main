@@ -5,20 +5,14 @@ This document outlines the complete, end-to-end user experience and logical flow
 ## Visual Flowchart
 
 ```mermaid
-%%{init: {"look": "classic", "theme": "default"}}%%
 graph TD
-    classDef startNode fill:#d8b4e2,stroke:#333,stroke-width:2px,color:black;
-    classDef processNode fill:#a3c2f1,stroke:#333,stroke-width:2px,color:black;
-    classDef conditionNode fill:#fce8b2,stroke:#333,stroke-width:2px,color:black;
-    classDef studentNode fill:#b8e0b6,stroke:#333,stroke-width:2px,color:black;
-
     START([App Launch]) --> TS[Teacher Selection Screen]
     TS --> |Teacher Selects Profile| IDLE[Idle Screen / Resting]
     
     IDLE --> |Teacher Triggers WAKE| FETCH[Fetch Firebase Data]
     FETCH --> |Loads Students & Task| GREET[Greeting Screen]
     
-    GREET --> FIRST_CHECK{Is this the first<br/>student in queue?}
+    GREET --> FIRST_CHECK{First student?}
     FIRST_CHECK -->|Yes| TASK_INTRO[Task Intro Screen]
     TASK_INTRO --> SCALL[Student Call Screen]
     FIRST_CHECK -->|No| SCALL
@@ -30,19 +24,15 @@ graph TD
         direction TB
         ADAPTIVE --> ROUTER{Determine Student's<br/>Affordance Level}
         
-        %% Affordance Level 1
         ROUTER --> |Affordance Level 1<br/>Basic Assessment| L1_PATH[No Scaffolding Required]
         L1_PATH --> EVAL_L1[Evaluate Screen - L1]
         
-        %% Affordance Level 2
         ROUTER --> |Affordance Level 2<br/>Medium Cognitive Support| L2_PATH[Engage Screen]
         L2_PATH --> EVAL_L2[Evaluate Screen - L2]
         
-        %% Affordance Level 3
         ROUTER --> |Affordance Level 3<br/>High Cognitive Support| L3_PATH[Explore / Explain / Elaborate]
-        L3_PATH --> EVAL_L3[Evaluate Screen - L3<br/>*Speech Speed -10%*]
+        L3_PATH --> EVAL_L3[Evaluate Screen - L3<br/>Speech Speed -10%]
         
-        %% Merge Evaluation Results
         EVAL_L1 --> EVAL_MERGE{Evaluation Result}
         EVAL_L2 --> EVAL_MERGE
         EVAL_L3 --> EVAL_MERGE
@@ -71,11 +61,6 @@ graph TD
     QUEUE_CHECK --> |No| SESS_COMP[Session Complete Screen]
     
     SESS_COMP --> |Waits exactly 10 Seconds| IDLE
-
-    class START startNode;
-    class TS,IDLE,FETCH,GREET,TASK_INTRO,ADAPTIVE,L1_PATH,L2_PATH,L3_PATH,KINESTHETIC,TEACHER_INT,BREAK,REMINDER,SESS_COMP processNode;
-    class FIRST_CHECK,WAIT_BYE,QUEUE_CHECK,ROUTER,EVAL_MERGE conditionNode;
-    class SCALL,CALIB,EVAL_L1,EVAL_L2,EVAL_L3,CELEB,GOODBYE studentNode;
 ```
 
 ---
