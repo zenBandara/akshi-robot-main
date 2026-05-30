@@ -1,6 +1,6 @@
 # Akshi Robot: Comprehensive User Experience (UX) Diagram
 
-This document outlines the complete, end-to-end user experience and logical flow of the Akshi Robot during a standard classroom session. It is designed to be easily presented and explains exactly how the robot dynamically reacts to teachers and students.
+This document outlines the complete, end-to-end user experience and logical flow of the Akshi Robot during a standard classroom session. It is designed to be easily presented and explains exactly how the robot dynamically reacts to teachers and students, with a detailed breakdown of the internal Constructivist & Affordance pathways.
 
 ## Visual Flowchart
 
@@ -26,19 +26,36 @@ graph TD
     CALIB --> |Magical Eyes Minigame| ADAPTIVE[Adaptive Learning Flow]
     
     subgraph Constructivist Educational Journey
-        ADAPTIVE --> |Loads Affordance L1/L2/L3| EXPLORE[Explore / Engage / Kinesthetic]
-        EXPLORE --> EVAL[Evaluate Screen]
+        direction TB
+        ADAPTIVE --> ROUTER{Determine Student's<br/>Affordance Level}
         
-        EVAL --> |Answers Correctly| CELEB[Celebration Screen]
+        %% Affordance Level 1
+        ROUTER --> |Affordance Level 1<br/>Basic Assessment| L1_PATH[No Scaffolding Required]
+        L1_PATH --> EVAL_L1[Evaluate Screen - L1]
         
-        EVAL --> |Answers Incorrectly| KINESTHETIC[Kinesthetic Side-Loop]
-        KINESTHETIC --> |Try Again| EVAL
+        %% Affordance Level 2
+        ROUTER --> |Affordance Level 2<br/>Medium Cognitive Support| L2_PATH[Engage Screen]
+        L2_PATH --> EVAL_L2[Evaluate Screen - L2]
         
-        EVAL --> |Repeated Failure| TEACHER_INT[Teacher Intervention]
+        %% Affordance Level 3
+        ROUTER --> |Affordance Level 3<br/>High Cognitive Support| L3_PATH[Explore / Explain / Elaborate]
+        L3_PATH --> EVAL_L3[Evaluate Screen - L3<br/>*Speech Speed -10%*]
+        
+        %% Merge Evaluation Results
+        EVAL_L1 --> EVAL_MERGE{Evaluation Result}
+        EVAL_L2 --> EVAL_MERGE
+        EVAL_L3 --> EVAL_MERGE
+        
+        EVAL_MERGE --> |Answers Correctly| CELEB[Celebration Screen]
+        
+        EVAL_MERGE --> |Answers Incorrectly| KINESTHETIC[Kinesthetic Side-Loop]
+        KINESTHETIC --> |Try Again| ROUTER
+        
+        EVAL_MERGE --> |Repeated Failure| TEACHER_INT[Teacher Intervention]
         TEACHER_INT --> CELEB
         
-        EVAL --> |Inactivity Timeout| BREAK[Brain/Water Break]
-        BREAK --> |Refreshed| EVAL
+        EVAL_MERGE --> |Inactivity Timeout| BREAK[Brain/Water Break]
+        BREAK --> |Refreshed| ROUTER
     end
     
     CELEB --> GOODBYE[Goodbye Screen]
@@ -55,9 +72,9 @@ graph TD
     SESS_COMP --> |Waits exactly 10 Seconds| IDLE
 
     class START startNode;
-    class TS,IDLE,FETCH,GREET,TASK_INTRO,ADAPTIVE,KINESTHETIC,TEACHER_INT,BREAK,REMINDER,SESS_COMP processNode;
-    class FIRST_CHECK,WAIT_BYE,QUEUE_CHECK conditionNode;
-    class SCALL,CALIB,EXPLORE,EVAL,CELEB,GOODBYE studentNode;
+    class TS,IDLE,FETCH,GREET,TASK_INTRO,ADAPTIVE,L1_PATH,L2_PATH,L3_PATH,KINESTHETIC,TEACHER_INT,BREAK,REMINDER,SESS_COMP processNode;
+    class FIRST_CHECK,WAIT_BYE,QUEUE_CHECK,ROUTER,EVAL_MERGE conditionNode;
+    class SCALL,CALIB,EVAL_L1,EVAL_L2,EVAL_L3,CELEB,GOODBYE studentNode;
 ```
 
 ---
@@ -73,10 +90,14 @@ When the teacher is ready, they trigger the `WAKE` command. The robot connects t
 ### 3. The Student Loop
 *   **Task Intro & Calling:** If it's the very first student, the robot explains the rules of the game (**Task Intro**). It then calls the specific student's name to come forward (**Student Call**).
 *   **Calibration:** The robot plays a "Magical Eyes" game to lock its camera onto the student's face.
-*   **The Lesson:** The student enters the **Constructivist Journey**, interacting with explore/engage screens based on their specific affordance level (L1, L2, or L3).
-*   **Evaluation:** The robot tests the student.
-    *   *Correct:* Immediate celebration!
-    *   *Incorrect:* The robot provides a kinesthetic side-loop to help them learn, or calls the teacher if they are truly stuck.
+*   **The Constructivist Journey (Adaptive Routing):** The robot dynamically determines the student's needs and routes them to the correct Affordance Level:
+    *   **Level 1:** Directly evaluates the student with no scaffolding.
+    *   **Level 2:** The student interacts with the **Engage Screen** before being evaluated.
+    *   **Level 3:** The student receives maximum cognitive support, moving through the **Explore, Explain, and Elaborate Screens**. During evaluation, the robot's speaking speed is slowed down by 10% to ensure high comprehension.
+*   **Evaluation Outcomes:**
+    *   *Correct:* Immediate transition to the Celebration Screen.
+    *   *Incorrect:* The robot launches a **Kinesthetic Side-Loop** (physical movement break) to help them reset before trying again.
+    *   *Repeated Failure:* The robot triggers **Teacher Intervention**.
 *   **Handoff:** The robot praises the student on the **Goodbye Screen** and waits for the student to say "Bye". If they forget, it gently reminds them every 20 seconds. 
 
 ### 4. Queue Management & Reset
