@@ -5,6 +5,7 @@ This document outlines the complete, end-to-end user experience and logical flow
 ## Visual Flowchart
 
 ```mermaid
+%%{init: {"look": "classic", "theme": "default"}}%%
 graph TD
     classDef startNode fill:#d8b4e2,stroke:#333,stroke-width:2px,color:black;
     classDef processNode fill:#a3c2f1,stroke:#333,stroke-width:2px,color:black;
