@@ -6,53 +6,58 @@ This document outlines the complete, end-to-end user experience and logical flow
 
 ```mermaid
 graph TD
-    classDef start fill:#d8b4e2,stroke:#333,stroke-width:2px,color:black;
-    classDef process fill:#a3c2f1,stroke:#333,stroke-width:2px,color:black;
-    classDef condition fill:#fce8b2,stroke:#333,stroke-width:2px,color:black;
-    classDef student fill:#b8e0b6,stroke:#333,stroke-width:2px,color:black;
+    classDef startNode fill:#d8b4e2,stroke:#333,stroke-width:2px,color:black;
+    classDef processNode fill:#a3c2f1,stroke:#333,stroke-width:2px,color:black;
+    classDef conditionNode fill:#fce8b2,stroke:#333,stroke-width:2px,color:black;
+    classDef studentNode fill:#b8e0b6,stroke:#333,stroke-width:2px,color:black;
 
-    START([App Launch]) ::: start --> TS[Teacher Selection Screen] ::: process
-    TS --> |Teacher Selects Profile| IDLE[Idle Screen / Resting] ::: process
+    START([App Launch]) --> TS[Teacher Selection Screen]
+    TS --> |Teacher Selects Profile| IDLE[Idle Screen / Resting]
     
-    IDLE --> |Teacher Triggers WAKE| FETCH[Fetch Firebase Data] ::: process
-    FETCH --> |Loads Students & Task| GREET[Greeting Screen] ::: process
+    IDLE --> |Teacher Triggers WAKE| FETCH[Fetch Firebase Data]
+    FETCH --> |Loads Students & Task| GREET[Greeting Screen]
     
-    GREET --> FIRST_CHECK{Is this the first<br/>student in queue?} ::: condition
-    FIRST_CHECK -->|Yes| TASK_INTRO[Task Intro Screen] ::: process
-    TASK_INTRO --> SCALL[Student Call Screen] ::: student
+    GREET --> FIRST_CHECK{Is this the first<br/>student in queue?}
+    FIRST_CHECK -->|Yes| TASK_INTRO[Task Intro Screen]
+    TASK_INTRO --> SCALL[Student Call Screen]
     FIRST_CHECK -->|No| SCALL
     
-    SCALL --> |Calls Student by Name| CALIB[Calibration Screen] ::: student
-    CALIB --> |Magical Eyes Minigame| ADAPTIVE[Adaptive Learning Flow] ::: process
+    SCALL --> |Calls Student by Name| CALIB[Calibration Screen]
+    CALIB --> |Magical Eyes Minigame| ADAPTIVE[Adaptive Learning Flow]
     
     subgraph Constructivist Educational Journey
-        ADAPTIVE --> |Loads Affordance L1/L2/L3| EXPLORE[Explore / Engage / Kinesthetic] ::: student
-        EXPLORE --> EVAL[Evaluate Screen] ::: student
+        ADAPTIVE --> |Loads Affordance L1/L2/L3| EXPLORE[Explore / Engage / Kinesthetic]
+        EXPLORE --> EVAL[Evaluate Screen]
         
-        EVAL --> |Answers Correctly| CELEB[Celebration Screen] ::: student
+        EVAL --> |Answers Correctly| CELEB[Celebration Screen]
         
-        EVAL --> |Answers Incorrectly| KINESTHETIC[Kinesthetic Side-Loop] ::: process
+        EVAL --> |Answers Incorrectly| KINESTHETIC[Kinesthetic Side-Loop]
         KINESTHETIC --> |Try Again| EVAL
         
-        EVAL --> |Repeated Failure| TEACHER_INT[Teacher Intervention] ::: process
+        EVAL --> |Repeated Failure| TEACHER_INT[Teacher Intervention]
         TEACHER_INT --> CELEB
         
-        EVAL --> |Inactivity Timeout| BREAK[Brain/Water Break] ::: process
+        EVAL --> |Inactivity Timeout| BREAK[Brain/Water Break]
         BREAK --> |Refreshed| EVAL
     end
     
-    CELEB --> GOODBYE[Goodbye Screen] ::: student
-    GOODBYE --> |Robot says 'Bye!'| WAIT_BYE{Student says 'BYE'?} ::: condition
+    CELEB --> GOODBYE[Goodbye Screen]
+    GOODBYE --> |Robot says 'Bye!'| WAIT_BYE{Student says 'BYE'?}
     
-    WAIT_BYE --> |Timeout 20s| REMINDER[Reminder Voice Prompt] ::: process
+    WAIT_BYE --> |Timeout 20s| REMINDER[Reminder Voice Prompt]
     REMINDER --> WAIT_BYE
     
-    WAIT_BYE --> |'BYE' Command Received| QUEUE_CHECK{Are there more<br/>students in queue?} ::: condition
+    WAIT_BYE --> |'BYE' Command Received| QUEUE_CHECK{Are there more<br/>students in queue?}
     
     QUEUE_CHECK --> |Yes| SCALL
-    QUEUE_CHECK --> |No| SESS_COMP[Session Complete Screen] ::: process
+    QUEUE_CHECK --> |No| SESS_COMP[Session Complete Screen]
     
     SESS_COMP --> |Waits exactly 10 Seconds| IDLE
+
+    class START startNode;
+    class TS,IDLE,FETCH,GREET,TASK_INTRO,ADAPTIVE,KINESTHETIC,TEACHER_INT,BREAK,REMINDER,SESS_COMP processNode;
+    class FIRST_CHECK,WAIT_BYE,QUEUE_CHECK conditionNode;
+    class SCALL,CALIB,EXPLORE,EVAL,CELEB,GOODBYE studentNode;
 ```
 
 ---
