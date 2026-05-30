@@ -16,74 +16,53 @@ The robot ranks the scaffolding it provides from highest support to lowest suppo
 ## The Dynamic Progression Algorithm
 
 ```mermaid
-stateDiagram-v2
-    direction TB
-
-    [*] --> LOAD_DB : Student Session Starts
+graph TD
+    START([Student Session Starts]) --> LOAD_DB
     
-    state LOAD_DB {
+    subgraph Database Loading
         direction LR
-        CheckDB[Check SQLite DB]
-        Found[State Found]
-        NotFound[No Record Found]
-        
-        CheckDB --> Found : Returning Student
-        CheckDB --> NotFound : Brand New Student
-    }
+        LOAD_DB[Check SQLite DB]
+        LOAD_DB --> |Returning Student| FOUND[State Found]
+        LOAD_DB --> |Brand New| NOT_FOUND[No Record Found]
+    end
     
-    LOAD_DB --> IDENTIFYING : Brand New Student
-    LOAD_DB --> CONFIRMING : Restored State
-    LOAD_DB --> ADVANCING : Restored State
+    NOT_FOUND --> IDENTIFYING
+    FOUND --> CONFIRMING
+    FOUND --> ADVANCING
     
-    %% IDENTIFYING STATE
-    state IDENTIFYING {
+    subgraph IDENTIFYING STATE
         direction TB
-        note "Robot cascades from 'none' down to 'elaborate'<br/>until the student gets the answer correct."
-        Cascade[Scaffolding Cascade]
-        Identify[Answer Correct]
-        
-        Cascade --> Identify
-    }
+        CASCADE[Scaffolding Cascade<br/>Starts at 'none', moves down]
+        CASCADE --> |Answer Correct| IDENTIFY_PASS[Baseline Phase Set<br/>Confirms = 0]
+    end
     
-    IDENTIFYING --> CONFIRMING : Sets Baseline Phase<br/>Confirms = 0
+    IDENTIFY_PASS --> CONFIRMING
     
-    %% CONFIRMING STATE
-    state CONFIRMING {
+    subgraph CONFIRMING STATE
         direction TB
-        note "Tests the student at their identified Baseline Phase."
+        ASK_BASE[Ask Question at Baseline Phase]
         
-        AskBaseline[Ask Question at Baseline Phase]
-        Correct[Answer Correct]
-        Incorrect[Answer Incorrect + Kinesthetic Failed]
-        
-        AskBaseline --> Correct
-        AskBaseline --> Incorrect
-    }
+        ASK_BASE --> |Answer Correct| CONFIRM_PASS[Confirms + 1]
+        ASK_BASE --> |Answer Incorrect| CONFIRM_FAIL[Kinesthetic Failed<br/>Lost Baseline]
+    end
     
-    CONFIRMING --> CONFIRMING : Correct (Confirms = 1)
-    CONFIRMING --> ADVANCING : Correct (Confirms = 2)
-    CONFIRMING --> IDENTIFYING : Incorrect (Lost Baseline)
-
-    %% ADVANCING STATE
-    state ADVANCING {
+    CONFIRM_PASS --> |Confirms = 1| CONFIRMING
+    CONFIRM_PASS --> |Confirms = 2| ADVANCING
+    CONFIRM_FAIL --> IDENTIFYING
+    
+    subgraph ADVANCING STATE
         direction TB
-        note "Tests the student with LESS scaffolding<br/>than their baseline (moving up the ladder)."
+        ASK_HARDER[Ask Question at 1 Phase Higher<br/>Less Scaffolding]
         
-        AskHarder[Ask Question at 1 Phase Higher]
-        PassHarder[Answer Correct]
-        FailHarder[Answer Incorrect]
-        
-        AskHarder --> PassHarder
-        AskHarder --> FailHarder
-    }
+        ASK_HARDER --> |Answer Correct| ADVANCE_PASS[Promoted! Baseline Updates]
+        ASK_HARDER --> |Answer Incorrect| ADVANCE_FAIL[Reverts to old Baseline]
+    end
     
-    ADVANCING --> CONFIRMING : Pass (Promoted! Baseline Updates)
-    ADVANCING --> CONFIRMING : Fail (Reverts to old Baseline)
-
-    %% PERSISTENCE
-    CONFIRMING --> SaveDB : Session Ends
-    ADVANCING --> SaveDB : Session Ends
-    SaveDB --> [*] : Saves to SQLite
+    ADVANCE_PASS --> CONFIRMING
+    ADVANCE_FAIL --> CONFIRMING
+    
+    CONFIRMING -.-> |Session Ends| SAVE_DB[(Save to SQLite)]
+    ADVANCING -.-> |Session Ends| SAVE_DB
 ```
 
 ---
