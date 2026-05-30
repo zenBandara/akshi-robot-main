@@ -41,6 +41,7 @@ awaiting_yes_no = False       # True when robot finished explaining and is waiti
 motivation_given = False
 key_mapping = {"1": "op1", "2": "op2", "3": "op3", "4": "op4"}
 voice_manager = VoiceManager()
+current_speech_rate = "+10%"
 
 def get_ui():
     global window, game_widget, timer_label
@@ -65,9 +66,13 @@ def get_ui():
     return window
 
 def on_show():
-    global evaluate_timer, active_animations, input_enabled, key_mapping, motivation_timer, motivation_given
-    level = state_manager.get_affordance_level()
+    global current_presenting_idx, presentation_keys, awaiting_yes_no, motivation_given
+    global active_animations, evaluate_timer, motivation_timer, input_enabled
+    global current_speech_rate
 
+    level = state_manager.get_affordance_level()
+    current_speech_rate = "+0%" if level == 3 else "+10%"
+    
     print(f"[Evaluate Screen] Becoming active at Affordance Level {level}...")
     state_manager.set_current_screen("evaluate")
     get_robot_eyes().set_expression("default")
@@ -177,7 +182,7 @@ def on_show():
     # ── All levels now use the sequential YES/NO presentation ──
     speech_template = "{name}, " + f"{speech_start} {desc_text}".strip()
     print(f"🤖 ROBOT SPEAKS INTRO: \"{speech_template.replace('{name}', student_name)}\"")
-    delay_ms = voice_manager.speak_with_name(speech_template, student_name, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}")
+    delay_ms = voice_manager.speak_with_name(speech_template, student_name, f"eval_intro_{student_name}_{task_data.get('task_id', 'id')}", rate=current_speech_rate)
 
     enable_input()
 
@@ -239,7 +244,7 @@ def present_option(idx):
     ask_speech = f"{op_speech} Is this your answer? Say yes or no."
 
     print(f"🤖 ROBOT ASKS OPTION {current_key}: \"{ask_speech}\"")
-    op_delay_ms = voice_manager.speak(ask_speech, f"eval_ask_{student_name}_{op_code}")
+    op_delay_ms = voice_manager.speak(ask_speech, f"eval_ask_{student_name}_{op_code}", rate=current_speech_rate)
 
     # Enable YES/NO input AFTER the robot finishes speaking
     def unlock_input():
@@ -316,7 +321,7 @@ def on_motivation_nudge():
     from core.telemetry_logger import telemetry_logger
     telemetry_logger.log_event("PEDAGOGICAL_NUDGE", detail=f"Motivation nudge given to {student_name}")
 
-    voice_manager.speak_with_name(nudge_template, nudge_name, f"motivation_{student_name}")
+    voice_manager.speak_with_name(nudge_template, nudge_name, f"motivation_{student_name}", rate=current_speech_rate)
 
 def on_timer_expire():
     """Called when the per-option timer expires."""
@@ -358,7 +363,7 @@ def on_timer_expire():
         from core.dialogue import DialoguePool
         print(f"[Evaluate Screen] ⏭️ L3 FINAL timeout → Skipping student {student_name}!")
         skip_template, skip_name = DialoguePool.get_template("skip_l3", student_name)
-        delay_ms = voice_manager.speak_with_name(skip_template, skip_name, f"timeout_skip_{student_name}")
+        delay_ms = voice_manager.speak_with_name(skip_template, skip_name, f"timeout_skip_{student_name}", rate=current_speech_rate)
 
         def skip_student():
             try:
@@ -374,7 +379,7 @@ def on_timer_expire():
         # ── L2: Route to Rabbit Jump Break ──
         print(f"[Evaluate Screen] 🐰 L2 FINAL timeout → Rabbit Jump Break for {student_name}!")
         timeout_template = "Hey {name}! I think you need some energy! Let's do something super fun!"
-        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_break_{student_name}")
+        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_break_{student_name}", rate=current_speech_rate)
 
         def go_to_break():
             try:
@@ -388,7 +393,7 @@ def on_timer_expire():
         # ── L1: Route to Phase Below (Kinesthetic/Water Break) ──
         print(f"[Evaluate Screen] 💧 L1 FINAL timeout → Phase below for {student_name}!")
         timeout_template = "That's okay {name}! I think you might need a little rest!"
-        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_l1_{student_name}")
+        delay_ms = voice_manager.speak_with_name(timeout_template, student_name, f"timeout_l1_{student_name}", rate=current_speech_rate)
 
         def transition_after_speech():
             try:
@@ -440,7 +445,7 @@ def handle_key_press(action):
                     get_robot_eyes().set_expression("default")
                     cheer_msg = f"You did a great job trying so hard, {student_name}! You're amazing! Let's let the next friend have a turn now!"
                     print(f"🤖 ROBOT SPEAKS (L3 Break Skip): \"{cheer_msg}\"")
-                    delay_ms = voice_manager.speak(cheer_msg, f"l3_break_skip_{student_name}")
+                    delay_ms = voice_manager.speak(cheer_msg, f"l3_break_skip_{student_name}", rate=current_speech_rate)
                     
                     def skip_student():
                         try:
@@ -575,7 +580,7 @@ def _process_answer(is_correct):
         encourage_template, encourage_name = DialoguePool.get_template(dialogue_category, student_name)
 
         print(f"🤖 ROBOT ENCOURAGES: \"{encourage_template.format(name=encourage_name)}\"")
-        delay_ms = voice_manager.speak_with_name(encourage_template, encourage_name, f"eval_encourage_{student_name}")
+        delay_ms = voice_manager.speak_with_name(encourage_template, encourage_name, f"eval_encourage_{student_name}", rate=current_speech_rate)
 
         def proceed_to_incorrect_cascade():
             try:

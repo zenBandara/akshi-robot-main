@@ -35,8 +35,8 @@ class VoiceManager:
         await communicate.save(filename)
 
     def speak(self, text, audio_name, rate="+10%"):
-        # Synthesize a strong deterministic hash of the text
-        text_hash = hashlib.md5(text.encode()).hexdigest()[:10]
+        # Synthesize a strong deterministic hash of the text AND rate
+        text_hash = hashlib.md5(f"{text}|{rate}".encode()).hexdigest()[:10]
         # Ignore audio_name for the actual file to prevent duplicates for different students!
         filename = os.path.join(self.audio_folder, f"tts_{text_hash}.mp3")
 
@@ -85,7 +85,8 @@ class VoiceManager:
             Path to the cached name audio file
         """
         safe_name = name.strip().replace(" ", "_")
-        name_file = os.path.join(self.name_cache_folder, f"name_{safe_name}.mp3")
+        safe_rate = rate.replace('%', '').replace('+', 'p').replace('-', 'm')
+        name_file = os.path.join(self.name_cache_folder, f"name_{safe_name}_{safe_rate}.mp3")
         
         if not os.path.exists(name_file):
             print(f"[VoiceManager] Generating name audio for '{name}' → {name_file}")
@@ -127,8 +128,8 @@ class VoiceManager:
             prefix = parts[0].strip() if parts[0].strip() else ""
             suffix = parts[1].strip() if len(parts) > 1 and parts[1].strip() else ""
             
-            # 2. Build a unique combined cache key from (template + name)
-            combined_hash = hashlib.md5(f"{template}|{name}".encode()).hexdigest()[:12]
+            # 2. Build a unique combined cache key from (template + name + rate)
+            combined_hash = hashlib.md5(f"{template}|{name}|{rate}".encode()).hexdigest()[:12]
             combined_file = os.path.join(self.combined_cache_folder, f"combined_{combined_hash}.mp3")
             
             # 3. Check if combined file already exists
@@ -141,7 +142,7 @@ class VoiceManager:
             
             # Prefix segment
             if prefix:
-                prefix_hash = hashlib.md5(prefix.encode()).hexdigest()[:10]
+                prefix_hash = hashlib.md5(f"{prefix}|{rate}".encode()).hexdigest()[:10]
                 prefix_file = os.path.join(self.audio_folder, f"tts_{prefix_hash}.mp3")
                 if not os.path.exists(prefix_file):
                     print(f"[VoiceManager] Generating prefix audio: '{prefix[:50]}...'")
@@ -154,7 +155,7 @@ class VoiceManager:
             
             # Suffix segment
             if suffix:
-                suffix_hash = hashlib.md5(suffix.encode()).hexdigest()[:10]
+                suffix_hash = hashlib.md5(f"{suffix}|{rate}".encode()).hexdigest()[:10]
                 suffix_file = os.path.join(self.audio_folder, f"tts_{suffix_hash}.mp3")
                 if not os.path.exists(suffix_file):
                     print(f"[VoiceManager] Generating suffix audio: '{suffix[:50]}...'")
