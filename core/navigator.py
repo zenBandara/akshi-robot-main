@@ -17,6 +17,12 @@ class Navigator:
     def navigate_to(self, screen_name):
         if screen_name in self.screens and self.stack:
             widget = self.screens[screen_name]
+            
+            # Fire the on_hide lifecycle hook for the outgoing widget if it defines one
+            current_widget = self.stack.currentWidget()
+            if current_widget and hasattr(current_widget, "on_hide"):
+                current_widget.on_hide()
+                
             self.stack.setCurrentWidget(widget)
             
             # Telemetry Log

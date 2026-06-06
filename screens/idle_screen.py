@@ -1,4 +1,5 @@
 import os
+import subprocess
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QTimer, QPropertyAnimation, Qt, QUrl
 from PySide6.QtWidgets import QApplication, QGraphicsOpacityEffect, QVBoxLayout, QLabel, QPushButton
@@ -15,6 +16,7 @@ video_label = None
 frame_timer = None
 current_frames = []
 current_frame_idx = 0
+movement_process = None
 
 def get_ui():
     global window
@@ -60,6 +62,7 @@ def get_ui():
     
     # Standardize lifecycle hooks for Navigator
     def on_show():
+        global movement_process
         print("[Idle Screen] Becoming active with native Video Engine...")
         keyboard_manager.register_handler(handle_key_press)
         state_manager.set_current_screen("idle")
@@ -70,8 +73,31 @@ def get_ui():
             setup_video()
         else:
             frame_timer.start(66)
+            
+        # Start the animal movement script
+        if movement_process is None:
+            try:
+                script_path = os.path.join(project_root, "core", "animal_movement.py")
+                movement_process = subprocess.Popen(["python", script_path])
+                print(f"[Idle Screen] Started animal movement subprocess: {movement_process.pid}")
+            except Exception as e:
+                print(f"[Idle Screen] Failed to start animal movement script: {e}")
+
+    def on_hide():
+        global movement_process
+        print("[Idle Screen] Hiding, cleaning up resources...")
+        if movement_process is not None:
+            try:
+                movement_process.terminate()
+                movement_process.wait(timeout=2)
+                print("[Idle Screen] Animal movement subprocess terminated.")
+            except Exception as e:
+                print(f"[Idle Screen] Error terminating animal movement: {e}")
+            finally:
+                movement_process = None
 
     window.on_show = on_show
+    window.on_hide = on_hide
     return window
 
 def setup_animations():
