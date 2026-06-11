@@ -52,8 +52,16 @@ def get_ui():
         }
     """)
     def quit_app():
+        global movement_process
         from core.telemetry_logger import telemetry_logger
         telemetry_logger.log_event("SYSTEM_QUIT", detail="Teacher pressed Quit button", sync=True)
+        if movement_process is not None:
+            try:
+                movement_process.terminate()
+                movement_process.wait(timeout=2)
+                print("[Idle Screen] Animal movement subprocess terminated on quit.")
+            except Exception as e:
+                print(f"[Idle Screen] Error terminating animal movement on quit: {e}")
         QApplication.instance().quit()
 
     quit_btn.clicked.connect(quit_app)
