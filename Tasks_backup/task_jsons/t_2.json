@@ -1,0 +1,128 @@
+{
+  "task_id": "t_2",
+  "task_name": "Left Right Identification",
+  "description": "A deeply conversational task teaching preschoolers the difference between left and right.",
+  "engage": {
+    "task_title": "The Magic Mirror Dance!",
+    "description": "Engage the student actively with a rhythmic video mirror dance.",
+    "video_urls": {
+      "start": "assets/video/t_1-eng-start.mp4",
+      "step_1": "assets/video/t_1-eng-step1.mp4",
+      "end": "assets/video/t_1-eng-end.mp4"
+    },
+    "speech_start": "Oh no, that is totally okay! We are going to try something super fun safely together. Stand up! It is time for the Magic Mirror Dance!",
+    "speech_middle": "Watch our character carefully on the screen! When they shake their arm with the red bracelet, that is the Left side! Let's shake our left arm right now!",
+    "speech_end": "Now they are shaking the blue bracelet arm, that is the Right side! Superb! Shake your right arm! Say 'Okay' when you are all done dancing "
+  },
+  "explore": {
+    "task_title": "Dinosaur Jungle Safari!",
+    "description": "Immersive long-format storytelling phase exploring the cognitive concepts of Left and Right using binoculars.",
+    "video_urls": {
+      "start": "assets/video/t_1-expl-start.mp4",
+      "step_1": "assets/video/t_1-expl-step1.mp4",
+      "end": "assets/video/t_1-expl-end.mp4"
+    },
+    "speech_start": "Let's grab our magic binoculars and carefully explore the dinosaur jungle! Put your hands up to your eyes like binoculars! Are you okay?",
+    "speech_middle": "Look all the way to the Left side! Shh! Behind those giant leaves on your Left, there is a tall, gentle dinosaur eating lunch! That is the Left side!",
+    "speech_end": "Now, quickly, safely swing your binoculars all the way to the Right side! Wow, do you see him? A fast little dinosaur is happily running across the field on your Right! Left for the tall dinosaur, Right for the fast dinosaur! Say 'Okay' when you are all done exploring!"
+  },
+  "explain": {
+    "task_title": "Understanding Left and Right",
+    "speech_start": "Here is a fun little trick just for you! Hold both of your hands out right in front of you. Look at them really closely! The hand that naturally makes an 'L' shape with your thumb and pointer finger... is your left hand! See the L? That means Left! And the other one is your right hand!",
+    "speech_end": "Now you know the magic secret of what left and right means. You are getting so smart, I can't even believe it!",
+    "video_url": "tasks/t1/explain_video.mp4",
+    "description": "Robot deeply explains the concept using the 'L' shape trick on the hands."
+  },
+  "elaborate": {
+    "task_type": "mcq_image",
+    "task_title": "Choose the correct direction",
+    "speech_start": "Hmm, let's look at this one a little closer together. Remember our fun trick? The hand that naturally makes an 'L' shape with your thumb and pointer finger is your left hand! Let's use that trick now. I know you can do this! Can you help me find the absolutely correct answer?",
+    "speech_end": "Excellent! You are learning so fast, I am so incredibly proud of you!",
+    "task_description": "Let's review these pictures together. Which one of these images shows the left hand?",
+    "multiple_choices_word": {
+      "op1": "Left Hand",
+      "op2": "Right Hand",
+      "op3": "Both Hands",
+      "op4": "No Hands"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/front_left_hand.png",
+      "op2": "assets/images/front_right_hand.png",
+      "op3": "assets/images/front_both_hands.png",
+      "op4": "assets/images/human_foot.png"
+    },
+    "multiple_choices_speech": {
+      "op1": "This picture shows a hand pointing perfectly to the left. That matches the L shape!",
+      "op2": "This picture shows a hand pointing to the right. That is lovely, but it is not left!",
+      "op3": "This picture shows both hands. We only want left!",
+      "op4": "This picture shows a foot! That isn't a hand at all!"
+    },
+    "correct_option": "op1",
+    "correct_option_speech": "So, the first picture is the absolutely correct answer because we are looking specifically for the left hand! Say 'Okay' "
+  },
+  "evaluate": {
+    "task_type": "mcq_image",
+    "task_title": "Identify direction",
+    "speech_start": "Alright, my brilliant superstar, it is time to show everybody what you know! Look very carefully at the screen and take all the time you need.",
+    "speech_end": "Wow! You are absolutely fantastic! I am cheering so loud for you!",
+    "task_description": "Can you show me which beautiful arrow points perfectly to the right?",
+    "multiple_choices_word": {
+      "op1": "Left Arrow",
+      "op2": "Right Arrow",
+      "op3": "Up Arrow",
+      "op4": "Down Arrow"
+    },
+    "multiple_choices_speech": {
+      "op1": "Take a very close look at this lovely arrow! Is it showing us the magic direction we need?",
+      "op2": "Or what about this beautiful one right here? Does this arrow look like your perfect match?",
+      "op3": "Check out this super cool arrow! Do you think this is the secret winner we are looking for?",
+      "op4": "And here is our last fun arrow! How about this one, could this be the right choice?"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/flat_left_arrow.png",
+      "op2": "assets/images/flat_right_arrow.png",
+      "op3": "assets/images/flat_up_arrow.png",
+      "op4": "assets/images/flat_down_arrow.png"
+    },
+    "correct_option": "op2"
+  },
+  "kinesthetic_L1": {
+    "task_title": "Kinesthetic Learning - Level 1",
+    "video_urls": {
+      "start": "assets/video/t_1-kin-start.mp4",
+      "step_1": "assets/video/t_1-kin-step1.mp4",
+      "step_2": "assets/video/t_1-kin-step2.mp4",
+      "end": "assets/video/t_1-kin-end.mp4"
+    },
+    "speech_start": "Let's try moving our beautiful bodies to understand this! What is the hand that you use for eating?",
+    "speech_step_1": "That is your right hand! Now, can you lift up the hand you use for eating nice and high?",
+    "speech_step_2": "Awesome! Now, what about your other hand? That is your left hand! Can you wiggle your left hand high in the air?",
+    "speech_end": "Wow! Now, go over to your teacher and show them your beautiful left and right hands! Say 'Yes' if passed, or 'No' if you need more help!"
+  },
+  "kinesthetic_L2": {
+    "task_title": "Kinesthetic Learning - Level 2",
+    "video_urls": {
+      "start": "assets/video/t_1-kin-start.mp4",
+      "step_1": "assets/video/t_1-kin-step1.mp4",
+      "step_2": "assets/video/t_1-kin-step2.mp4",
+      "end": "assets/video/t_1-kin-end.mp4"
+    },
+    "speech_start": "I know we tried this a moment ago, but let's try it again! Let's think carefully about when you eat your yummy food. What hand do you use for eating?",
+    "speech_step_1": "Yes, that is your right hand! Lift up that eating hand nice and high so everyone can see!",
+    "speech_step_2": "Fantastic! Now let's think about the other hand you don't use for eating. That is your left hand! Can you wiggle your left hand high in the air?",
+    "speech_end": "You are doing so well! Go show your teacher how perfectly you know your eating hand and your other hand! Say 'Yes' if passed, or 'No' if you need more help!"
+  },
+  "kinesthetic_L3": {
+    "task_title": "Kinesthetic Learning - Level 3",
+    "video_urls": {
+      "start": "assets/video/t_1-kin-start.mp4",
+      "step_1": "assets/video/t_1-kin-step1.mp4",
+      "step_2": "assets/video/t_1-kin-step2.mp4",
+      "end": "assets/video/t_1-kin-end.mp4"
+    },
+    "speech_start": "Okay, let me tell you a little story! Imagine you are sitting at the table with a big, yummy plate of your favorite food. Let's do this one more time. Show me the exact hand you use to pick up your spoon and eat!",
+    "speech_step_1": "That special hand is your right hand! Raise that right eating hand way up into the sky!",
+    "speech_step_2": "Great job! Now, what about the hand that is resting on the table? That is your left hand! Can you shake your left hand high in the air?",
+    "speech_end": "What an amazing learner! Go over and give your teacher a gentle high-five with your left and right hands! Say 'Yes' if passed, or 'No' if you need more help!"
+  }
+}

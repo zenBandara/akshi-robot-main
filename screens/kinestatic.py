@@ -19,6 +19,7 @@ video_label = None
 frame_timer = None
 current_frames = []
 current_frame_idx = 0
+current_playing_dir = None
 
 def get_ui():
     global window
@@ -42,9 +43,11 @@ def apply_rounded_clip(widget, radius=20):
     region = QRegion(path.toFillPolygon().toPolygon())
     widget.setMask(region)
 
+current_playing_dir = None
+
 def swap_video(stage, kinesthetic_data):
     """Dynamically hot-swaps the underlying image sequence layer matching the vocal queue."""
-    global current_frames, current_frame_idx, frame_timer
+    global current_frames, current_frame_idx, frame_timer, current_playing_dir
     
     urls_dict = kinesthetic_data.get("video_urls", {})
     media_url = urls_dict.get(stage, "")
@@ -52,17 +55,20 @@ def swap_video(stage, kinesthetic_data):
     if not media_url:
         return
         
-    # Example media_url: "assets/video/t_1-kin-start.mp4"
-    # We strip the extension to get the directory containing the frames
     base_dir = media_url.rsplit('.', 1)[0]
     abs_dir_path = os.path.join(project_root, base_dir)
     
     if os.path.isdir(abs_dir_path):
-        # Gather all frame_*.jpg
+        if abs_dir_path == current_playing_dir:
+            print(f"[Kinesthetic Screen] Continuing seamless sequence for stage '{stage}'...")
+            return
+            
         frames = [os.path.join(abs_dir_path, f) for f in os.listdir(abs_dir_path) if f.endswith('.jpg')]
         frames.sort()
         current_frames = frames
         current_frame_idx = 0
+        current_playing_dir = abs_dir_path
+        
         if current_frames and frame_timer:
             frame_timer.start(66) # 15 FPS (~66ms)
             print(f"[Kinesthetic Screen] Image sequence playing stage '{stage}': {abs_dir_path}")
@@ -70,8 +76,8 @@ def swap_video(stage, kinesthetic_data):
         print(f"[Kinesthetic Screen] Image sequence dir not found for stage '{stage}': {abs_dir_path}")
 
 def update_frame():
-    global current_frames, current_frame_idx, video_label
-    if current_frames and video_label:
+    global current_frames, current_frame_idx, video_label, window
+    if current_frames and video_label and window:
         pixmap = QPixmap(current_frames[current_frame_idx])
         video_label.setPixmap(pixmap)
         current_frame_idx = (current_frame_idx + 1) % len(current_frames)
@@ -85,7 +91,7 @@ def setup_video_container():
     if video_label is None:
         video_label = QLabel()
         video_label.setAlignment(Qt.AlignCenter)
-        video_label.setScaledContents(True) # Fills container smoothly
+        video_label.setScaledContents(True)
         
     container = window.video_container
     if container.layout() is None:

@@ -105,7 +105,9 @@ def setup_video(explain_data):
     if video_label is None:
         video_label = QLabel()
         video_label.setAlignment(Qt.AlignCenter)
-        video_label.setScaledContents(True)
+        video_label.setScaledContents(False)
+        from PySide6.QtWidgets import QSizePolicy
+        video_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
     
     # Mount into the container layout (same pattern as idle_screen.py web_container)
     container = window.video_container
@@ -125,9 +127,8 @@ def setup_video(explain_data):
     if container.layout().indexOf(video_label) == -1:
         container.layout().addWidget(video_label)
     
-    # Apply rounded corner clip mask to the container
-    container.setStyleSheet("background-color: #FFF3E0; border: 4px solid #FFCC80; border-radius: 20px;")
-    QTimer.singleShot(100, lambda: apply_rounded_clip(container, 20))
+    # Remove border styling completely to fix layout clipping issues
+    container.setStyleSheet("background-color: transparent; border: none;")
     
     if os.path.isdir(abs_dir_path):
         frames = [os.path.join(abs_dir_path, f) for f in os.listdir(abs_dir_path) if f.endswith('.jpg')]
@@ -144,10 +145,14 @@ def setup_video(explain_data):
         print(f"[Explain Screen] Image sequence dir not found: {abs_dir_path}")
 
 def update_frame():
-    global current_frames, current_frame_idx, video_label
-    if current_frames and video_label:
+    global current_frames, current_frame_idx, video_label, window
+    if current_frames and video_label and window:
         pixmap = QPixmap(current_frames[current_frame_idx])
-        video_label.setPixmap(pixmap)
+        
+        target_size = video_label.size()
+        scaled_pixmap = pixmap.scaled(target_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        
+        video_label.setPixmap(scaled_pixmap)
         current_frame_idx = (current_frame_idx + 1) % len(current_frames)
 
 def play_second_speech():
