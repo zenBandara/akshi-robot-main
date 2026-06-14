@@ -1,7 +1,7 @@
 {
     "task_id": "t_1",
-    "task_name": "Left Right Identification",
-    "description": "A deeply conversational task teaching preschoolers the difference between left and right.",
+    "task_name": "Counting Faces",
+    "description": "A deeply conversational task teaching preschoolers how to count happy and sad faces.",
     "engage": {
         "task_title": "Engage Screen - Faces",
         "description": "Engage the student with emotional faces.",
@@ -57,7 +57,8 @@
             "op4": "Now look here. One. Two. Three. Wow! 3 happy faces. This is the answer."
         },
         "correct_option": "op4",
-        "correct_option_speech": "Great job! Now your turn!"
+        "correct_option_speech": "Great job! Now your turn!",
+        "speech_end": "Great job! Now your turn!"
     },
     "evaluate": {
         "task_type": "mcq_image",
