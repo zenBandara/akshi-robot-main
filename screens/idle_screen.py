@@ -195,7 +195,7 @@ def handle_key_press(mapped_action):
             all_tasks = task_loader.get_loaded_tasks()
             lesson_data = next((t for t in all_tasks if t.get("task_id") == lesson_id), None)
             if not lesson_data:
-                lesson_data = next((t for t in all_tasks if t.get("task_id") == "t_2"), None)
+                lesson_data = next((t for t in all_tasks if t.get("task_id") == "t_1"), None)
             state_manager.set_current_task(lesson_data)
             print(f"[Idle Screen] Fetched task: {lesson_data.get('task_id') if lesson_data else 'None'}")
             

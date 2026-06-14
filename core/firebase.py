@@ -95,7 +95,7 @@ def get_current_lesson(teacher_key):
     """Fetch the active lesson assigned by the teacher."""
     ref = db.reference(f"teachers/{teacher_key}/current_lesson")
     lesson = ref.get()
-    return lesson if lesson else "t_2"
+    return lesson if lesson else "t_1"
 
 def log_event(data):
     """Stub for Firestore logging. Handled in Phase 6."""
