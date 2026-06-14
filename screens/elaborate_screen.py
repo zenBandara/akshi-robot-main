@@ -15,6 +15,7 @@ ui_path = os.path.join(project_root, "ui", "elaborateUI.ui")
 window = None
 input_enabled = False
 voice_manager = VoiceManager()
+timeout_timer = None
 
 def get_ui():
     global window
@@ -31,7 +32,29 @@ def get_ui():
         
     return window
 
+def on_timeout():
+    global input_enabled, timeout_timer
+    if not input_enabled:
+        return
+    input_enabled = False
+    voice_manager.stop()
+    get_robot_eyes().set_expression("default")
+    if timeout_timer:
+        timeout_timer.stop()
+        timeout_timer = None
+    print("[Elaborate Screen] ⏰ 50s timeout — auto-advancing to next screen.")
+    try:
+        from core.flow_controller import flow_controller
+        parent_stack = window.parentWidget()
+        if parent_stack:
+            flow_controller.advance_cascade(parent_stack)
+    except ImportError: pass
+
 def on_show():
+    global input_enabled, timeout_timer
+    if timeout_timer:
+        timeout_timer.stop()
+        timeout_timer = None
     print("[Elaborate Screen Guided Mode] Becoming active...")
     state_manager.set_current_screen("elaborate")
 
@@ -170,6 +193,12 @@ def on_show():
     
     print(f"[Elaborate Screen Guided Mode] Enabling keyboard input immediately to allow interruption.")
     enable_input()
+    
+    timeout_timer = QTimer()
+    timeout_timer.setSingleShot(True)
+    timeout_timer.setInterval(50000)
+    timeout_timer.timeout.connect(on_timeout)
+    timeout_timer.start()
 
 def enable_input():
     global input_enabled
@@ -178,7 +207,7 @@ def enable_input():
     print("[Elaborate Screen Guided Mode] Explanation complete. Keyboard hardware inputs enabled.")
 
 def handle_key_press(action):
-    global input_enabled
+    global input_enabled, timeout_timer
     if not input_enabled:
         return
         
@@ -186,6 +215,9 @@ def handle_key_press(action):
         input_enabled = False
         voice_manager.stop()
         get_robot_eyes().set_expression("default")
+        if timeout_timer:
+            timeout_timer.stop()
+            timeout_timer = None
         
         print("[Elaborate Screen] Student said OKAY/YES! Re-evaluating via FlowController Native Cascade.")
         

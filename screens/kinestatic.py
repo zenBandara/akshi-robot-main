@@ -17,6 +17,7 @@ input_enabled = False
 voice_manager = VoiceManager()
 video_label = None
 frame_timer = None
+timeout_timer = None
 current_frames = []
 current_frame_idx = 0
 current_playing_dir = None
@@ -115,8 +116,31 @@ def setup_video_container():
         frame_timer.timeout.connect(update_frame)
 
 
+def on_timeout():
+    global input_enabled, timeout_timer, frame_timer
+    if not input_enabled:
+        return
+    input_enabled = False
+    voice_manager.stop()
+    get_robot_eyes().set_expression("default")
+    if frame_timer:
+        frame_timer.stop()
+    if timeout_timer:
+        timeout_timer.stop()
+        timeout_timer = None
+    print("[Kinesthetic Screen] ⏰ 50s timeout — treating as failed.")
+    try:
+        from core.flow_controller import flow_controller
+        parent_stack = window.parentWidget()
+        if parent_stack:
+            flow_controller.kinesthetic_failed(parent_stack)
+    except ImportError: pass
+
 def on_show():
-    global input_enabled, current_playing_dir
+    global input_enabled, current_playing_dir, timeout_timer
+    if timeout_timer:
+        timeout_timer.stop()
+        timeout_timer = None
     current_playing_dir = None
     print("[Kinesthetic Screen] Becoming active...")
     state_manager.set_current_screen("kinesthetic")
@@ -195,6 +219,12 @@ def on_show():
     # Enable bypass immediately
     print("[Kinesthetic Screen] Enabling keyboard block natively for developer bypass")
     enable_input()
+    
+    timeout_timer = QTimer()
+    timeout_timer.setSingleShot(True)
+    timeout_timer.setInterval(50000)
+    timeout_timer.timeout.connect(on_timeout)
+    timeout_timer.start()
 
 
 def enable_input():
@@ -204,7 +234,7 @@ def enable_input():
 
 
 def handle_key_press(action):
-    global input_enabled
+    global input_enabled, timeout_timer
     if not input_enabled:
         return
         
@@ -213,6 +243,9 @@ def handle_key_press(action):
         voice_manager.stop()
         if frame_timer:
             frame_timer.stop()
+        if timeout_timer:
+            timeout_timer.stop()
+            timeout_timer = None
         print("[Kinesthetic Screen] Passed! Returning to evaluation...")
         get_robot_eyes().set_expression("default")
         try:
@@ -227,6 +260,9 @@ def handle_key_press(action):
         voice_manager.stop()
         if frame_timer:
             frame_timer.stop()
+        if timeout_timer:
+            timeout_timer.stop()
+            timeout_timer = None
         print("[Kinesthetic Screen] Failed! Dropping to scaffolding phase...")
         get_robot_eyes().set_expression("default")
         try:

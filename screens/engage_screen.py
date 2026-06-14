@@ -18,6 +18,7 @@ input_enabled = False
 voice_manager = VoiceManager()
 video_label = None
 frame_timer = None
+timeout_timer = None
 current_frames = []
 current_frame_idx = 0
 current_playing_dir = None
@@ -116,12 +117,34 @@ def setup_video_container():
         frame_timer.timeout.connect(update_frame)
 
 
+def on_timeout():
+    global input_enabled, timeout_timer, frame_timer
+    if not input_enabled:
+        return
+    input_enabled = False
+    voice_manager.stop()
+    get_robot_eyes().set_expression("default")
+    if frame_timer:
+        frame_timer.stop()
+    if timeout_timer:
+        timeout_timer.stop()
+        timeout_timer = None
+    print("[Engage Screen] ⏰ 50s timeout — auto-advancing to next screen.")
+    try:
+        from core.flow_controller import flow_controller
+        parent_stack = window.parentWidget()
+        if parent_stack:
+            flow_controller.advance_cascade(parent_stack)
+    except ImportError: pass
+
 def on_show():
-    global input_enabled
+    global input_enabled, timeout_timer
+    if timeout_timer:
+        timeout_timer.stop()
+        timeout_timer = None
     print("[Engage Screen] Becoming active...")
     state_manager.set_current_screen("engage")
 
-    # Keep real frames streaming during scaffolding.
     try:
         set_frame_streaming(True, reason="engage")
     except Exception as e:
@@ -186,6 +209,12 @@ def on_show():
         
     print(f"[Engage Screen] Enabling keyboard input immediately to allow for speech interruption.")
     enable_input()
+    
+    timeout_timer = QTimer()
+    timeout_timer.setSingleShot(True)
+    timeout_timer.setInterval(50000)
+    timeout_timer.timeout.connect(on_timeout)
+    timeout_timer.start()
 
 
 def enable_input():
@@ -196,7 +225,7 @@ def enable_input():
 
 
 def handle_key_press(action):
-    global input_enabled
+    global input_enabled, timeout_timer
     if not input_enabled:
         return
         
@@ -206,6 +235,9 @@ def handle_key_press(action):
         get_robot_eyes().set_expression("default")
         if frame_timer:
             frame_timer.stop()
+        if timeout_timer:
+            timeout_timer.stop()
+            timeout_timer = None
             
         print("[Engage Screen] Student said OKAY/YES. Flowing smoothly toward Evaluate L2 natively.")
         try:
