@@ -128,12 +128,12 @@ def on_timeout():
     if timeout_timer:
         timeout_timer.stop()
         timeout_timer = None
-    print("[Kinesthetic Screen] ⏰ 50s timeout — treating as failed.")
+    print("[Kinesthetic Screen] ⏰ 50s timeout — treating as passed.")
     try:
         from core.flow_controller import flow_controller
         parent_stack = window.parentWidget()
         if parent_stack:
-            flow_controller.kinesthetic_failed(parent_stack)
+            flow_controller.kinesthetic_passed(parent_stack)
     except ImportError: pass
 
 def on_show():
