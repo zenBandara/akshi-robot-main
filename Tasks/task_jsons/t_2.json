@@ -1,6 +1,6 @@
 {
-  "task_id": "t_1",
-  "task_name": "Counting Faces",
+  "task_id": "t_2",
+  "task_name": "Counting Faces 2",
   "description": "A deeply conversational task teaching preschoolers how to count happy and sad faces.",
   "engage": {
     "task_title": "Engage Screen - Faces",
@@ -36,8 +36,8 @@
   "elaborate": {
     "task_type": "mcq_image",
     "task_title": "Guided Example - Count the Happy Faces",
-    "task_description": "We need 2 happy faces.",
-    "speech_start": "We need 2 happy faces.",
+    "task_description": "We need 3 happy faces.",
+    "speech_start": "We need 3 happy faces.",
     "multiple_choices_word": {
       "op1": "2 Faces",
       "op2": "4 Faces",
@@ -51,26 +51,26 @@
       "op4": "assets/images/faces/3_happy.png"
     },
     "multiple_choices_speech": {
-      "op1": "Now look here. One. Two. Two happy faces! This is the answer!",
+      "op1": "Look here. One. Two. Only 2. Not this one.",
       "op2": "Let's check this one. One. Two. Three. Four. Four is too many.",
       "op3": "What about this one? Just one. Not enough.",
-      "op4": "Look here. One. Two. Three. Three is too many."
+      "op4": "Now look here. One. Two. Three. Wow! 3 happy faces. This is the answer."
     },
-    "correct_option": "op1",
-    "correct_option_speech": "Great job! 2 happy faces! Now your turn!",
+    "correct_option": "op4",
+    "correct_option_speech": "Great job! Now your turn!",
     "speech_end": "Great job! Now your turn!"
   },
   "evaluate": {
     "task_type": "mcq_image",
-    "task_title": "Quiz - Count 3 Happy Faces",
-    "speech_start": "Your turn! Find 3 happy faces.",
+    "task_title": "Quiz - Count 4 Happy Faces",
+    "speech_start": "Your turn! Find 4 happy faces.",
     "speech_end": "Wow! Great job!",
-    "task_description": "Show me 3 happy faces.",
+    "task_description": "Show me 4 happy faces.",
     "multiple_choices_word": {
       "op1": "2 Faces",
       "op2": "1 Face",
-      "op3": "4 Faces",
-      "op4": "3 Faces"
+      "op3": "3 Faces",
+      "op4": "4 Faces"
     },
     "multiple_choices_speech": {
       "op1": "Look here. Is this it?",
@@ -81,8 +81,8 @@
     "multiple_choices_images": {
       "op1": "assets/images/faces/2_happy.png",
       "op2": "assets/images/faces/1_happy.png",
-      "op3": "assets/images/faces/4_happy.png",
-      "op4": "assets/images/faces/3_happy.png"
+      "op3": "assets/images/faces/3_happy.png",
+      "op4": "assets/images/faces/4_happy.png"
     },
     "correct_option": "op4"
   },
