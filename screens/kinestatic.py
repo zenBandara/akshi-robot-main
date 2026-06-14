@@ -116,7 +116,8 @@ def setup_video_container():
 
 
 def on_show():
-    global input_enabled
+    global input_enabled, current_playing_dir
+    current_playing_dir = None
     print("[Kinesthetic Screen] Becoming active...")
     state_manager.set_current_screen("kinesthetic")
     
