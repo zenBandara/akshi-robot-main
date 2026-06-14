@@ -20,6 +20,7 @@ video_label = None
 frame_timer = None
 current_frames = []
 current_frame_idx = 0
+current_playing_dir = None
 
 def get_ui():
     global window
@@ -43,9 +44,11 @@ def apply_rounded_clip(widget, radius=20):
     region = QRegion(path.toFillPolygon().toPolygon())
     widget.setMask(region)
 
+current_playing_dir = None
+
 def swap_video(stage, engage_data):
-    """Dynamically hot-swaps the underlying image sequence layer matching the precise engagement vocal queue."""
-    global current_frames, current_frame_idx, frame_timer
+    """Dynamically hot-swaps the underlying image sequence layer matching the vocal queue."""
+    global current_frames, current_frame_idx, frame_timer, current_playing_dir
     
     urls_dict = engage_data.get("video_urls", {})
     media_url = urls_dict.get(stage, "")
@@ -57,10 +60,16 @@ def swap_video(stage, engage_data):
     abs_dir_path = os.path.join(project_root, base_dir)
     
     if os.path.isdir(abs_dir_path):
+        if abs_dir_path == current_playing_dir:
+            print(f"[Engage Screen] Continuing seamless sequence for stage '{stage}'...")
+            return
+            
         frames = [os.path.join(abs_dir_path, f) for f in os.listdir(abs_dir_path) if f.endswith('.jpg')]
         frames.sort()
         current_frames = frames
         current_frame_idx = 0
+        current_playing_dir = abs_dir_path
+        
         if current_frames and frame_timer:
             frame_timer.start(66) # 15 FPS (~66ms)
             print(f"[Engage Screen] Image sequence playing stage '{stage}': {abs_dir_path}")

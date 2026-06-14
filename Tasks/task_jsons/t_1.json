@@ -1,128 +1,128 @@
 {
-    "task_id": "t_1",
-    "task_name": "Counting Faces",
-    "description": "A deeply conversational task teaching preschoolers how to count happy and sad faces.",
-    "engage": {
-        "task_title": "Engage Screen - Faces",
-        "description": "Engage the student with emotional faces.",
-        "video_urls": {
-            "start": "assets/video/engage_em.mp4",
-            "step_1": "assets/video/engage_em.mp4",
-            "end": "assets/video/engage_em.mp4"
-        },
-        "speech_start": "Look!!!",
-        "speech_middle": "Happy face. Sad face.",
-        "speech_end": "Great looking!"
+  "task_id": "t_1",
+  "task_name": "Counting Faces",
+  "description": "A deeply conversational task teaching preschoolers how to count happy and sad faces.",
+  "engage": {
+    "task_title": "Engage Screen - Faces",
+    "description": "Engage the student with emotional faces.",
+    "video_urls": {
+      "start": "assets/video/engage_em.mp4",
+      "step_1": "assets/video/engage_em.mp4",
+      "end": "assets/video/engage_em.mp4"
     },
-    "explore": {
-        "task_title": "Explore Screen - Faces",
-        "description": "Explore the student with emotional faces.",
-        "video_urls": {
-            "start": "assets/video/explore_em.mp4",
-            "step_1": "assets/video/explore_em.mp4",
-            "end": "assets/video/explore_em.mp4"
-        },
-        "speech_start": "Look!! Small group of happy faces.",
-        "speech_middle": "Big group of sad faces. Small group of sad faces.",
-        "speech_end": "Big group of Happy faces. Very Good!!"
+    "speech_start": "Look. Happy face. . Look. Sad face.",
+    "speech_middle": "Let's count. . One. . Two. . Three. . Four. . Five.",
+    "speech_end": "Again, let's count. . One. . Two. . Three. . Four. . Five. . Say okey after finish"
+  },
+  "explore": {
+    "task_title": "Explore Screen - Faces",
+    "description": "Explore the student with emotional faces.",
+    "video_urls": {
+      "start": "assets/video/explore_em.mp4",
+      "step_1": "assets/video/explore_em.mp4",
+      "end": "assets/video/explore_em.mp4"
     },
-    "explain": {
-        "task_title": "Explain Screen - Counting Faces",
-        "description": "Teach that faces can be counted.",
-        "video_url": "assets/video/explain_em.mp4",
-        "speech_start": "One sad face. Two sad faces. Three sad faces. One happy face.",
-        "speech_end": "Two happy faces. Three happy faces. Great counting!"
+    "speech_start": "Look!! Small group of happy faces.",
+    "speech_middle": "Big group of sad faces. Small group of sad faces.",
+    "speech_end": "Big group of Happy faces. Very Good!!. . Say Okey."
+  },
+  "explain": {
+    "task_title": "Explain Screen - Counting Faces",
+    "description": "Teach that faces can be counted.",
+    "video_url": "assets/video/explain_em.mp4",
+    "speech_start": "One sad face. Two sad faces. Three sad faces. One happy face.",
+    "speech_end": "Two happy faces. Three happy faces. Great counting!"
+  },
+  "elaborate": {
+    "task_type": "mcq_image",
+    "task_title": "Guided Example - Count the Happy Faces",
+    "task_description": "We need 3 happy faces.",
+    "speech_start": "We need 3 happy faces.",
+    "multiple_choices_word": {
+      "op1": "2 Faces",
+      "op2": "4 Faces",
+      "op3": "1 Face",
+      "op4": "3 Faces"
     },
-    "elaborate": {
-        "task_type": "mcq_image",
-        "task_title": "Guided Example - Count the Happy Faces",
-        "task_description": "We need 3 happy faces.",
-        "speech_start": "We need 3 happy faces.",
-        "multiple_choices_word": {
-            "op1": "2 Faces",
-            "op2": "4 Faces",
-            "op3": "1 Face",
-            "op4": "3 Faces"
-        },
-        "multiple_choices_images": {
-            "op1": "assets/images/faces/2_happy.png",
-            "op2": "assets/images/faces/4_happy.png",
-            "op3": "assets/images/faces/1_happy.png",
-            "op4": "assets/images/faces/3_happy.png"
-        },
-        "multiple_choices_speech": {
-            "op1": "Look here. One. Two. Only 2. Not this one.",
-            "op2": "Let's check this one. One. Two. Three. Four. Four is too many.",
-            "op3": "What about this one? Just one. Not enough.",
-            "op4": "Now look here. One. Two. Three. Wow! 3 happy faces. This is the answer."
-        },
-        "correct_option": "op4",
-        "correct_option_speech": "Great job! Now your turn!",
-        "speech_end": "Great job! Now your turn!"
+    "multiple_choices_images": {
+      "op1": "assets/images/faces/2_happy.png",
+      "op2": "assets/images/faces/4_happy.png",
+      "op3": "assets/images/faces/1_happy.png",
+      "op4": "assets/images/faces/3_happy.png"
     },
-    "evaluate": {
-        "task_type": "mcq_image",
-        "task_title": "Quiz - Count 3 Happy Faces",
-        "speech_start": "Your turn! Find 3 happy faces.",
-        "speech_end": "Wow! Great job!",
-        "task_description": "Show me 3 happy faces.",
-        "multiple_choices_word": {
-            "op1": "2 Faces",
-            "op2": "1 Face",
-            "op3": "4 Faces",
-            "op4": "3 Faces"
-        },
-        "multiple_choices_speech": {
-            "op1": "Look here. Is this it?",
-            "op2": "Or this one. Is this it?",
-            "op3": "Look here. Is this it?",
-            "op4": "Or this one. Is this it?"
-        },
-        "multiple_choices_images": {
-            "op1": "assets/images/faces/2_happy.png",
-            "op2": "assets/images/faces/1_happy.png",
-            "op3": "assets/images/faces/4_happy.png",
-            "op4": "assets/images/faces/3_happy.png"
-        },
-        "correct_option": "op4"
+    "multiple_choices_speech": {
+      "op1": "Look here. One. Two. Only 2. Not this one.",
+      "op2": "Let's check this one. One. Two. Three. Four. Four is too many.",
+      "op3": "What about this one? Just one. Not enough.",
+      "op4": "Now look here. One. Two. Three. Wow! 3 happy faces. This is the answer."
     },
-    "kinesthetic_L1": {
-        "task_title": "Kinesthetic Learning - Counting",
-        "video_urls": {
-            "start": "assets/video/kinesthetic_counting.mp4",
-            "step_1": "assets/video/kinesthetic_counting.mp4",
-            "step_2": "assets/video/kinesthetic_counting.mp4",
-            "end": "assets/video/kinesthetic_counting.mp4"
-        },
-        "speech_start": "Let's count together! One. Two. Three. Four. Five.",
-        "speech_step_1": "Again One. Two. Three. Four. Five.",
-        "speech_step_2": "Again One. Two. Three. Four. Five.",
-        "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+    "correct_option": "op4",
+    "correct_option_speech": "Great job! Now your turn!",
+    "speech_end": "Great job! Now your turn!"
+  },
+  "evaluate": {
+    "task_type": "mcq_image",
+    "task_title": "Quiz - Count 3 Happy Faces",
+    "speech_start": "Your turn! Find 3 happy faces.",
+    "speech_end": "Wow! Great job!",
+    "task_description": "Show me 3 happy faces.",
+    "multiple_choices_word": {
+      "op1": "2 Faces",
+      "op2": "1 Face",
+      "op3": "4 Faces",
+      "op4": "3 Faces"
     },
-    "kinesthetic_L2": {
-        "task_title": "Kinesthetic Learning - Counting",
-        "video_urls": {
-            "start": "assets/video/kinesthetic_counting.mp4",
-            "step_1": "assets/video/kinesthetic_counting.mp4",
-            "step_2": "assets/video/kinesthetic_counting.mp4",
-            "end": "assets/video/kinesthetic_counting.mp4"
-        },
-        "speech_start": "Let's count together! One. Two. Three. Four. Five.",
-        "speech_step_1": "Again One. Two. Three. Four. Five.",
-        "speech_step_2": "Again One. Two. Three. Four. Five.",
-        "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+    "multiple_choices_speech": {
+      "op1": "Look here. Is this it?",
+      "op2": "Or this one. Is this it?",
+      "op3": "Look here. Is this it?",
+      "op4": "Or this one. Is this it?"
     },
-    "kinesthetic_L3": {
-        "task_title": "Kinesthetic Learning - Counting",
-        "video_urls": {
-            "start": "assets/video/kinesthetic_counting.mp4",
-            "step_1": "assets/video/kinesthetic_counting.mp4",
-            "step_2": "assets/video/kinesthetic_counting.mp4",
-            "end": "assets/video/kinesthetic_counting.mp4"
-        },
-        "speech_start": "Let's count together! One. Two. Three. Four. Five.",
-        "speech_step_1": "Again One. Two. Three. Four. Five.",
-        "speech_step_2": "Again One. Two. Three. Four. Five.",
-        "speech_end": "Again One. Two. Three. Four. Five. Wow!"
-    }
+    "multiple_choices_images": {
+      "op1": "assets/images/faces/2_happy.png",
+      "op2": "assets/images/faces/1_happy.png",
+      "op3": "assets/images/faces/4_happy.png",
+      "op4": "assets/images/faces/3_happy.png"
+    },
+    "correct_option": "op4"
+  },
+  "kinesthetic_L1": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L2": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L3": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  }
 }
