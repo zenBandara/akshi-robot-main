@@ -68,7 +68,7 @@ def get_ui():
 def on_show():
     global current_presenting_idx, presentation_keys, awaiting_yes_no, motivation_given
     global active_animations, evaluate_timer, motivation_timer, input_enabled
-    global current_speech_rate
+    global current_speech_rate, key_mapping
 
     level = state_manager.get_affordance_level()
     current_speech_rate = "-10%" if level == 3 else "+10%"
