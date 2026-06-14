@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer, QRectF, QPointF
 from PySide6.QtGui import (
     QPainter, QColor, QLinearGradient,
-    QFont, QPen
+    QFont, QPen, QPixmap
 )
 from core.state_manager import state_manager
 from core.keyboard_manager import keyboard_manager
@@ -41,6 +41,8 @@ class TeacherInterventionWidget(QWidget):
         self.question_text = ""
         self.affordance_level = 3
         self.path_taken = []
+        self.options = []
+        self.correct_option = ""
 
         # Subtle animation (15 FPS)
         self.anim_timer = QTimer(self)
@@ -53,6 +55,27 @@ class TeacherInterventionWidget(QWidget):
         self.path_taken = path or []
         eval_data = task_data.get("evaluate", {}) if task_data else {}
         self.question_text = eval_data.get("task_description", "Question not available")
+
+        mc_words = eval_data.get("multiple_choices_word", {})
+        mc_images = eval_data.get("multiple_choices_images", {})
+        self.correct_option = eval_data.get("correct_option", "")
+
+        self.options = []
+        for op_key in ["op1", "op2", "op3", "op4"]:
+            label = mc_words.get(op_key, "")
+            img_path = mc_images.get(op_key, "")
+            pixmap = None
+            if img_path:
+                abs_img_path = os.path.join(project_root, img_path)
+                if os.path.exists(abs_img_path):
+                    pixmap = QPixmap(abs_img_path)
+            self.options.append({
+                "key": op_key,
+                "label": label,
+                "pixmap": pixmap,
+                "is_correct": (op_key == self.correct_option),
+            })
+
         self.update()
 
     def _animate(self):
@@ -69,6 +92,7 @@ class TeacherInterventionWidget(QWidget):
         self._draw_title_card(p, w, h)
         self._draw_message(p, w, h)
         self._draw_question_card(p, w, h)
+        self._draw_answer_cards(p, w, h)
         self._draw_robot_speech(p, w, h)
         self._draw_action_button(p, w, h)
 
@@ -111,7 +135,7 @@ class TeacherInterventionWidget(QWidget):
     def _draw_question_card(self, p, w, h):
         margin = 50
         card_y = 230
-        card_h = int(h * 0.30)
+        card_h = int(h * 0.18)
         card_rect = QRectF(margin, card_y, w - margin * 2, card_h)
 
         # White card — same style as evaluate question_label: #F8FAFC bg, rounded
@@ -142,9 +166,60 @@ class TeacherInterventionWidget(QWidget):
         p.drawText(question_rect, Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
                    self.question_text)
 
+    def _draw_answer_cards(self, p, w, h):
+        if not self.options:
+            return
+
+        margin = 50
+        inner_pad = 12
+        cards_y = 230 + int(h * 0.18) + 16
+        num_cards = len(self.options)
+        total_gap = inner_pad * (num_cards - 1)
+        card_w = (w - margin * 2 - total_gap) // num_cards if num_cards > 0 else (w - margin * 2)
+        card_h = int(h * 0.20)
+
+        font_label = QFont("Helvetica", 14, QFont.Bold)
+
+        for idx, opt in enumerate(self.options):
+            cx = margin + idx * (card_w + inner_pad)
+
+            card_rect = QRectF(cx, cards_y, card_w, card_h)
+            is_correct = opt.get("is_correct", False)
+
+            if is_correct:
+                p.setPen(QPen(QColor(46, 125, 50), 4))
+                p.setBrush(QColor(220, 255, 220, 240))
+            else:
+                p.setPen(QPen(QColor(226, 232, 240), 3))
+                p.setBrush(QColor(255, 255, 255, 240))
+            p.drawRoundedRect(card_rect, 14, 14)
+
+            pix = opt.get("pixmap")
+            label = opt.get("label", "")
+            img_area_h = int(card_h * 0.65) if pix and not pix.isNull() else 0
+            text_h = card_h - img_area_h if img_area_h else card_h
+
+            if pix and not pix.isNull():
+                scaled = pix.scaledToHeight(img_area_h, Qt.SmoothTransformation)
+                px = cx + (card_w - scaled.width()) / 2
+                py = cards_y + 10
+                p.drawPixmap(int(px), int(py), scaled)
+
+            p.setFont(font_label)
+            label_rect = QRectF(cx + 8, cards_y + img_area_h + 6, card_w - 16, text_h - 6)
+            p.setPen(QColor(26, 35, 126))
+            p.drawText(label_rect, Qt.AlignCenter | Qt.TextWordWrap, label)
+
+            if is_correct:
+                check_size = 22
+                p.setFont(QFont("Helvetica", 18, QFont.Bold))
+                p.setPen(QColor(46, 125, 50))
+                p.drawText(QRectF(cx + card_w - check_size - 8, cards_y + 4, check_size, check_size),
+                           Qt.AlignCenter, "✓")
+
     # ─── ROBOT SPEECH — italic, green, matches other screens ───
     def _draw_robot_speech(self, p, w, h):
-        speech_y = int(h * 0.62)
+        speech_y = int(h * 0.78)
         p.setFont(QFont("Helvetica", 20))
         p.setPen(QColor(21, 101, 192))              # #1565C0 italic style
         speech_rect = QRectF(50, speech_y, w - 100, 50)
@@ -156,7 +231,7 @@ class TeacherInterventionWidget(QWidget):
         btn_w = 360
         btn_h = 60
         btn_x = w // 2 - btn_w // 2
-        btn_y = int(h * 0.77)
+        btn_y = int(h * 0.86)
 
         btn_rect = QRectF(btn_x, btn_y, btn_w, btn_h)
 
