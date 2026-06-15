@@ -1,0 +1,128 @@
+{
+  "task_id": "task3",
+  "task_name": "Counting Letters",
+  "description": "A conversational task teaching preschoolers how to count letters.",
+  "engage": {
+    "task_title": "Engage Screen - Letters",
+    "description": "Engage the student with letters.",
+    "video_urls": {
+      "start": "assets/video/engage_letters.mp4",
+      "step_1": "assets/video/engage_letters.mp4",
+      "end": "assets/video/engage_letters.mp4"
+    },
+    "speech_start": "A, . B, . C, . D, . E, . F, . G.",
+    "speech_middle": "A, . B, . C, . D, . E, . F, . G.",
+    "speech_end": "A, . B, . C, . D, . E, . F, . G. . . Say OK if you are done."
+  },
+  "explore": {
+    "task_title": "Explore Screen - Letters",
+    "description": "Explore small and large groups of letters.",
+    "video_urls": {
+      "start": "assets/video/explore_letters.mp4",
+      "step_1": "assets/video/explore_letters.mp4",
+      "end": "assets/video/explore_letters.mp4"
+    },
+    "speech_start": "Small group of A. . . Large group of B.",
+    "speech_middle": "Small group of A. . . Large group of B.",
+    "speech_end": "Small group of A. . . Large group of B. . . Say OK if you are done."
+  },
+  "explain": {
+    "task_title": "Explain Screen - Counting Letters",
+    "description": "Teach counting letters A, B, and C.",
+    "video_url": "assets/video/explain_letters_0616.mp4",
+    "speech_start": "Let's count A. . One, . two, . three. . Let's count B.",
+    "speech_end": "One, . two, . three. . Let's count C. . One, . two, . three. . . Say OK if you are done."
+  },
+  "elaborate": {
+    "task_type": "mcq_image",
+    "task_title": "Guided Example - Count the Letters",
+    "task_description": "We need 2 O letters.",
+    "speech_start": "We need 2 O letters.",
+    "multiple_choices_word": {
+      "op1": "2 A letters",
+      "op2": "3 B letters",
+      "op3": "1 O",
+      "op4": "2 O letters"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/letters/2_a.png",
+      "op2": "assets/images/letters/3_b.png",
+      "op3": "assets/images/letters/1_o.png",
+      "op4": "assets/images/letters/2_o.png"
+    },
+    "multiple_choices_speech": {
+      "op1": "This is 2 A letters.",
+      "op2": "This is 3 B letters.",
+      "op3": "This is 1 O.",
+      "op4": "This is 2 O letters! This is the answer!"
+    },
+    "correct_option": "op4",
+    "correct_option_speech": "Great job! 2 O letters! Now your turn!",
+    "speech_end": "Great job! Now your turn!"
+  },
+  "evaluate": {
+    "task_type": "mcq_image",
+    "task_title": "Quiz - Find four O letters",
+    "speech_start": "Your turn! Find four O letters.",
+    "speech_end": "Wow! Great job!",
+    "task_description": "Find four O letters.",
+    "multiple_choices_word": {
+      "op1": "3 O letters",
+      "op2": "2 A letters and 1 O letter",
+      "op3": "4 O letters",
+      "op4": "1 B letter and 2 A letters"
+    },
+    "multiple_choices_speech": {
+      "op1": "Look here. Is this it?",
+      "op2": "Or this one. Is this it?",
+      "op3": "Look here. Is this it?",
+      "op4": "Or this one. Is this it?"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/letters/3_o.png",
+      "op2": "assets/images/letters/2a_1o.png",
+      "op3": "assets/images/letters/4_o.png",
+      "op4": "assets/images/letters/1b_2a.png"
+    },
+    "correct_option": "op3"
+  },
+  "kinesthetic_L1": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L2": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L3": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  }
+}
