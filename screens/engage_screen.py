@@ -129,7 +129,7 @@ def on_timeout():
     if timeout_timer:
         timeout_timer.stop()
         timeout_timer = None
-    print("[Engage Screen] ⏰ 50s timeout — auto-advancing to next screen.")
+    print("[Engage Screen] ⏰ 90s timeout — auto-advancing to next screen.")
     try:
         from core.flow_controller import flow_controller
         parent_stack = window.parentWidget()
@@ -201,9 +201,12 @@ def on_show():
         window.update()
         QApplication.processEvents()
         
-        print(f"🤖 ROBOT SPEAKS: \"{speech_start}\"")
-        start_delay = voice_manager.speak(speech_start, f"engage_{student_name}_start")
-        QTimer.singleShot(start_delay + 600, play_middle)
+        print(f"🤖 ROBOT SPEAKS: \"{speech_start}\" (delayed 2s for video sync)")
+        # Delay audio by 2 seconds so video frames start first
+        def _play_start():
+            delay = voice_manager.speak(speech_start, f"engage_{student_name}_start")
+            QTimer.singleShot(delay + 600, play_middle)
+        QTimer.singleShot(2000, _play_start)
     else:
         play_middle()
         
@@ -212,7 +215,7 @@ def on_show():
     
     timeout_timer = QTimer()
     timeout_timer.setSingleShot(True)
-    timeout_timer.setInterval(50000)
+    timeout_timer.setInterval(90000)
     timeout_timer.timeout.connect(on_timeout)
     timeout_timer.start()
 
