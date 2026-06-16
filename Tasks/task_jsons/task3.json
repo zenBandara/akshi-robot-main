@@ -5,14 +5,15 @@
   "engage": {
     "task_title": "Engage Screen - Letters",
     "description": "Engage the student with letters.",
+    "audio_delay_ms": 0,
     "video_urls": {
       "start": "assets/video/engage_letters.mp4",
       "step_1": "assets/video/engage_letters.mp4",
       "end": "assets/video/engage_letters.mp4"
     },
     "speech_start": "A, . B, . C, . D, . E, . F, . G.",
-    "speech_middle": "A, . B, . C, . D, . E, . F, . G.",
-    "speech_end": "A, . B, . C, . D, . E, . F, . G. . . Say OK if you are done."
+    "speech_middle": "",
+    "speech_end": "Say OK if you are done."
   },
   "explore": {
     "task_title": "Explore Screen - Letters",

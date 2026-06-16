@@ -171,6 +171,7 @@ def on_show():
     speech_start = engage_data.get("speech_start", "Let's try something super fun safely together.")
     speech_middle = engage_data.get("speech_middle", "Watch our character carefully on the screen!")
     speech_end = engage_data.get("speech_end", "Say 'Okay' when you are all done!")
+    audio_delay_ms = engage_data.get("audio_delay_ms", 0)
     
     get_robot_eyes().set_expression("default")
     
@@ -201,12 +202,12 @@ def on_show():
         window.update()
         QApplication.processEvents()
         
-        print(f"🤖 ROBOT SPEAKS: \"{speech_start}\" (delayed 2s for video sync)")
-        # Delay audio by 2 seconds so video frames start first
+        print(f"🤖 ROBOT SPEAKS: \"{speech_start}\" (delayed {audio_delay_ms}ms for video sync)")
+        # Delay audio so video frames start first — configurable via JSON
         def _play_start():
             delay = voice_manager.speak(speech_start, f"engage_{student_name}_start")
             QTimer.singleShot(delay + 600, play_middle)
-        QTimer.singleShot(2000, _play_start)
+        QTimer.singleShot(audio_delay_ms, _play_start)
     else:
         play_middle()
         
