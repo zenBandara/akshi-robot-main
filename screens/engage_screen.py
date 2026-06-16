@@ -85,7 +85,11 @@ def update_frame():
         current_frame_idx = (current_frame_idx + 1) % len(current_frames)
 
 def setup_video_container():
-    global video_label, frame_timer
+    global video_label, frame_timer, current_playing_dir, current_frames, current_frame_idx
+    
+    current_playing_dir = None
+    current_frames = []
+    current_frame_idx = 0
     
     if frame_timer:
         frame_timer.stop()
