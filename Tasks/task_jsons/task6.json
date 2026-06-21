@@ -1,0 +1,128 @@
+{
+  "task_id": "task6",
+  "task_name": "Counting Animals - Task 6",
+  "description": "A deeply conversational task teaching preschoolers how to count animals.",
+  "engage": {
+    "task_title": "Engage Screen - Animals",
+    "description": "Engage the student with animals.",
+    "video_urls": {
+      "start": "assets/video/engage_animals.mp4",
+      "step_1": "assets/video/engage_animals.mp4",
+      "end": "assets/video/engage_animals.mp4"
+    },
+    "speech_start": "This is a dog. . . . This is a cat. . . . This is a fish. . . . And you can see this is a butterfly, . . and a bird! . . . Wow!",
+    "speech_middle": "Let's count. . One. . Two. . Three. . Four. . Five.",
+    "speech_end": "Again, let's count. . One. . Two. . Three. . Four. . Five. . . Say OK if you are done."
+  },
+  "explore": {
+    "task_title": "Explore Screen - Animals",
+    "description": "Explore the student with animals.",
+    "video_urls": {
+      "start": "assets/video/explore_animals.mp4",
+      "step_1": "assets/video/explore_animals.mp4",
+      "end": "assets/video/explore_animals.mp4"
+    },
+    "speech_start": "This is a group of cat. . . . This is a group of dog.",
+    "speech_middle": "This is a group of fish. . . . And you can see this is a group of butterfly.",
+    "speech_end": "Very Good!! . . Say OK if you are done."
+  },
+  "explain": {
+    "task_title": "Explain Screen - Counting Animals",
+    "description": "Teach that animals can be counted.",
+    "video_url": "assets/video/explain_animals.mp4",
+    "speech_start": "One. . . Two. . . Three. . You can see here three cats. . . . One. . . Two. . . Three. . In here you can see three fish. . . .",
+    "speech_end": "One. . . Two. . . Three. . You can see here three dogs. . . Say OK if you are done."
+  },
+  "elaborate": {
+    "task_type": "mcq_image",
+    "task_title": "Guided Example - Count the Cats",
+    "task_description": "We need 3 cats.",
+    "speech_start": "We need 3 cats.",
+    "multiple_choices_word": {
+      "op1": "1 Cat",
+      "op2": "2 Dogs",
+      "op3": "4 Cats",
+      "op4": "3 Cats"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/animals/1_cat.png",
+      "op2": "assets/images/animals/2_dog.png",
+      "op3": "assets/images/animals/4_cat.png",
+      "op4": "assets/images/animals/3_cat.png"
+    },
+    "multiple_choices_speech": {
+      "op1": "Let's check this one. Just one cat. Not enough.",
+      "op2": "Look here. Two dogs. But we need cats.",
+      "op3": "Look here. One, two, three, four. Four is too many.",
+      "op4": "Now look here. One. Two. Three. Three cats! This is the answer!"
+    },
+    "correct_option": "op4",
+    "correct_option_speech": "Great job! Three cats! Now your turn!",
+    "speech_end": "Great job! Now your turn!"
+  },
+  "evaluate": {
+    "task_type": "mcq_image",
+    "task_title": "Quiz - Find 4 Dogs",
+    "speech_start": "Your turn! Find 4 dogs.",
+    "speech_end": "Wow! Great job!",
+    "task_description": "Show me 4 dogs.",
+    "multiple_choices_word": {
+      "op1": "1 Dog",
+      "op2": "2 Cats",
+      "op3": "4 Dogs",
+      "op4": "2 Dogs"
+    },
+    "multiple_choices_speech": {
+      "op1": "Look here. Is this it?",
+      "op2": "Or this one. Is this it?",
+      "op3": "Look here. Is this it?",
+      "op4": "Or this one. Is this it?"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/animals/1_dog.png",
+      "op2": "assets/images/animals/2_cat.png",
+      "op3": "assets/images/animals/4_dog.png",
+      "op4": "assets/images/animals/2_dog.png"
+    },
+    "correct_option": "op3"
+  },
+  "kinesthetic_L1": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L2": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L3": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  }
+}
