@@ -1,0 +1,128 @@
+{
+  "task_id": "task7",
+  "task_name": "Counting Colors and Animals - Task 7",
+  "description": "A deeply conversational task teaching preschoolers how to count colored animals.",
+  "engage": {
+    "task_title": "Engage Screen - Colors",
+    "description": "Engage the student with colors and counting.",
+    "video_urls": {
+      "start": "assets/video/engage_colors.mp4",
+      "step_1": "assets/video/engage_colors.mp4",
+      "end": "assets/video/engage_colors.mp4"
+    },
+    "speech_start": "Here we can see a red apple. . . . Can you see it? . . . Now, . . a green leaf. . . . Here. . . . Then we can see a blue sky. . . Can you see the blue skye",
+    "speech_middle": "Let's count. . . . One. . . Two. . . Three. . . Four. . . Five.",
+    "speech_end": "Let's repeat again. . . . One. . . Two. . . Three. . . Four. . . Five. . . . Say OK if you are done."
+  },
+  "explore": {
+    "task_title": "Explore Screen - Colors",
+    "description": "Explore many and few groups with the student.",
+    "video_urls": {
+      "start": "assets/video/explore_colors.mp4",
+      "step_1": "assets/video/explore_colors.mp4",
+      "end": "assets/video/explore_colors.mp4"
+    },
+    "speech_start": "Here we can see many apples. . . . And now, . . few apples.",
+    "speech_middle": "Now we can see many leaves. . . . Now, . . few leaves.",
+    "speech_end": "You can see many apples, . . many leaves, . . few apples, . . few leaves. . . . Say OK if you are done."
+  },
+  "explain": {
+    "task_title": "Explain Screen - Counting Colors",
+    "description": "Teach that colored animals can be counted.",
+    "video_url": "assets/video/explain_colors.mp4",
+    "speech_start": "One. . . Two. . . Three. . . Three red fish. . . .",
+    "speech_end": "One. . . Two. . . Three. . . Four. . . Four blue birds. . . . Say OK if you are done."
+  },
+  "elaborate": {
+    "task_type": "mcq_image",
+    "task_title": "Guided Example - Find 2 Blue Birds",
+    "task_description": "We need 2 blue birds.",
+    "speech_start": "We need 2 blue birds.",
+    "multiple_choices_word": {
+      "op1": "3 Blue Birds",
+      "op2": "2 Green Birds",
+      "op3": "2 Red Birds",
+      "op4": "2 Blue Birds"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/colors/elab_op1_3_blue_birds.png",
+      "op2": "assets/images/colors/elab_op2_2_green_birds.png",
+      "op3": "assets/images/colors/elab_op3_2_red_birds.png",
+      "op4": "assets/images/colors/elab_op4_2_blue_birds.png"
+    },
+    "multiple_choices_speech": {
+      "op1": "Let's check this one. One, two, three. Three blue birds. That is too many.",
+      "op2": "Look here. Two green birds. But we need blue birds.",
+      "op3": "Look here. Two red birds. But we need blue birds.",
+      "op4": "Now look here. One. Two. Two blue birds! This is the answer!"
+    },
+    "correct_option": "op4",
+    "correct_option_speech": "Great job! Two blue birds! Now your turn!",
+    "speech_end": "Great job! Now your turn!"
+  },
+  "evaluate": {
+    "task_type": "mcq_image",
+    "task_title": "Quiz - Find 3 Red Sheeps",
+    "speech_start": "Your turn! Find 3 red sheeps.",
+    "speech_end": "Wow! Great job!",
+    "task_description": "Show me 3 red sheeps.",
+    "multiple_choices_word": {
+      "op1": "2 Blue Sheeps",
+      "op2": "3 Red Sheeps",
+      "op3": "3 Red Fish",
+      "op4": "4 Green Sheeps"
+    },
+    "multiple_choices_speech": {
+      "op1": "Look here. Is this it?",
+      "op2": "Or this one. Is this it?",
+      "op3": "Look here. Is this it?",
+      "op4": "Or this one. Is this it?"
+    },
+    "multiple_choices_images": {
+      "op1": "assets/images/colors/eval_op1_2_blue_sheep.png",
+      "op2": "assets/images/colors/eval_op2_3_red_sheeps.png",
+      "op3": "assets/images/colors/eval_op3_3_red_fish.png",
+      "op4": "assets/images/colors/eval_op4_4_green_sheeps.png"
+    },
+    "correct_option": "op2"
+  },
+  "kinesthetic_L1": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L2": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  },
+  "kinesthetic_L3": {
+    "task_title": "Kinesthetic Learning - Counting",
+    "video_urls": {
+      "start": "assets/video/kinesthetic_counting.mp4",
+      "step_1": "assets/video/kinesthetic_counting.mp4",
+      "step_2": "assets/video/kinesthetic_counting.mp4",
+      "end": "assets/video/kinesthetic_counting.mp4"
+    },
+    "speech_start": "Let's count together! One. Two. Three. Four. Five.",
+    "speech_step_1": "Again One. Two. Three. Four. Five.",
+    "speech_step_2": "Again One. Two. Three. Four. Five.",
+    "speech_end": "Again One. Two. Three. Four. Five. Wow!"
+  }
+}
